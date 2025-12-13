@@ -1,0 +1,45 @@
+/* ===========================
+   ANIMAÇÕES EXTRAS (Tailwind não possui)
+=========================== */
+
+/* Sidebar mobile entrando */
+@keyframes slideIn {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.animate-slideIn {
+  animation: slideIn 0.25s ease-out forwards;
+}
+
+/* Sidebar mobile saindo */
+@keyframes slideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+}
+
+.animate-slideOut {
+  animation: slideOut 0.25s ease-in forwards;
+}
+
+/* Fade suave para elementos */
+@keyframes fadeIn {
+  0% { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
