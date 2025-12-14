@@ -29,6 +29,13 @@ export default function Sidebar({ onClose }) {
   const { user, logout } = useAuth();
   const [openMinistries, setOpenMinistries] = useState(false);
 
+  // 🔐 AUTH MINISTÉRIOS (APENAS VISIBILIDADE)
+  const canSeeMinistries =
+    user?.role === "admin" ||
+    user?.role === "pastor" ||
+    user?.role === "lider" ||
+    user?.role === "obreiro";
+
   const baseLinkClass = `
     group flex items-center gap-3 rounded-2xl px-3 py-2.5
     text-sm font-medium transition-all duration-200
@@ -76,51 +83,57 @@ export default function Sidebar({ onClose }) {
           </NavLink>
         ))}
 
-        {/* MENU DE MINISTÉRIOS */}
-        <button
-          onClick={() => setOpenMinistries(!openMinistries)}
-          className={`${baseLinkClass} ${inactiveClass} w-full flex justify-between`}
-        >
-          <div className="flex items-center gap-3">
-            <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-base-100/10 text-lg">
-              🙏
-            </span>
-            <span>Ministérios</span>
-          </div>
-          <span className="text-base-100/70">
-            {openMinistries ? "▲" : "▼"}
-          </span>
-        </button>
+        {/* ===============================
+            MENU DE MINISTÉRIOS (COM AUTH)
+        ================================ */}
+        {canSeeMinistries && (
+          <>
+            <button
+              onClick={() => setOpenMinistries(!openMinistries)}
+              className={`${baseLinkClass} ${inactiveClass} w-full flex justify-between`}
+            >
+              <div className="flex items-center gap-3">
+                <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-base-100/10 text-lg">
+                  🙏
+                </span>
+                <span>Ministérios</span>
+              </div>
+              <span className="text-base-100/70">
+                {openMinistries ? "▲" : "▼"}
+              </span>
+            </button>
 
-        {/* SUBMENU MINISTÉRIOS */}
-        {openMinistries && (
-          <div
-            className="
-              ml-10 mt-1 flex flex-col gap-1 
-              border-l border-white/10 pl-3
-              animate-fadeIn
-            "
-          >
-            {ministryLinks.map((sub) => (
-              <NavLink
-                key={sub.to}
-                to={sub.to}
-                onClick={onClose}
-                className={({ isActive }) =>
-                  `
-                  text-sm py-1.5 rounded-lg transition 
-                  ${
-                    isActive
-                      ? "text-primary font-semibold"
-                      : "text-base-100/70 hover:text-base-100"
-                  }
-                  `
-                }
+            {/* SUBMENU MINISTÉRIOS */}
+            {openMinistries && (
+              <div
+                className="
+                  ml-10 mt-1 flex flex-col gap-1 
+                  border-l border-white/10 pl-3
+                  animate-fadeIn
+                "
               >
-                {sub.label}
-              </NavLink>
-            ))}
-          </div>
+                {ministryLinks.map((sub) => (
+                  <NavLink
+                    key={sub.to}
+                    to={sub.to}
+                    onClick={onClose}
+                    className={({ isActive }) =>
+                      `
+                      text-sm py-1.5 rounded-lg transition 
+                      ${
+                        isActive
+                          ? "text-primary font-semibold"
+                          : "text-base-100/70 hover:text-base-100"
+                      }
+                      `
+                    }
+                  >
+                    {sub.label}
+                  </NavLink>
+                ))}
+              </div>
+            )}
+          </>
         )}
 
         {/* Admin */}

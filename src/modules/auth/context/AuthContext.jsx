@@ -3,10 +3,41 @@ import { createContext, useContext, useState, useEffect } from "react";
 const AuthContext = createContext();
 
 const defaultUsers = [
-  { id: 1, nome: "Admin Master", email: "admin@teste.com", role: "admin", senha: "admin" },
-  { id: 2, nome: "Pastor João", email: "pastor@teste.com", role: "pastor", senha: "admin" },
-  { id: 3, nome: "Líder Maria", email: "lider@teste.com", role: "lider", senha: "admin" },
-  { id: 4, nome: "Obreiro Pedro", email: "obreiro@teste.com", role: "obreiro", senha: "admin" }
+  {
+    id: 1,
+    nome: "Admin Master",
+    email: "admin@teste.com",
+    role: "admin",
+    senha: "admin",
+  },
+  {
+    id: 2,
+    nome: "Pastor João",
+    email: "pastor@teste.com",
+    role: "pastor",
+    senha: "admin",
+  },
+  {
+    id: 3,
+    nome: "Líder Maria",
+    email: "lider@teste.com",
+    role: "lider",
+    senha: "admin",
+  },
+  {
+    id: 4,
+    nome: "Obreiro Pedro",
+    email: "obreiro@teste.com",
+    role: "obreiro",
+    senha: "admin",
+  },
+  {
+    id: 5,
+    nome: "Ana",
+    email: "ana@teste.com",
+    role: "membro",
+    senha: "admin",
+  },
 ];
 
 export function AuthProvider({ children }) {
@@ -31,7 +62,9 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = (email, senha) => {
-    const found = defaultUsers.find(u => u.email === email && u.senha === senha);
+    const found = defaultUsers.find(
+      (u) => u.email === email && u.senha === senha
+    );
     if (!found) return false;
 
     setUser(found);
@@ -44,7 +77,7 @@ export function AuthProvider({ children }) {
     localStorage.removeItem("011church-user");
   };
 
-  // 🔥 AQUI ESTÁ A CORREÇÃO QUE IMPEDE TELA BRANCA
+  // 🔥 Evita tela branca durante carregamento
   if (loading) {
     return (
       <div style={{ color: "white", padding: 40 }}>

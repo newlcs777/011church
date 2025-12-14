@@ -41,17 +41,11 @@ export default function ScheduleReadMode({
       );
     });
 
-  if (dates.length === 0) {
-    return (
-      <p className="text-sm text-base-content/60 text-center py-6">
-        Nenhuma escala encontrada.
-      </p>
-    );
-  }
-
   return (
     <div className="max-w-5xl mx-auto">
-      {/* FILTRO */}
+      {/* ===============================
+          FILTRO (SEMPRE VISÍVEL)
+      ================================ */}
       <input
         type="text"
         placeholder="Filtrar por nome (ex: Lucas)"
@@ -67,119 +61,136 @@ export default function ScheduleReadMode({
       />
 
       {/* ===============================
+          SEM RESULTADOS
+      ================================ */}
+      {dates.length === 0 && (
+        <p className="text-sm text-base-content/60 text-center py-6">
+          Nenhuma escala encontrada.
+        </p>
+      )}
+
+      {/* ===============================
           DESKTOP / TABLET → TABELA
       ================================ */}
-      <div className="hidden sm:block overflow-x-auto">
-        <table className="table table-zebra table-sm w-full">
-          <thead>
-            <tr>
-              <th className="w-36">Dia</th>
-              <th>Manhã</th>
-              <th>Noite</th>
-            </tr>
-          </thead>
+      {dates.length > 0 && (
+        <div className="hidden sm:block overflow-x-auto">
+          <table className="table table-zebra table-sm w-full">
+            <thead>
+              <tr>
+                <th className="w-36">Dia</th>
+                <th>Manhã</th>
+                <th>Noite</th>
+              </tr>
+            </thead>
 
-          <tbody>
-            {dates.map((date) => {
-              const morning = [];
-              const night = [];
+            <tbody>
+              {dates.map((date) => {
+                const morning = [];
+                const night = [];
 
-              schedulesByDate[date]
-                .filter((s) =>
-                  !filter
-                    ? true
-                    : getMemberName(s.memberId)
-                        .toLowerCase()
-                        .includes(filter.toLowerCase())
-                )
-                .forEach((s) => {
-                  const cult = normalizeCult(s.cult);
+                schedulesByDate[date]
+                  .filter((s) =>
+                    !filter
+                      ? true
+                      : getMemberName(s.memberId)
+                          .toLowerCase()
+                          .includes(filter.toLowerCase())
+                  )
+                  .forEach((s) => {
+                    const cult = normalizeCult(s.cult);
 
-                  if (cult.includes("man")) {
-                    morning.push(getMemberName(s.memberId));
-                  } else if (cult.includes("noi")) {
-                    night.push(getMemberName(s.memberId));
-                  }
-                });
+                    if (cult.includes("man")) {
+                      morning.push(getMemberName(s.memberId));
+                    } else if (cult.includes("noi")) {
+                      night.push(getMemberName(s.memberId));
+                    }
+                  });
 
-              return (
-                <tr key={date}>
-                  <td className="font-medium">
-                    {formatShortDate(date)}
-                  </td>
+                return (
+                  <tr key={date}>
+                    <td className="font-medium">
+                      {formatShortDate(date)}
+                    </td>
 
-                  <td className="text-sm">
-                    {morning.length > 0
-                      ? morning.join(", ")
-                      : "—"}
-                  </td>
+                    <td className="text-sm">
+                      {morning.length > 0
+                        ? morning.join(", ")
+                        : "—"}
+                    </td>
 
-                  <td className="text-sm">
-                    {night.length > 0
-                      ? night.join(", ")
-                      : "—"}
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
+                    <td className="text-sm">
+                      {night.length > 0
+                        ? night.join(", ")
+                        : "—"}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {/* ===============================
           MOBILE → CARDS
       ================================ */}
-      <div className="sm:hidden flex flex-col gap-3">
-        {dates.map((date) => {
-          const morning = [];
-          const night = [];
+      {dates.length > 0 && (
+        <div className="sm:hidden flex flex-col gap-3">
+          {dates.map((date) => {
+            const morning = [];
+            const night = [];
 
-          schedulesByDate[date]
-            .filter((s) =>
-              !filter
-                ? true
-                : getMemberName(s.memberId)
-                    .toLowerCase()
-                    .includes(filter.toLowerCase())
-            )
-            .forEach((s) => {
-              const cult = normalizeCult(s.cult);
+            schedulesByDate[date]
+              .filter((s) =>
+                !filter
+                  ? true
+                  : getMemberName(s.memberId)
+                      .toLowerCase()
+                      .includes(filter.toLowerCase())
+              )
+              .forEach((s) => {
+                const cult = normalizeCult(s.cult);
 
-              if (cult.includes("man")) {
-                morning.push(getMemberName(s.memberId));
-              } else if (cult.includes("noi")) {
-                night.push(getMemberName(s.memberId));
-              }
-            });
+                if (cult.includes("man")) {
+                  morning.push(getMemberName(s.memberId));
+                } else if (cult.includes("noi")) {
+                  night.push(getMemberName(s.memberId));
+                }
+              });
 
-          return (
-            <div
-              key={date}
-              className="
-                border
-                border-base-300
-                rounded-xl
-                p-3
-                bg-base-100
-              "
-            >
-              <div className="text-sm font-semibold mb-2">
-                {formatShortDate(date)}
+            return (
+              <div
+                key={date}
+                className="
+                  border
+                  border-base-300
+                  rounded-xl
+                  p-3
+                  bg-base-100
+                "
+              >
+                <div className="text-sm font-semibold mb-2">
+                  {formatShortDate(date)}
+                </div>
+
+                <div className="text-sm text-base-content/70">
+                  <span className="font-medium">Manhã:</span>{" "}
+                  {morning.length > 0
+                    ? morning.join(", ")
+                    : "—"}
+                </div>
+
+                <div className="text-sm text-base-content/70">
+                  <span className="font-medium">Noite:</span>{" "}
+                  {night.length > 0
+                    ? night.join(", ")
+                    : "—"}
+                </div>
               </div>
-
-              <div className="text-sm text-base-content/70">
-                <span className="font-medium">Manhã:</span>{" "}
-                {morning.length > 0 ? morning.join(", ") : "—"}
-              </div>
-
-              <div className="text-sm text-base-content/70">
-                <span className="font-medium">Noite:</span>{" "}
-                {night.length > 0 ? night.join(", ") : "—"}
-              </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }

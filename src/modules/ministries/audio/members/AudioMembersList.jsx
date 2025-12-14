@@ -30,8 +30,15 @@ export default function AudioMembersList() {
 
   return (
     <MinistryPageWrapper title="Membros — Ministério de Áudio">
-      {/* HEADER AÇÕES */}
-      <div className="flex items-center justify-between mb-4">
+      {/* HEADER */}
+      <div
+        className="
+          flex
+          items-center
+          justify-between
+          mb-4
+        "
+      >
         {/* 🔙 VOLTAR */}
         <button
           type="button"
@@ -39,7 +46,9 @@ export default function AudioMembersList() {
           className="
             btn
             btn-ghost
-            btn-sm
+            btn-xs
+            text-base-content/70
+            hover:text-base-content
             focus:outline-none
             focus:ring-0
           "
@@ -47,7 +56,7 @@ export default function AudioMembersList() {
           ← Voltar
         </button>
 
-        {/* ➕ ADICIONAR MEMBRO — SOMENTE GESTÃO */}
+        {/* ➕ NOVO MEMBRO */}
         {canEdit && (
           <button
             type="button"
@@ -55,30 +64,41 @@ export default function AudioMembersList() {
               navigate("/ministerios/audio/members/create")
             }
             className="
-              btn
-              btn-outline
-              btn-sm
-              rounded-lg
-              bg-base-200
-              hover:bg-base-300
-              focus:outline-none
-              focus:ring-0
+               btn
+            btn-ghost
+            btn-xs
+            text-base-content/70
+            hover:text-base-content
+            focus:outline-none
+            focus:ring-0
             "
           >
-            + Novo Membro
+            + Novo
           </button>
         )}
       </div>
 
       {!canEdit && (
-        <p className="text-xs text-base-content/60 mb-3">
+        <p
+          className="
+            text-xs
+            text-base-content/60
+            mb-3
+          "
+        >
           Visualização somente leitura
         </p>
       )}
 
       {/* CONTEÚDO */}
       {loading ? (
-        <p className="text-sm text-base-content/60 p-4">
+        <p
+          className="
+            text-sm
+            text-base-content/60
+            p-4
+          "
+        >
           Carregando…
         </p>
       ) : (
