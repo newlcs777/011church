@@ -19,8 +19,10 @@ function getSchedulesCollection(ministry) {
 }
 
 // Buscar escalas por mês (YYYY-MM)
+// Buscar escalas por mês (YYYY-MM)
 export async function getSchedulesByMonth(ministry, month) {
   const colRef = getSchedulesCollection(ministry);
+
   const q = query(colRef, where("month", "==", month));
   const snapshot = await getDocs(q);
 

@@ -21,7 +21,7 @@ function getDaysInMonth(year, month) {
 }
 
 function getFirstWeekDay(year, month) {
-  return new Date(year, month, 1).getDay();
+  return new Date(year, month, 1).getDay(); // 0 = domingo
 }
 
 /* ===============================
@@ -34,14 +34,13 @@ export default function AudioScheduleCalendar({
   onRemove,
 }) {
   const { user } = useAuthContext();
-
   const members = useSelector((state) => state.members.audio || []);
-  const grouped = groupSchedulesByDate(schedules || []);
 
+  const grouped = groupSchedulesByDate(schedules || []);
   const today = new Date();
 
   /* ===============================
-     CONTROLE DE PERFIL
+     PERMISSÕES
   ================================ */
   const canManageSchedule =
     user?.role === "admin" ||
@@ -56,7 +55,6 @@ export default function AudioScheduleCalendar({
     canManageSchedule ? "calendar" : "read"
   );
 
-  /* 🔒 Garante sincronização caso o usuário mude */
   useEffect(() => {
     setViewMode(canManageSchedule ? "calendar" : "read");
   }, [canManageSchedule]);
@@ -101,59 +99,102 @@ export default function AudioScheduleCalendar({
   return (
     <>
       {/* HEADER */}
-      <div className="flex items-center justify-center gap-4 mb-4">
+      <div className="mb-6 flex items-center justify-between">
         <button
           onClick={goPrevMonth}
-          className="btn btn-ghost btn-sm rounded-full text-base-content/70"
+          className="
+            h-9
+            w-9
+            flex
+            items-center
+            justify-center
+            rounded-full
+            border
+            border-base-300
+            bg-base-100
+            text-base-content/60
+            hover:bg-base-200
+            transition
+          "
         >
-          ◀
+          ‹
         </button>
 
-        <h2 className="text-xl font-bold capitalize text-center">
-          {monthLabel}
-        </h2>
+        <div className="text-center">
+          <h2 className="text-base font-semibold capitalize">
+            {monthLabel}
+          </h2>
+          <p className="text-xs text-base-content/50">
+            Toque em um dia para gerenciar a escala
+          </p>
+        </div>
 
         <button
           onClick={goNextMonth}
-          className="btn btn-ghost btn-sm rounded-full text-base-content/70"
+          className="
+            h-9
+            w-9
+            flex
+            items-center
+            justify-center
+            rounded-full
+            border
+            border-base-300
+            bg-base-100
+            text-base-content/60
+            hover:bg-base-200
+            transition
+          "
         >
-          ▶
+          ›
         </button>
       </div>
 
-      {/* AVISO PARA MEMBRO / OBREIRO */}
+      {/* TOGGLE */}
+      {canManageSchedule && (
+        <div className="flex justify-center mb-6">
+          <div
+            className="
+              inline-flex
+              gap-1
+              rounded-xl
+              border
+              border-base-300
+              bg-base-100
+              p-1
+            "
+          >
+            {["calendar", "read"].map((mode) => (
+              <button
+                key={mode}
+                onClick={() => setViewMode(mode)}
+                className={`
+                  h-8
+                  px-4
+                  rounded-lg
+                  text-sm
+                  transition
+                  ${
+                    viewMode === mode
+                      ? "bg-base-200 text-base-content"
+                      : "text-base-content/60 hover:bg-base-200"
+                  }
+                `}
+              >
+                {mode === "calendar" ? "Calendário" : "Lista"}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {!canManageSchedule && (
         <p className="text-xs text-center text-base-content/50 mb-4">
           Visualização somente leitura
         </p>
       )}
 
-      {/* TOGGLE DE VISÃO (SÓ GESTÃO) */}
-      {canManageSchedule && (
-        <div className="flex justify-center gap-2 mb-5">
-          <button
-            onClick={() => setViewMode("calendar")}
-            className={`btn btn-sm ${
-              viewMode === "calendar" ? "btn-primary" : "btn-ghost"
-            }`}
-          >
-            Calendário
-          </button>
-
-          <button
-            onClick={() => setViewMode("read")}
-            className={`btn btn-sm ${
-              viewMode === "read" ? "btn-primary" : "btn-ghost"
-            }`}
-          >
-            Lista
-          </button>
-        </div>
-      )}
-
-      {/* ===============================
-          MODO LEITURA (TODOS)
-      ================================ */}
+      {/* LISTA */}
       {viewMode === "read" && (
         <ScheduleReadMode
           schedulesByDate={grouped}
@@ -161,24 +202,23 @@ export default function AudioScheduleCalendar({
         />
       )}
 
-      {/* ===============================
-          CALENDÁRIO (SOMENTE GESTÃO)
-      ================================ */}
+      {/* CALENDÁRIO LIMPO */}
       {viewMode === "calendar" && canManageSchedule && (
         <>
-          <p className="text-xs text-center text-base-content/60 mb-3">
-            Clique em um dia para adicionar ou visualizar a escala
-          </p>
-
-          {/* SEMANA */}
-          <div className="grid grid-cols-7 text-xs font-semibold text-center text-base-content/70 mb-2">
-            {["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"].map((d) => (
-              <div key={d}>{d}</div>
+          {/* DIAS DA SEMANA */}
+          <div className="grid grid-cols-7 text-[11px] font-medium text-center text-base-content/60 mb-3">
+            {["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"].map((d, i) => (
+              <div
+                key={d}
+                className={i === 0 ? "text-error" : ""}
+              >
+                {d}
+              </div>
             ))}
           </div>
 
-          {/* GRID */}
-          <div className="grid grid-cols-7 gap-2">
+          {/* DIAS */}
+          <div className="grid grid-cols-7 gap-y-3">
             {Array.from({ length: firstWeekDay }).map((_, i) => (
               <div key={`empty-${i}`} />
             ))}
@@ -196,61 +236,63 @@ export default function AudioScheduleCalendar({
                 today.toDateString() ===
                 new Date(currentYear, currentMonth, day).toDateString();
 
+              const weekDayIndex = new Date(
+                currentYear,
+                currentMonth,
+                day
+              ).getDay();
+
+              const isSunday = weekDayIndex === 0;
+
               return (
-                <div
+                <button
                   key={date}
-                  onClick={() => {
-                    if (!canManageSchedule) return;
-                    setSelectedDate(date);
-                  }}
-                  className={`
-                    min-h-[96px]
-                    rounded-2xl
-                    border
-                    p-3
-                    cursor-pointer
-                    transition-all
-                    duration-200
-                    hover:shadow-md
-                    hover:-translate-y-[1px]
-                    active:scale-[0.98]
-                    ${isToday ? "ring-2 ring-primary" : ""}
-                    ${
-                      hasSchedule
-                        ? "border-primary/40 bg-primary/5"
-                        : "border-base-300 bg-base-100"
-                    }
-                  `}
+                  onClick={() => setSelectedDate(date)}
+                  className="
+                    relative
+                    mx-auto
+                    flex
+                    h-10
+                    w-10
+                    items-center
+                    justify-center
+                    rounded-full
+                    text-sm
+                    font-medium
+                    transition
+                    hover:bg-base-200
+                  "
                 >
-                  {/* TOPO */}
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-bold">{day}</span>
+                  <span
+                    className={`
+                      ${
+                        isSunday
+                          ? "text-error"
+                          : "text-base-content"
+                      }
+                      ${isToday ? "font-bold" : ""}
+                    `}
+                  >
+                    {day}
+                  </span>
 
-                    {hasSchedule && (
-                      <span className="text-xs bg-primary text-primary-content px-2 py-0.5 rounded-full font-semibold">
-                        {daySchedules.length}
-                      </span>
-                    )}
-                  </div>
-
-                  {/* STATUS */}
-                  <div className="mt-4 flex items-center justify-center">
-                    {hasSchedule ? (
-                      <span className="text-xs text-primary font-medium">
-                        Escala criada
-                      </span>
-                    ) : (
-                      <span className="text-xs text-base-content/60 font-medium">
-                        Criar escala
-                      </span>
-                    )}
-                  </div>
-                </div>
+                  {hasSchedule && (
+                    <span
+                      className="
+                        absolute
+                        bottom-1
+                        h-1.5
+                        w-1.5
+                        rounded-full
+                        bg-primary
+                      "
+                    />
+                  )}
+                </button>
               );
             })}
           </div>
 
-          {/* MODAL */}
           {selectedDate && (
             <DayScheduleModal
               date={selectedDate}

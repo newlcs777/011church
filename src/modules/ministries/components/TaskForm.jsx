@@ -52,16 +52,35 @@ export default function TaskForm({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4 max-w-lg">
-      {/* HEADER */}
-      <div className="flex items-center justify-between mb-2">
+    <form
+      onSubmit={handleSubmit}
+      className="
+        space-y-4
+        max-w-lg
+        mx-auto
+      "
+    >
+      {/* HEADER CENTRALIZADO */}
+      <div className="relative mb-4 flex items-center justify-center">
         <button
           type="button"
           onClick={() => navigate(-1)}
-          className="btn btn-ghost btn-sm focus:outline-none focus:ring-0"
+          className="
+            absolute
+            left-0
+            btn
+            btn-ghost
+            btn-sm
+            focus:outline-none
+            focus:ring-0
+          "
         >
-          ← Voltar
+          ←
         </button>
+
+        <h2 className="text-base font-semibold">
+          Adicionar Tarefa
+        </h2>
       </div>
 
       {!canEdit && (
@@ -152,7 +171,13 @@ export default function TaskForm({
 
         <textarea
           name="description"
-          className="textarea textarea-bordered textarea-sm w-full"
+          className="
+            textarea
+            textarea-bordered
+            textarea-sm
+            w-full
+            resize-none
+          "
           rows={3}
           value={form.description}
           onChange={handleChange}
@@ -160,12 +185,18 @@ export default function TaskForm({
         />
       </div>
 
-      {/* AÇÕES */}
+      {/* AÇÕES PADRÃO MOBILE */}
       {canEdit && (
-        <div className="flex gap-2 pt-2">
+        <div className="pt-4 flex justify-end gap-2">
           <button
             type="submit"
-            className="btn btn-outline btn-sm flex-1 focus:outline-none focus:ring-0"
+            className="
+              btn
+              btn-outline
+              btn-sm
+              focus:outline-none
+              focus:ring-0
+            "
           >
             Salvar
           </button>

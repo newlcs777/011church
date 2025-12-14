@@ -8,7 +8,6 @@ import MinistryPageWrapper from "@/modules/ministries/components/MinistryPageWra
 import { useAuthContext } from "@/modules/auth/context/AuthContext";
 import { canEditMinistry } from "@/modules/auth/permissions";
 
-
 export default function AudioIndex() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -24,8 +23,8 @@ export default function AudioIndex() {
 
   return (
     <MinistryPageWrapper
-      title="Áudio"
-      subtitle="Gerencie os membros, tarefas e escalas do ministério de áudio"
+      title="Ministério de Áudio"
+      subtitle="Acompanhe e organize as pessoas, tarefas e escalas do ministério de áudio."
     >
       {/* CARD DE STATUS */}
       <div
@@ -46,6 +45,11 @@ export default function AudioIndex() {
             rounded-xl
             p-4
             shadow-sm
+            flex
+            flex-col
+            items-center
+            justify-center
+            text-center
           "
         >
           <h3
@@ -55,13 +59,13 @@ export default function AudioIndex() {
               text-base-content/70
             "
           >
-            Membros
+            Total de membros
           </h3>
 
           <p
             className="
               mt-1
-              text-2xl
+              text-3xl
               font-semibold
             "
           >
@@ -74,80 +78,83 @@ export default function AudioIndex() {
       <div
         className="
           mt-6
-          flex
-          flex-wrap
-          items-center
+          grid
+          grid-cols-1
           gap-2
+          sm:grid-cols-2
+          lg:flex
+          lg:flex-wrap
+          lg:items-center
         "
       >
-        {/* ESCALA (todos veem) */}
         <button
           className="
-            btn
-            btn-outline
-            btn-sm
+            h-10
+            px-4
             rounded-lg
-            focus:outline-none
-            focus:ring-0
+            border
+            border-base-300
+            bg-base-100
+            text-sm
             hover:bg-base-200
-            transition-all
+            transition
           "
           onClick={() => navigate("schedule")}
         >
-          Ver Escala
+          Escala do ministério
         </button>
 
-        {/* MEMBROS (todos veem) */}
         <button
           className="
-            btn
-            btn-outline
-            btn-sm
+            h-10
+            px-4
             rounded-lg
-            focus:outline-none
-            focus:ring-0
+            border
+            border-base-300
+            bg-base-100
+            text-sm
             hover:bg-base-200
-            transition-all
+            transition
           "
           onClick={() => navigate("members")}
         >
-          Membros
+          Lista de membros
         </button>
 
-        {/* NOVO MEMBRO (somente quem pode editar) */}
         {canEdit && (
           <button
             className="
-              btn
-              btn-outline
-              btn-sm
+              h-10
+              px-4
               rounded-lg
-              focus:outline-none
-              focus:ring-0
+              border
+              border-base-300
+              bg-base-100
+              text-sm
               hover:bg-base-200
-              transition-all
+              transition
             "
             onClick={() => navigate("members/create")}
           >
-            + Novo
+            Adicionar membro
           </button>
         )}
 
-        {/* TAREFAS (todos veem) */}
         <button
           className="
-            btn
-            btn-outline
-            btn-sm
+            h-10
+            px-4
             rounded-lg
-            focus:outline-none
-            focus:ring-0
+            border
+            border-base-300
+            bg-base-100
+            text-sm
             hover:bg-base-200
-            transition-all
+            transition
           "
           onClick={() => navigate("tasks")}
         >
-          Tarefas
+          Tarefas do ministério
         </button>
       </div>
     </MinistryPageWrapper>

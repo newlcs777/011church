@@ -2,26 +2,20 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
-// ministries/components (global)
 import MinistryPageWrapper from "../../components/MinistryPageWrapper.jsx";
-
-// audio/schedule
 import AudioScheduleCalendar from "../schedule/AudioScheduleCalendar.jsx";
 
-// store
 import {
   fetchSchedules,
   removeSchedule,
 } from "../../store/scheduleSlice.js";
 import { fetchMembers } from "../../store/membersSlice.js";
 
-// 🔐 AUTH
 import { useAuthContext } from "../../../auth/context/AuthContext";
 
 export default function AudioSchedulePage() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const { user } = useAuthContext();
 
   const canManage =
@@ -42,29 +36,26 @@ export default function AudioSchedulePage() {
 
   function handleRemove(id) {
     if (!canManage) return;
-
     dispatch(removeSchedule({ ministry: "audio", id }));
   }
 
   return (
     <MinistryPageWrapper>
-      {/* 🔙 HEADER DE AÇÃO */}
-      <div
-        className="
-          mb-4
-          flex
-          items-center
-          justify-between
-          gap-2
-        "
-      >
+      {/* HEADER SUPERIOR */}
+      <div className="mb-6 flex items-center justify-between">
         <button
           onClick={() => navigate(-1)}
           className="
-            btn
-            btn-ghost
-            btn-sm
+            h-9
+            px-4
             rounded-lg
+            border
+            border-base-300
+            bg-base-100
+            text-sm
+            text-base-content/80
+            hover:bg-base-200
+            transition
           "
         >
           ← Voltar
@@ -76,41 +67,43 @@ export default function AudioSchedulePage() {
               navigate("/ministerios/audio/schedule/create")
             }
             className="
-              btn
-              btn-ghost
-              btn-sm
+              h-9
+              px-4
               rounded-lg
+              border
+              border-base-300
+              bg-base-100
+              text-sm
+              text-base-content/80
+              hover:bg-base-200
+              transition
             "
           >
-            + Nova Escala
+            Nova escala
           </button>
         )}
       </div>
 
       {!canManage && (
-        <p className="text-xs text-base-content/60 text-center mb-4">
-          Visualização somente leitura
+        <p className="mb-4 text-center text-xs text-base-content/60">
+          Você está visualizando a escala em modo somente leitura.
         </p>
       )}
 
-      {/* 🟦 TÍTULO CENTRALIZADO */}
-      <div className="text-center mb-6">
-        <h1 className="text-2xl font-bold">
-          Escala — Ministério de Áudio
+      {/* TÍTULO */}
+      <div className="text-center mb-8">
+        <h1 className="text-2xl font-semibold">
+          Escala do Ministério de Áudio
         </h1>
+        <p className="mt-1 text-sm text-base-content/60">
+          Selecione um dia no calendário para criar ou visualizar a escala.
+        </p>
       </div>
 
-      {/* CONTEÚDO */}
+      {/* CONTEÚDO (SEM CARD DUPLICADO) */}
       {loading ? (
-        <div
-          className="
-            mt-6
-            p-4
-            text-sm
-            text-base-content/60
-          "
-        >
-          Carregando…
+        <div className="py-10 text-center text-sm text-base-content/60">
+          Carregando escalas…
         </div>
       ) : (
         <AudioScheduleCalendar
