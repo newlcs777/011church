@@ -1,4 +1,8 @@
+import { useNavigate } from "react-router-dom";
+
 export default function VerseCard({ verse }) {
+  const navigate = useNavigate();
+
   // 🔹 SKELETON INTERNO
   if (!verse) {
     return (
@@ -16,16 +20,9 @@ export default function VerseCard({ verse }) {
           animate-pulse
         "
       >
-        {/* CONVITE */}
         <div className="h-3 w-40 bg-base-200 rounded mx-auto" />
-
-        {/* REFERÊNCIA */}
         <div className="h-4 w-48 bg-base-200 rounded mx-auto" />
-
-        {/* DIVISOR */}
         <div className="h-px bg-base-200" />
-
-        {/* TEXTO */}
         <div className="space-y-2">
           <div className="h-3 w-full bg-base-200 rounded" />
           <div className="h-3 w-[90%] bg-base-200 rounded" />
@@ -42,8 +39,23 @@ export default function VerseCard({ verse }) {
       ? verse.text
       : verse.text?.text || verse.text?.verse || "";
 
+  // 🔹 clique → abre direto o modo leitura
+  const handleClick = () => {
+    if (!verse?.book || !verse?.chapter || !verse?.verse) return;
+
+    navigate("/bible/read", {
+      state: {
+        book: verse.book,
+        chapter: verse.chapter,
+        verse: verse.verse, // 🔹 versículo exato
+      },
+    });
+  };
+
   return (
     <div
+      onClick={handleClick}
+      role="button"
       className="
         rounded-2xl
         bg-base-100
@@ -54,6 +66,11 @@ export default function VerseCard({ verse }) {
         flex
         flex-col
         gap-5
+        cursor-pointer
+
+        hover:shadow-md
+        hover:border-primary/40
+        transition
 
         animate-fadeInUp
       "
@@ -66,9 +83,6 @@ export default function VerseCard({ verse }) {
           tracking-wider
           text-base-content/60
           text-center
-
-          animate-fadeIn
-          delay-75
         "
       >
         Palavra para o seu dia
@@ -81,24 +95,13 @@ export default function VerseCard({ verse }) {
           font-semibold
           text-base-content
           text-center
-
-          animate-fadeIn
-          delay-100
         "
       >
         {reference}
       </h3>
 
       {/* DIVISOR */}
-      <div
-        className="
-          h-px
-          bg-base-200
-
-          animate-fadeIn
-          delay-150
-        "
-      />
+      <div className="h-px bg-base-200" />
 
       {/* TEXTO BÍBLICO */}
       <p
@@ -106,9 +109,6 @@ export default function VerseCard({ verse }) {
           text-sm
           leading-relaxed
           text-base-content/80
-
-          animate-fadeIn
-          delay-200
         "
       >
         {text}

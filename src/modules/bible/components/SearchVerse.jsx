@@ -1,47 +1,152 @@
 // src/modules/bible/components/SearchVerse.jsx
 import { useState } from "react";
 import Button from "../../../components/ui/Button";
-import Input from "../../../components/ui/Input";
+import { livrosAT, livrosNT, capitulosPorLivro } from "../data/livros";
 
-export default function SearchVerse({ onSearch }) {
-  const [query, setQuery] = useState("");
+export default function SearchVerse({ onSelect }) {
+  const [testament, setTestament] = useState("");
+  const [book, setBook] = useState("");
+  const [chapter, setChapter] = useState("");
 
-  const submit = (e) => {
+  // Livros filtrados por testamento
+  const booksByTestament =
+    testament === "AT"
+      ? livrosAT
+      : testament === "NT"
+      ? livrosNT
+      : [];
+
+  const chapters =
+    book && capitulosPorLivro[book]
+      ? Array.from(
+          { length: capitulosPorLivro[book] },
+          (_, i) => i + 1
+        )
+      : [];
+
+  const handleSubmit = (e) => {
     e.preventDefault();
-    if (query.trim().length < 3) return;
-    onSearch(query);
+    if (!book || !chapter) return;
+
+    onSelect({
+      book,
+      chapter: Number(chapter),
+    });
   };
 
   return (
     <form
-      onSubmit={submit}
+      onSubmit={handleSubmit}
       className="
-        w-full
         flex
         flex-col
-        gap-3
-        md:flex-row
-        md:items-end
+        gap-5
+        max-w-md
+        mx-auto
       "
     >
-      <div className="flex-1 w-full">
-        <Input
-          label="Buscar passagem"
-          placeholder="Ex: João 3:16"
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
+      {/* TESTAMENTO */}
+      <div className="flex flex-col gap-1.5">
+        <label className="text-sm font-medium text-base-content/80">
+          Testamento
+        </label>
+
+        <select
+          value={testament}
+          onChange={(e) => {
+            setTestament(e.target.value);
+            setBook("");
+            setChapter("");
+          }}
+          className="
+            select
+            select-bordered
+            w-full
+          "
+        >
+          <option value="">Selecione o testamento</option>
+          <option value="AT">Antigo Testamento</option>
+          <option value="NT">Novo Testamento</option>
+        </select>
       </div>
 
-      <Button
-        type="submit"
-        className="
-          w-full        /* mobile */
-          md:w-32       /* desktop */
-        "
-      >
-        Buscar
-      </Button>
+      {/* LIVRO */}
+      <div className="flex flex-col gap-1.5">
+        <label className="text-sm font-medium text-base-content/80">
+          Livro bíblico
+        </label>
+
+        <select
+          value={book}
+          onChange={(e) => {
+            setBook(e.target.value);
+            setChapter("");
+          }}
+          disabled={!testament}
+          className="
+            select
+            select-bordered
+            w-full
+            disabled:bg-base-200
+            disabled:text-base-content/40
+          "
+        >
+          <option value="">
+            {testament
+              ? "Selecione um livro"
+              : "Escolha o testamento primeiro"}
+          </option>
+
+          {booksByTestament.map((b) => (
+            <option key={b} value={b}>
+              {b}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* CAPÍTULO */}
+      <div className="flex flex-col gap-1.5">
+        <label className="text-sm font-medium text-base-content/80">
+          Capítulo
+        </label>
+
+        <select
+          value={chapter}
+          onChange={(e) => setChapter(e.target.value)}
+          disabled={!book}
+          className="
+            select
+            select-bordered
+            w-full
+            disabled:bg-base-200
+            disabled:text-base-content/40
+          "
+        >
+          <option value="">
+            {book ? "Selecione o capítulo" : "Escolha um livro primeiro"}
+          </option>
+
+          {chapters.map((c) => (
+            <option key={c} value={c}>
+              Capítulo {c}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      {/* AÇÃO */}
+      <div className="pt-3 flex justify-center">
+        <Button
+          type="submit"
+          variant="outline"
+          size="sm"
+          disabled={!book || !chapter}
+          className="whitespace-nowrap"
+        >
+          Ler capítulo
+        </Button>
+      </div>
     </form>
   );
 }

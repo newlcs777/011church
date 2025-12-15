@@ -7,6 +7,7 @@ import Login from "../modules/auth/pages/Login";
 /* ===================== PÁGINAS PRINCIPAIS ===================== */
 import HomePage from "../modules/home/pages/HomePage";
 import BiblePage from "../modules/bible/pages/BiblePage";
+import BibleReadPage from "../modules/bible/pages/BibleReadPage";
 
 /* ===================== EVENTOS ===================== */
 import EventsList from "../modules/events/pages/EventsList";
@@ -70,6 +71,14 @@ export default function AppRoutes() {
         }
       />
 
+<Route
+  path="/bible/read"
+  element={
+    <ProtectedRoute>
+      <BibleReadPage />
+    </ProtectedRoute>
+  }
+/>
       {/* ===================== EVENTOS ===================== */}
       <Route
         path="/eventos"

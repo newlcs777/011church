@@ -31,7 +31,13 @@ export function getDailyVerseFromJson() {
   const verseText = versesObj[verseNumber];
 
   return {
+    // 🔹 já existia
     reference: `${bookName} ${chapter}:${verseNumber}`,
     text: verseText,
+
+    // 🔹 novos campos (não quebram nada)
+    book: bookName,
+    chapter: Number(chapter),
+    verse: Number(verseNumber),
   };
 }
