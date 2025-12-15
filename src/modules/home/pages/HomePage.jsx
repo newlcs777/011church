@@ -28,7 +28,7 @@ export default function HomePage() {
     >
       {/* HEADER */}
       <PageHeader
-        title={`Olá, ${firstName}! 👋`}
+        title={`Olá, ${firstName}!`}
         subtitle="Que bom ter você aqui. Que este seja um tempo de edificação."
       />
 
@@ -37,7 +37,7 @@ export default function HomePage() {
         <RoleSummaryCard />
       )}
 
-      {/* PALAVRA DO DIA */}
+      {/* ESTUDO DO DIA (CAPÍTULO) */}
       <section className="flex flex-col gap-2">
         {loading && <VerseSkeleton />}
 

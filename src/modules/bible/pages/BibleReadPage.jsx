@@ -75,14 +75,12 @@ export default function BibleReadPage() {
         flex
         flex-col
         min-h-screen
-        transition-colors
-        bg-[#020617]
       "
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
       {/* HEADER DE LEITURA */}
-      <div className="border-b border-[#020617] bg-[#020617]">
+      <div className="border-b bg-base-100">
         <div className="max-w-3xl mx-auto px-4 py-4 relative text-center">
           {/* VOLTAR */}
           <button
@@ -92,8 +90,8 @@ export default function BibleReadPage() {
               right-4
               top-4
               text-sm
-              text-[#94A3B8]
-              hover:text-white
+              text-base-content/60
+              hover:text-base-content
               transition
             "
           >
@@ -101,11 +99,11 @@ export default function BibleReadPage() {
           </button>
 
           {/* TÍTULO */}
-          <h1 className="text-xl font-semibold tracking-wide text-[#E5E7EB]">
+          <h1 className="text-xl font-semibold tracking-wide">
             {book} {chapter}
           </h1>
 
-          <p className="text-sm text-[#94A3B8] mt-1">
+          <p className="text-sm text-base-content/60 mt-1">
             Modo leitura
           </p>
         </div>
@@ -117,11 +115,6 @@ export default function BibleReadPage() {
             size="sm"
             onClick={() => goToChapter(chapter - 1)}
             disabled={!hasPrev}
-            className="
-              border-[#1E293B]
-              text-[#CBD5E1]
-              hover:bg-[#020617]/80
-            "
           >
             ← Anterior
           </Button>
@@ -135,8 +128,6 @@ export default function BibleReadPage() {
               select
               select-ghost
               select-sm
-              text-[#CBD5E1]
-              bg-transparent
             "
           >
             {Array.from({ length: totalChapters }).map((_, i) => (
@@ -151,11 +142,6 @@ export default function BibleReadPage() {
             size="sm"
             onClick={() => goToChapter(chapter + 1)}
             disabled={!hasNext}
-            className="
-              border-[#1E293B]
-              text-[#CBD5E1]
-              hover:bg-[#020617]/80
-            "
           >
             Próximo →
           </Button>
