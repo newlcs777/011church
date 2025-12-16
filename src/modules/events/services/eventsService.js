@@ -1,32 +1,101 @@
+import {
+  collection,
+  getDocs,
+  getDoc,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+} from "firebase/firestore";
 
-let events = [
-  {
-    id: 1,
-    titulo: "Culto de Domingo",
-    descricao: "Celebração dominical às 18h.",
-    data: "2025-02-20",
-    horario: "18:00",
-    local: "011 Church - Santo Amaro",
-  },
-];
+import { db } from "@/firebase/firebase";
 
-export function getEvents() {
-  return events;
+const COLLECTION = "events";
+
+/**
+ * 🔹 Normaliza datas para não quebrar Redux
+ */
+function normalizeEvent(id, data) {
+  return {
+    id,
+    ...data,
+    createdAt: data?.createdAt?.toDate
+      ? data.createdAt.toDate().toISOString()
+      : data?.createdAt ?? null,
+    updatedAt: data?.updatedAt?.toDate
+      ? data.updatedAt.toDate().toISOString()
+      : data?.updatedAt ?? null,
+  };
 }
 
-export function getEvent(id) {
-  return events.find((e) => e.id === Number(id));
+/**
+ * Buscar todos os eventos
+ */
+export async function getEvents() {
+  const snapshot = await getDocs(collection(db, COLLECTION));
+
+  return snapshot.docs.map((d) =>
+    normalizeEvent(d.id, d.data())
+  );
 }
 
-export function createEvent(evt) {
-  evt.id = Date.now();
-  events.push(evt);
+/**
+ * Buscar evento por ID
+ */
+export async function getEvent(id) {
+  const ref = doc(db, COLLECTION, id);
+  const snap = await getDoc(ref);
+
+  if (!snap.exists()) return null;
+
+  return normalizeEvent(snap.id, snap.data());
 }
 
-export function updateEvent(updated) {
-  events = events.map((e) => (e.id === updated.id ? updated : e));
+/**
+ * Criar evento
+ */
+export async function createEvent(evt) {
+  const payload = {
+    ...evt,
+    createdAt: new Date().toISOString(), // ✔ serializável
+  };
+
+  const ref = await addDoc(
+    collection(db, COLLECTION),
+    payload
+  );
+
+  return {
+    id: ref.id,
+    ...payload,
+  };
 }
 
-export function deleteEvent(id) {
-  events = events.filter((e) => e.id !== Number(id));
+/**
+ * Atualizar evento
+ */
+export async function updateEvent(updated) {
+  const ref = doc(db, COLLECTION, updated.id);
+
+  const { id, ...data } = updated;
+
+  const payload = {
+    ...data,
+    updatedAt: new Date().toISOString(), // ✔ serializável
+  };
+
+  await updateDoc(ref, payload);
+
+  return {
+    id,
+    ...payload,
+  };
+}
+
+/**
+ * Deletar evento
+ */
+export async function deleteEvent(id) {
+  const ref = doc(db, COLLECTION, id);
+  await deleteDoc(ref);
 }

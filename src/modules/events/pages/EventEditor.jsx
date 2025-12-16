@@ -1,17 +1,26 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { getEvent, createEvent, updateEvent } from "../services/eventsService";
+
 import useAuth from "../../auth/hooks/useAuth";
-import Input from "../../../components/ui/Input";
-import Button from "../../../components/ui/Button";
+import useEvents from "../hooks/useEvents";
+import { canCreateEvent } from "../utils/eventPermissions";
+
 import PageHeader from "../../../components/ui/PageHeader";
+import EventForm from "../components/EventForm";
 
 export default function EventEditor() {
   const { id } = useParams();
   const editing = Boolean(id);
   const navigate = useNavigate();
   const { user } = useAuth();
+
+  const canCreate = canCreateEvent(user.role);
+
+  const {
+    getEventById,
+    createEvent,
+    updateEvent,
+  } = useEvents();
 
   const [form, setForm] = useState({
     titulo: "",
@@ -21,88 +30,81 @@ export default function EventEditor() {
     local: "",
   });
 
+  /* 🔴 CORREÇÃO 1: nunca sobrescrever com objeto incompleto */
   useEffect(() => {
     if (editing) {
-      const evt = getEvent(id);
-      if (evt) setForm(evt);
-    }
-  }, [id, editing]);
+      const evt = getEventById(id);
 
-  const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
+      if (evt) {
+        setForm({
+          titulo: evt.titulo ?? "",
+          descricao: evt.descricao ?? "",
+          data: evt.data ?? "",
+          horario: evt.horario ?? "",
+          local: evt.local ?? "",
+        });
+      }
+    }
+  }, [editing, id, getEventById]);
+
+  /* 🔴 CORREÇÃO 2: atualização segura de estado */
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (editing) updateEvent(form);
-    else createEvent(form);
+
+    if (editing) {
+      updateEvent(form);
+    } else {
+      createEvent(form);
+    }
+
     navigate("/eventos");
   };
 
-  if (user.role !== "admin" && user.role !== "pastor")
-    return <p className="p-4">Acesso negado.</p>;
+  if (!canCreate) {
+    return (
+      <p className="p-6 text-sm text-base-content/60 text-center">
+        Você não tem permissão para criar eventos.
+      </p>
+    );
+  }
 
   return (
-    <div className="flex flex-col gap-4 max-w-xl">
+    <div className="flex flex-col gap-6 pb-6">
+      {/* HEADER — PADRÃO HOME */}
       <PageHeader
-        title={editing ? "Editar Evento" : "Criar Evento"}
-        subtitle="Organize os eventos da igreja de forma simples"
+        title={editing ? "Editar evento" : "Novo evento"}
+        subtitle={
+          editing
+            ? "Atualize as informações do evento"
+            : "Preencha os dados para cadastrar um novo evento"
+        }
       />
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <Input
-          label="Título"
-          name="titulo"
-          placeholder="Ex: Culto de Domingo"
-          value={form.titulo}
-          onChange={handleChange}
-        />
-        <div className="flex flex-col gap-1">
-          <label className="text-sm font-medium">Descrição</label>
-          <textarea
-            className="textarea textarea-bordered"
-            name="descricao"
-            placeholder="Detalhes sobre o evento"
-            value={form.descricao}
+      {/* FORM */}
+      <section className="flex flex-col gap-2">
+        <div className="rounded-xl bg-base-100 p-6">
+          <EventForm
+            values={form}
             onChange={handleChange}
+            onSubmit={handleSubmit}
+            onCancel={() => navigate("/eventos")}
+            submitLabel={
+              editing
+                ? "Salvar alterações"
+                : "Salvar evento"
+            }
           />
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Input
-            label="Data"
-            name="data"
-            type="date"
-            value={form.data}
-            onChange={handleChange}
-          />
-          <Input
-            label="Horário"
-            name="horario"
-            type="time"
-            value={form.horario}
-            onChange={handleChange}
-          />
-        </div>
-        <Input
-          label="Local"
-          name="local"
-          placeholder="Ex: 011 Church - Santo Amaro"
-          value={form.local}
-          onChange={handleChange}
-        />
-
-        <div className="flex gap-2 mt-2">
-          <Button type="submit">
-            Salvar
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => navigate("/eventos")}
-          >
-            Cancelar
-          </Button>
-        </div>
-      </form>
+      </section>
     </div>
   );
 }

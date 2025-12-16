@@ -1,5 +1,14 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore, getDocs, collection } from "firebase/firestore";
+import {
+  getFirestore,
+  getDocs,
+  getDoc,        // ✅ ADD
+  addDoc,        // ✅ ADD
+  updateDoc,     // ✅ ADD
+  deleteDoc,     // ✅ ADD
+  doc,           // ✅ ADD
+  collection,
+} from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { getStorage } from "firebase/storage";
 
@@ -22,7 +31,16 @@ export const storage = getStorage(app);
 
 // Debug manual no console
 if (typeof window !== "undefined") {
-  window.firebase = { db, getDocs, collection };
+  window.firebase = {
+    db,
+    getDocs,
+    getDoc,      // ✅ ADD
+    addDoc,      // ✅ ADD
+    updateDoc,   // ✅ ADD
+    deleteDoc,   // ✅ ADD
+    doc,         // ✅ ADD
+    collection,
+  };
   console.log("🔥 Firestore disponível no window");
 }
 

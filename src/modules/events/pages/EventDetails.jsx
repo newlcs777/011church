@@ -1,15 +1,24 @@
-
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { getEvent, deleteEvent } from "../services/eventsService";
 import useAuth from "../../auth/hooks/useAuth";
+import useEvents from "../hooks/useEvents";
 
 export default function EventDetails() {
   const { id } = useParams();
-  const event = getEvent(id);
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  if (!event) return <p className="p-4">Evento não encontrado.</p>;
+  const { getEventById, deleteEvent } = useEvents();
+  const event = getEventById(id);
+
+  if (!event) {
+    return (
+      <p className="p-6 text-sm text-base-content/60 text-center">
+        Evento não encontrado.
+      </p>
+    );
+  }
+
+  const canEdit = user?.role === "admin" || user?.role === "pastor";
 
   const handleDelete = () => {
     deleteEvent(event.id);
@@ -17,36 +26,59 @@ export default function EventDetails() {
   };
 
   return (
-    <div className="flex flex-col gap-4">
-      <Link to="/eventos" className="btn btn-sm btn-outline w-24">
-        ← Voltar
-      </Link>
-
-      <h1 className="text-2xl font-bold">{event.titulo}</h1>
-      <p>{event.descricao}</p>
-      <p>
-        <b>Data:</b> {event.data}
-      </p>
-      <p>
-        <b>Horário:</b> {event.horario}
-      </p>
-      <p>
-        <b>Local:</b> {event.local}
-      </p>
-
-      {(user.role === "admin" || user.role === "pastor") && (
-        <div className="flex gap-2 mt-4">
-          <Link
-            to={`/eventos/editar/${event.id}`}
-            className="btn btn-warning"
-          >
-            Editar
+    <div className="flex justify-center px-4">
+      <div className="w-full max-w-2xl flex flex-col gap-6">
+        {/* HEADER */}
+        <div className="flex items-center justify-between">
+          <Link to="/eventos" className="btn btn-sm btn-ghost">
+            ← Voltar
           </Link>
-          <button onClick={handleDelete} className="btn btn-error">
-            Excluir
-          </button>
+
+          {canEdit && (
+            <Link to={`/eventos/editar/${event.id}`} className="btn btn-sm btn-ghost">
+              Editar
+            </Link>
+          )}
         </div>
-      )}
+
+        {/* TÍTULO */}
+        <div className="text-center">
+          <h1 className="text-xl font-semibold">{event.titulo}</h1>
+          {event.descricao && (
+            <p className="mt-1 text-sm text-base-content/60">{event.descricao}</p>
+          )}
+        </div>
+
+        {/* INFO */}
+        <div className="rounded-xl border border-base-300 bg-base-100 p-6 flex flex-col gap-4">
+          <div className="flex justify-between text-sm">
+            <div>
+              <p className="text-xs text-base-content/50">DATA</p>
+              <p className="font-medium">{event.data}</p>
+            </div>
+
+            <div>
+              <p className="text-xs text-base-content/50">HORÁRIO</p>
+              <p className="font-medium">{event.horario}</p>
+            </div>
+          </div>
+
+          <div>
+            <p className="text-xs text-base-content/50">LOCAL</p>
+            <p className="font-medium">{event.local || "Não informado"}</p>
+          </div>
+        </div>
+
+        {/* AÇÃO PERIGOSA */}
+        {canEdit && (
+          <button
+            onClick={handleDelete}
+            className="btn btn-sm btn-ghost text-error self-center"
+          >
+            Excluir evento
+          </button>
+        )}
+      </div>
     </div>
   );
 }
