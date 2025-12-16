@@ -1,9 +1,13 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { useRef } from "react";
+import { useRef, useState, useMemo } from "react";
 
 import BibleReader from "../components/BibleReader";
 import Button from "@/components/ui/Button";
-import { capitulosPorLivro } from "../data/livros";
+import {
+  capitulosPorLivro,
+  livrosAT,
+  livrosNT,
+} from "../data/livros";
 
 export default function BibleReadPage() {
   const navigate = useNavigate();
@@ -11,26 +15,57 @@ export default function BibleReadPage() {
 
   const touchStartX = useRef(0);
   const touchStartY = useRef(0);
+  const bookDropdownRef = useRef(null);
+
+  const [readingMode] = useState(true);
+  const [openBooks, setOpenBooks] = useState(false);
 
   if (!state?.book || !state?.chapter) {
     return (
       <div className="p-6">
-        <Button onClick={() => navigate("/bible")}>
-          Voltar
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => navigate("/bible")}
+        >
+          ← Voltar
         </Button>
       </div>
     );
   }
 
   const { book, chapter, verse } = state;
-  const totalChapters = capitulosPorLivro[book] || 0;
 
+  const totalChapters = capitulosPorLivro[book] || 0;
   const hasPrev = chapter > 1;
   const hasNext = chapter < totalChapters;
 
+  /* =========================
+     TESTAMENTO ATUAL
+  ========================= */
+  const isNT = useMemo(
+    () => livrosNT.includes(book),
+    [book]
+  );
+
+  const booksList = isNT ? livrosNT : livrosAT;
+
+  /* =========================
+     NAVEGAÇÕES
+  ========================= */
   const goToChapter = (ch) => {
     navigate("/bible/read", {
       state: { book, chapter: ch },
+    });
+  };
+
+  const goToBook = (newBook) => {
+    setOpenBooks(false);
+    navigate("/bible/read", {
+      state: {
+        book: newBook,
+        chapter: 1,
+      },
     });
   };
 
@@ -50,7 +85,6 @@ export default function BibleReadPage() {
 
     const MIN_SWIPE = 60;
 
-    // Evita conflito com scroll vertical
     if (
       Math.abs(deltaX) < MIN_SWIPE ||
       Math.abs(deltaX) < Math.abs(deltaY)
@@ -58,13 +92,11 @@ export default function BibleReadPage() {
       return;
     }
 
-    // 👉 direita → PRÓXIMO capítulo
-    if (deltaX > 0 && hasNext) {
+    if (deltaX < 0 && hasNext) {
       goToChapter(chapter + 1);
     }
 
-    // 👈 esquerda → ANTERIOR capítulo
-    if (deltaX < 0 && hasPrev) {
+    if (deltaX > 0 && hasPrev) {
       goToChapter(chapter - 1);
     }
   };
@@ -79,9 +111,18 @@ export default function BibleReadPage() {
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      {/* HEADER DE LEITURA */}
+      {/* HEADER */}
       <div className="border-b bg-base-100">
-        <div className="max-w-3xl mx-auto px-4 py-4 relative text-center">
+        <div
+          className="
+            max-w-3xl
+            mx-auto
+            px-4
+            py-4
+            relative
+            text-center
+          "
+        >
           {/* VOLTAR */}
           <button
             onClick={() => navigate("/bible")}
@@ -90,7 +131,7 @@ export default function BibleReadPage() {
               right-4
               top-4
               text-sm
-              text-base-content/60
+              text-base-content/70
               hover:text-base-content
               transition
             "
@@ -98,25 +139,102 @@ export default function BibleReadPage() {
             ← Voltar
           </button>
 
-          {/* TÍTULO */}
-          <h1 className="text-xl font-semibold tracking-wide">
-            {book} {chapter}
-          </h1>
+          {/* DROPDOWN DE LIVRO (CUSTOM) */}
+          <div
+            ref={bookDropdownRef}
+            className="relative inline-block"
+          >
+            <button
+              onClick={() => setOpenBooks((v) => !v)}
+              className="
+                inline-flex
+                items-center
+                gap-1
+                text-xl
+                font-semibold
+                tracking-wide
+                text-base-content
+                hover:underline
+              "
+            >
+              {book}
+              <span className="text-base-content/60">▾</span>
+            </button>
 
-          <p className="text-sm text-base-content/60 mt-1">
-            Modo leitura
+            {openBooks && (
+              <div
+                className="
+                  absolute
+                  left-1/2
+                  -translate-x-1/2
+                  mt-2
+                  w-56
+                  max-h-72
+                  overflow-auto
+                  rounded-xl
+                  border
+                  border-base-300
+                  bg-base-100
+                  shadow-lg
+                  z-50
+                "
+              >
+                {booksList.map((b) => (
+                  <button
+                    key={b}
+                    onClick={() => goToBook(b)}
+                    className={`
+                      w-full
+                      text-left
+                      px-4
+                      py-2
+                      text-sm
+                      transition
+                      ${
+                        b === book
+                          ? "bg-base-200 font-medium"
+                          : "hover:bg-base-200"
+                      }
+                    `}
+                  >
+                    {b}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* CAPÍTULO */}
+          <p className="text-sm text-base-content/70 mt-0.5">
+            Capítulo {chapter}
           </p>
         </div>
 
-        {/* CONTROLES */}
-        <div className="max-w-3xl mx-auto px-4 pb-4 flex items-center justify-between gap-4">
+        {/* CONTROLES DE CAPÍTULO */}
+        <div
+          className="
+            max-w-3xl
+            mx-auto
+            px-4
+            pb-3
+            grid
+            grid-cols-3
+            items-center
+            gap-2
+          "
+        >
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
             onClick={() => goToChapter(chapter - 1)}
             disabled={!hasPrev}
+            className="
+              justify-start
+              text-base-content/80
+              truncate
+            "
           >
-            ← Anterior
+            ← Capítulo {chapter - 1}
           </Button>
 
           <select
@@ -128,6 +246,8 @@ export default function BibleReadPage() {
               select
               select-ghost
               select-sm
+              text-base-content/90
+              mx-auto
             "
           >
             {Array.from({ length: totalChapters }).map((_, i) => (
@@ -138,23 +258,36 @@ export default function BibleReadPage() {
           </select>
 
           <Button
-            variant="outline"
+            variant="ghost"
             size="sm"
             onClick={() => goToChapter(chapter + 1)}
             disabled={!hasNext}
+            className="
+              justify-end
+              text-base-content/80
+              truncate
+            "
           >
-            Próximo →
+            Capítulo {chapter + 1} →
           </Button>
         </div>
       </div>
 
       {/* TEXTO */}
-      <div className="px-4 py-8 flex-1">
+      <div
+        className="
+          px-4
+          py-5
+          sm:py-8
+          flex-1
+        "
+      >
         <div className="max-w-3xl mx-auto">
           <BibleReader
             bookName={book}
             chapter={chapter}
             focusVerse={verse}
+            readingMode={readingMode}
           />
         </div>
       </div>

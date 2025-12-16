@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { useNavigate, Link, useSearchParams } from "react-router-dom";
 
 import SearchVerse from "../components/SearchVerse";
@@ -11,9 +12,8 @@ export default function BiblePage() {
   const initialBook = searchParams.get("book") || "";
   const initialChapter = searchParams.get("chapter") || "";
 
-  /* ========================
-     BUSCA → LEITURA
-  ========================= */
+  const [testament, setTestament] = useState("AT"); // AT | NT
+
   const handleSearch = ({ book, chapter }) => {
     if (!book || !chapter) return;
 
@@ -45,7 +45,10 @@ export default function BiblePage() {
               <Button
                 variant="ghost"
                 size="sm"
-                className="text-base-content/60 hover:text-base-content"
+                className="
+                  text-base-content/60
+                  hover:text-base-content
+                "
               >
                 ← Voltar
               </Button>
@@ -70,12 +73,70 @@ export default function BiblePage() {
           "
         >
           Separe um momento para a leitura da Palavra.
-          Escolha o livro e o capítulo que deseja ler e siga para o modo de leitura.
+          Escolha o testamento, o livro e o capítulo.
         </p>
+
+        {/* SELETOR DE TESTAMENTO */}
+        <div
+          className="
+            flex
+            justify-center
+            gap-2
+          "
+        >
+          {/* SELETOR DE TESTAMENTO */}
+<div
+  className="
+    flex
+    justify-center
+    gap-1
+    bg-base-200/40
+    p-1
+    rounded-xl
+    w-fit
+    mx-auto
+  "
+>
+  <Button
+    variant="ghost"
+    size="sm"
+    onClick={() => setTestament("AT")}
+    className={`
+      rounded-lg
+      px-4
+      ${
+        testament === "AT"
+          ? "bg-base-100 shadow-sm text-base-content"
+          : "text-base-content/60"
+      }
+    `}
+  >
+    Velho Testamento
+  </Button>
+
+  <Button
+    variant="ghost"
+    size="sm"
+    onClick={() => setTestament("NT")}
+    className={`
+      rounded-lg
+      px-4
+      ${
+        testament === "NT"
+          ? "bg-base-100 shadow-sm text-base-content"
+          : "text-base-content/60"
+      }
+    `}
+  >
+    Novo Testamento
+  </Button>
+</div>
+        </div>
 
         {/* SELEÇÃO */}
         <div className="w-full max-w-sm mx-auto">
           <SearchVerse
+            testament={testament}
             onSelect={handleSearch}
             initialBook={initialBook}
             initialChapter={initialChapter}

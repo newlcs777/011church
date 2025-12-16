@@ -1,13 +1,16 @@
 // src/modules/bible/components/SearchVerse.jsx
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Button from "../../../components/ui/Button";
 import { livrosAT, livrosNT, capitulosPorLivro } from "../data/livros";
 
-export default function SearchVerse({ onSelect }) {
+export default function SearchVerse({ onSelect, testament }) {
   const [book, setBook] = useState("");
   const [chapter, setChapter] = useState("");
 
-  const allBooks = [...livrosAT, ...livrosNT];
+  const books =
+    testament === "NT"
+      ? livrosNT
+      : livrosAT;
 
   const chapters =
     book && capitulosPorLivro[book]
@@ -16,6 +19,12 @@ export default function SearchVerse({ onSelect }) {
           (_, i) => i + 1
         )
       : [];
+
+  // Quando troca o testamento, reseta seleção
+  useEffect(() => {
+    setBook("");
+    setChapter("");
+  }, [testament]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -56,8 +65,11 @@ export default function SearchVerse({ onSelect }) {
             w-full
           "
         >
-          <option value="">Selecione um livro</option>
-          {allBooks.map((b) => (
+          <option value="">
+            Selecione um livro
+          </option>
+
+          {books.map((b) => (
             <option key={b} value={b}>
               {b}
             </option>
@@ -84,7 +96,9 @@ export default function SearchVerse({ onSelect }) {
           "
         >
           <option value="">
-            {book ? "Selecione o capítulo" : "Escolha um livro primeiro"}
+            {book
+              ? "Selecione o capítulo"
+              : "Escolha um livro primeiro"}
           </option>
 
           {chapters.map((c) => (

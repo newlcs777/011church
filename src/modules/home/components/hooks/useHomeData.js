@@ -1,35 +1,38 @@
-import { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-
-import { fetchDailyVerse } from "../../store/homeThunks";
+import { useEffect, useState } from "react";
 import useAuth from "@/modules/auth/hooks/useAuth";
+
 import {
   getHomePermissions,
   getQuickActions,
 } from "../../utils/homePermissions";
 
-// ✅ caminho correto
-import { getDailyVerseFromJson } from "../../utils/getDailyVerseFromJson";
+import { getDailyVerse } from "../../utils/getDailyVerseFromJson";
+
+const STORAGE_KEY = "dailyVerse";
 
 export default function useHomeData() {
-  const dispatch = useDispatch();
   const { user } = useAuth();
-
-  const { verse, loading } = useSelector((state) => state.home);
+  const [verse, setVerse] = useState(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // 🔥 força trocar versículo a cada reload
-    localStorage.removeItem("dailyVerse");
+    // 🔄 SEMPRE gera um novo versículo a cada F5
+    const newVerse = getDailyVerse();
 
-    const newVerse = getDailyVerseFromJson();
-
-    if (!newVerse && !verse) {
-      dispatch(fetchDailyVerse());
+    if (newVerse) {
+      // 💾 sobrescreve o cache
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify(newVerse)
+      );
+      setVerse(newVerse);
     }
-  }, [dispatch]);
+
+    setLoading(false);
+  }, []);
 
   return {
-    verse: getDailyVerseFromJson() || verse,
+    verse,
     loading,
     role: user?.role,
     permissions: getHomePermissions(user?.role),

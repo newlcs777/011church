@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 export default function VerseCard({ verse }) {
   const navigate = useNavigate();
 
-  if (!verse?.book || !verse?.chapter) return null;
+  if (!verse || !verse.book || !verse.chapter) return null;
 
   const handleClick = () => {
     navigate("/bible/read", {
@@ -16,8 +16,12 @@ export default function VerseCard({ verse }) {
 
   return (
     <div
-      onClick={handleClick}
       role="button"
+      tabIndex={0}
+      onClick={handleClick}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") handleClick();
+      }}
       className="
         rounded-2xl
         bg-base-100
@@ -27,7 +31,7 @@ export default function VerseCard({ verse }) {
         shadow-sm
         flex
         flex-col
-        gap-3
+        gap-4
         cursor-pointer
         hover:shadow-md
         hover:border-primary/40
@@ -42,7 +46,14 @@ export default function VerseCard({ verse }) {
         {verse.reference}
       </h3>
 
-      <p className="text-sm text-base-content/70 text-center">
+      {/* TEXTO COMPLETO DO VERSÍCULO (SEM CORTE) */}
+      {verse.previewText && (
+        <p className="text-sm text-base-content/80 text-center leading-relaxed whitespace-pre-line">
+          {verse.previewText}
+        </p>
+      )}
+
+      <p className="text-xs text-base-content/50 text-center">
         Toque para abrir o capítulo completo
       </p>
     </div>

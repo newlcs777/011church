@@ -1,43 +1,30 @@
 import bibleData from "../../bible/data/bible_almeida_rc_structured.json";
+import { getChapterVerses } from "../../bible/data/livros";
 
 function pickRandom(arr) {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-export function getDailyVerseFromJson() {
+export function getDailyVerse() {
   const booksObj = bibleData?.books;
+  if (!booksObj) return null;
 
-  if (!booksObj) {
-    return {
-      reference: "Erro ao carregar",
-      text: "Estrutura da Bíblia inválida.",
-    };
-  }
+  const book = pickRandom(Object.values(booksObj));
+  const bookName = book.name;
 
-  const bookIds = Object.keys(booksObj);
-  const bookId = pickRandom(bookIds);
+  const chapterKey = pickRandom(Object.keys(book.chapters));
+  const chapter = Number(chapterKey);
 
-  const book = booksObj[bookId];
-  const bookName = book?.name || `Livro ${bookId}`;
+  // 🔹 só para PREVIEW
+  const verses = getChapterVerses(bookName, chapter);
+  if (!verses.length) return null;
 
-  const chaptersObj = book?.chapters;
-  const chapterKeys = Object.keys(chaptersObj);
-  const chapter = pickRandom(chapterKeys);
-
-  const versesObj = chaptersObj[chapter];
-  const verseKeys = Object.keys(versesObj);
-  const verseNumber = pickRandom(verseKeys);
-
-  const verseText = versesObj[verseNumber];
+  const verseObj = pickRandom(verses);
 
   return {
-    // 🔹 já existia
-    reference: `${bookName} ${chapter}:${verseNumber}`,
-    text: verseText,
-
-    // 🔹 novos campos (não quebram nada)
+    reference: `${bookName} ${chapter}:${verseObj.verse}`,
+    previewText: verseObj.text, // 👈 TEXTO PARA HOME
     book: bookName,
-    chapter: Number(chapter),
-    verse: Number(verseNumber),
+    chapter,
   };
 }
