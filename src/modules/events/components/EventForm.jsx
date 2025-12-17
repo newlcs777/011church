@@ -1,5 +1,4 @@
 import Input from "../../../components/ui/Input";
-import Button from "../../../components/ui/Button";
 
 export default function EventForm({
   values,
@@ -11,7 +10,11 @@ export default function EventForm({
   return (
     <form
       onSubmit={onSubmit}
-      className="flex flex-col gap-6"
+      className="
+        flex
+        flex-col
+        gap-6
+      "
     >
       {/* TÍTULO */}
       <Input
@@ -20,23 +23,29 @@ export default function EventForm({
         placeholder="Ex: Culto de Domingo"
         value={values.titulo}
         onChange={onChange}
+        required
       />
 
       {/* DESCRIÇÃO */}
       <div className="flex flex-col gap-2">
-        <label className="text-sm text-base-content/70">
+        <label
+          htmlFor="descricao"
+          className="text-sm text-base-content/70"
+        >
           Descrição
         </label>
 
         <textarea
+          id="descricao"
           name="descricao"
           placeholder="Detalhes sobre o evento"
           value={values.descricao}
           onChange={onChange}
+          required
           className="
             w-full
-            h-28
-            rounded-lg
+            min-h-[120px]
+            rounded-xl
             border
             border-base-300
             bg-base-100
@@ -45,8 +54,8 @@ export default function EventForm({
             leading-relaxed
             resize-none
             focus:outline-none
-            focus:ring-1
-            focus:ring-base-300
+            focus-visible:ring-2
+            focus-visible:ring-primary
           "
         />
       </div>
@@ -59,6 +68,7 @@ export default function EventForm({
           type="date"
           value={values.data}
           onChange={onChange}
+          required
         />
 
         <Input
@@ -67,6 +77,7 @@ export default function EventForm({
           type="time"
           value={values.horario}
           onChange={onChange}
+          required
         />
       </div>
 
@@ -77,24 +88,67 @@ export default function EventForm({
         placeholder="Ex: 011 Church - Santo Amaro"
         value={values.local}
         onChange={onChange}
+        required
       />
 
       {/* AÇÕES */}
-      <div className="flex justify-between pt-2">
-        <Button
-          type="button"
-          variant="ghost"
-          onClick={onCancel}
-        >
-          Cancelar
-        </Button>
+      <div className="flex justify-end gap-3 pt-2">
+        {onCancel && (
+          <button
+            type="button"
+            onClick={onCancel}
+            className="
+              inline-flex
+              items-center
+              justify-center
+              gap-2
+              rounded-xl
+              px-3
+              py-1.5
+              text-xs
+              font-medium
+              tracking-wide
+              transition-all
+              duration-200
+              focus:outline-none
+              focus-visible:ring-2
+              focus-visible:ring-primary
+              disabled:cursor-not-allowed
+              disabled:opacity-60
+              text-neutral/70
+              hover:bg-base-200/70
+            "
+          >
+            Cancelar
+          </button>
+        )}
 
-        <Button
+        <button
           type="submit"
-          variant="ghost"
+          className="
+            inline-flex
+            items-center
+            justify-center
+            gap-2
+            rounded-xl
+            px-3
+            py-1.5
+            text-xs
+            font-medium
+            tracking-wide
+            transition-all
+            duration-200
+            focus:outline-none
+            focus-visible:ring-2
+            focus-visible:ring-primary
+            disabled:cursor-not-allowed
+            disabled:opacity-60
+            text-neutral/70
+            hover:bg-base-200/70
+          "
         >
           {submitLabel}
-        </Button>
+        </button>
       </div>
     </form>
   );

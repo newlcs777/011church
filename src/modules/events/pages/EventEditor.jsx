@@ -20,6 +20,7 @@ export default function EventEditor() {
     getEventById,
     createEvent,
     updateEvent,
+    loading,
   } = useEvents();
 
   const [form, setForm] = useState({
@@ -30,24 +31,21 @@ export default function EventEditor() {
     local: "",
   });
 
-  /* 🔴 CORREÇÃO 1: nunca sobrescrever com objeto incompleto */
   useEffect(() => {
-    if (editing) {
-      const evt = getEventById(id);
+    if (!editing) return;
 
-      if (evt) {
-        setForm({
-          titulo: evt.titulo ?? "",
-          descricao: evt.descricao ?? "",
-          data: evt.data ?? "",
-          horario: evt.horario ?? "",
-          local: evt.local ?? "",
-        });
-      }
-    }
-  }, [editing, id, getEventById]);
+    const evt = getEventById(id);
+    if (!evt) return;
 
-  /* 🔴 CORREÇÃO 2: atualização segura de estado */
+    setForm({
+      titulo: evt.titulo ?? "",
+      descricao: evt.descricao ?? "",
+      data: evt.data ?? "",
+      horario: evt.horario ?? "",
+      local: evt.local ?? "",
+    });
+  }, [editing, id]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
 
@@ -61,7 +59,10 @@ export default function EventEditor() {
     e.preventDefault();
 
     if (editing) {
-      updateEvent(form);
+      updateEvent({
+        id,
+        ...form,
+      });
     } else {
       createEvent(form);
     }
@@ -79,30 +80,73 @@ export default function EventEditor() {
 
   return (
     <div className="flex flex-col gap-6 pb-6">
-      {/* HEADER — PADRÃO HOME */}
-      <PageHeader
-        title={editing ? "Editar evento" : "Novo evento"}
-        subtitle={
-          editing
-            ? "Atualize as informações do evento"
-            : "Preencha os dados para cadastrar um novo evento"
-        }
-      />
+      {/* TOPO */}
+      <div className="flex items-center justify-between">
+        <span className="w-[60px]" />
+
+        <PageHeader
+          title={editing ? "Editar evento" : "Novo evento"}
+          subtitle={
+            editing
+              ? "Atualize as informações do evento"
+              : "Preencha os dados para cadastrar um novo evento"
+          }
+          align="center"
+        />
+
+        <button
+          type="button"
+          onClick={() => navigate(-1)}
+          className="
+            inline-flex
+            items-center
+            justify-center
+            gap-2
+            rounded-xl
+            px-3
+            py-1.5
+            text-xs
+            font-medium
+            tracking-wide
+            transition-all
+            duration-200
+            focus:outline-none
+            focus-visible:ring-2
+            focus-visible:ring-primary
+            text-neutral/70
+            hover:bg-base-200/70
+          "
+        >
+          Voltar
+        </button>
+      </div>
 
       {/* FORM */}
       <section className="flex flex-col gap-2">
         <div className="rounded-xl bg-base-100 p-6">
-          <EventForm
-            values={form}
-            onChange={handleChange}
-            onSubmit={handleSubmit}
-            onCancel={() => navigate("/eventos")}
-            submitLabel={
-              editing
-                ? "Salvar alterações"
-                : "Salvar evento"
-            }
-          />
+          {editing && loading ? (
+            <div className="flex flex-col gap-4 animate-pulse">
+              <div className="h-10 rounded bg-base-200" />
+              <div className="h-28 rounded bg-base-200" />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="h-10 rounded bg-base-200" />
+                <div className="h-10 rounded bg-base-200" />
+              </div>
+              <div className="h-10 rounded bg-base-200" />
+            </div>
+          ) : (
+            <EventForm
+              values={form}
+              onChange={handleChange}
+              onSubmit={handleSubmit}
+              onCancel={() => navigate(-1)}
+              submitLabel={
+                editing
+                  ? "Salvar alterações"
+                  : "Salvar evento"
+              }
+            />
+          )}
         </div>
       </section>
     </div>
