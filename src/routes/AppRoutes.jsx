@@ -19,6 +19,11 @@ import ComunicadosList from "../modules/comunicados/pages/ComunicadosList";
 import ComunicadoDetails from "../modules/comunicados/pages/ComunicadoDetails";
 import ComunicadoEditor from "../modules/comunicados/pages/ComunicadoEditor";
 
+/* ===================== DNA ===================== */
+import DnaPage from "../modules/dna/pages/oldpage.jsx";
+import DnaEditorPage from "../modules/dna/pages/DnaEditorPage";
+import DnaDetailsPage from "../modules/dna/pages/DnaDetailsPage";
+
 /* ===================== ADMIN ===================== */
 import AdminDashboard from "../modules/admin/pages/AdminDashboard";
 
@@ -71,14 +76,15 @@ export default function AppRoutes() {
         }
       />
 
-<Route
-  path="/bible/read"
-  element={
-    <ProtectedRoute>
-      <BibleReadPage />
-    </ProtectedRoute>
-  }
-/>
+      <Route
+        path="/bible/read"
+        element={
+          <ProtectedRoute>
+            <BibleReadPage />
+          </ProtectedRoute>
+        }
+      />
+
       {/* ===================== EVENTOS ===================== */}
       <Route
         path="/eventos"
@@ -149,6 +155,34 @@ export default function AppRoutes() {
         element={
           <ProtectedRoute>
             <ComunicadoDetails />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* ===================== DNA ===================== */}
+      <Route
+        path="/dna"
+        element={
+          <ProtectedRoute>
+            <DnaPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/dna/novo"
+        element={
+          <ProtectedRoute>
+            <DnaEditorPage />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/dna/:id"
+        element={
+          <ProtectedRoute>
+            <DnaDetailsPage />
           </ProtectedRoute>
         }
       />

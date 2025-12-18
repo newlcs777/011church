@@ -9,37 +9,39 @@ export default function PageHeader({
   return (
     <div
       className="
-        relative
         pb-4
         border-b
         border-base-200
       "
     >
-      {/* AÇÕES À DIREITA */}
-      {right && (
-        <div className="absolute right-0 top-0">
-          {right}
-        </div>
-      )}
-
-      {/* TÍTULO */}
       <div
         className={`
-          flex
-          flex-col
-          gap-1
-          ${isCenter ? "items-center text-center" : ""}
+          grid
+          grid-cols-3
+          items-center
+          ${isCenter ? "text-center" : ""}
         `}
       >
-        <h1 className="text-xl md:text-2xl font-semibold text-neutral">
-          {title}
-        </h1>
+        {/* COLUNA ESQUERDA (reserva espaço) */}
+        <div />
 
-        {subtitle && (
-          <p className="text-xs md:text-sm text-neutral/70">
-            {subtitle}
-          </p>
-        )}
+        {/* TÍTULO CENTRAL */}
+        <div className="flex flex-col gap-1 items-center">
+          <h1 className="text-xl md:text-2xl font-semibold text-neutral">
+            {title}
+          </h1>
+
+          {subtitle && (
+            <p className="text-xs md:text-sm text-neutral/70">
+              {subtitle}
+            </p>
+          )}
+        </div>
+
+        {/* AÇÕES À DIREITA */}
+        <div className="flex justify-end">
+          {right}
+        </div>
       </div>
     </div>
   );

@@ -7,6 +7,7 @@ const links = [
   { to: "/bible", label: "Bíblia", icon: "📖" },
   { to: "/eventos", label: "Eventos", icon: "📅" },
   { to: "/comunicados", label: "Comunicados", icon: "📢" },
+  { to: "/dna", label: "DNA", icon: "🧬" },
   { to: "/escalas", label: "Escalas", icon: "📝" },
 ];
 
@@ -41,8 +42,10 @@ export default function Sidebar({ onClose }) {
     text-sm font-medium transition-all duration-200
   `;
 
-  const activeClass = "bg-base-100/15 text-base-100 shadow-sm shadow-black/20";
-  const inactiveClass = "text-base-100/80 hover:bg-base-100/5 hover:text-base-100";
+  const activeClass =
+    "bg-base-100/15 text-base-100 shadow-sm shadow-black/20";
+  const inactiveClass =
+    "text-base-100/80 hover:bg-base-100/5 hover:text-base-100";
 
   return (
     <aside
@@ -65,7 +68,6 @@ export default function Sidebar({ onClose }) {
 
       {/* NAV */}
       <nav className="flex-1 space-y-1 px-3 pt-4">
-
         {/* Links padrão */}
         {links.map((item) => (
           <NavLink
@@ -73,7 +75,9 @@ export default function Sidebar({ onClose }) {
             to={item.to}
             onClick={onClose}
             className={({ isActive }) =>
-              `${baseLinkClass} ${isActive ? activeClass : inactiveClass}`
+              `${baseLinkClass} ${
+                isActive ? activeClass : inactiveClass
+              }`
             }
           >
             <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-base-100/10 text-lg">
@@ -89,7 +93,9 @@ export default function Sidebar({ onClose }) {
         {canSeeMinistries && (
           <>
             <button
-              onClick={() => setOpenMinistries(!openMinistries)}
+              onClick={() =>
+                setOpenMinistries(!openMinistries)
+              }
               className={`${baseLinkClass} ${inactiveClass} w-full flex justify-between`}
             >
               <div className="flex items-center gap-3">
@@ -142,7 +148,9 @@ export default function Sidebar({ onClose }) {
             to="/admin"
             onClick={onClose}
             className={({ isActive }) =>
-              `${baseLinkClass} mt-3 ${isActive ? activeClass : inactiveClass}`
+              `${baseLinkClass} mt-3 ${
+                isActive ? activeClass : inactiveClass
+              }`
             }
           >
             <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-base-100/10 text-lg">
@@ -151,6 +159,61 @@ export default function Sidebar({ onClose }) {
             <span>Admin</span>
           </NavLink>
         )}
+
+        {/* ===============================
+            LINKS EXTERNOS
+        ================================ */}
+        <div className="mt-6">
+          <div className="border-t border-white/10 pt-4 space-y-1">
+            <a
+              href="https://open.spotify.com/show/3EA0VR82RfeiktPW4SqgJT"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`${baseLinkClass} ${inactiveClass}`}
+            >
+              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-base-100/10 text-lg">
+                🎧
+              </span>
+              <span>Spotify (Cultos)</span>
+            </a>
+
+            <a
+              href="https://www.instagram.com/011church/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`${baseLinkClass} ${inactiveClass}`}
+            >
+              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-base-100/10 text-lg">
+                📸
+              </span>
+              <span>Instagram</span>
+            </a>
+
+            <a
+              href="https://www.youtube.com/@011church-sede"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`${baseLinkClass} ${inactiveClass}`}
+            >
+              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-base-100/10 text-lg">
+                ▶️
+              </span>
+              <span>YouTube</span>
+            </a>
+
+            <a
+              href="#"
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`${baseLinkClass} ${inactiveClass}`}
+            >
+              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-base-100/10 text-lg">
+                💙
+              </span>
+              <span>Doações</span>
+            </a>
+          </div>
+        </div>
       </nav>
 
       {/* LOGOUT */}
