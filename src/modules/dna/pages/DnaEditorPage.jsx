@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { FaTrash, FaArrowLeft } from "react-icons/fa";
 
 import PageHeader from "@/components/ui/PageHeader";
 import Button from "@/components/ui/Button";
@@ -15,7 +16,7 @@ export default function DnaEditorPage() {
   const { user } = useAuth();
 
   const isNew = !id;
-  const { getById, create, update, remove } = useDna(); // ✅ remove
+  const { getById, create, update, remove } = useDna();
   const canCreate = canCreateDna(user?.role);
 
   const [initialData, setInitialData] = useState(null);
@@ -65,16 +66,16 @@ export default function DnaEditorPage() {
   }
 
   async function handleDelete() {
-    const confirm = window.confirm(
+    const confirmDelete = window.confirm(
       "Tem certeza que deseja excluir este DNA?"
     );
 
-    if (!confirm) return;
+    if (!confirmDelete) return;
 
     setLoading(true);
 
     try {
-      await remove(id); // ✅ AGORA EXCLUI DE VERDADE (soft delete)
+      await remove(id);
       navigate("/dna");
     } finally {
       setLoading(false);
@@ -82,27 +83,77 @@ export default function DnaEditorPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6 max-w-xl">
+    <div
+      className="
+        max-w-xl
+        mx-auto
+        flex
+        flex-col
+        gap-6
+        pb-6
+      "
+    >
+      {/* HEADER */}
       <PageHeader
         title={isNew ? "Criar DNA" : "Editar DNA"}
         subtitle="Cadastro do grupo DNA"
+        right={
+          <Button
+            variant="ghost"
+            onClick={() => navigate("/dna")}
+            className="
+              flex
+              items-center
+              gap-2
+            "
+          >
+            <FaArrowLeft size={14} />
+            Voltar
+          </Button>
+        }
       />
 
-      <DnaForm
-        initialData={initialData}
-        onSubmit={handleSubmit}
-        onCancel={() => navigate("/dna")}
-        isSubmitting={loading}
-      />
+      {/* FORMULÁRIO */}
+      <section
+        className="
+          bg-base-100
+          rounded-2xl
+        "
+      >
+        <DnaForm
+          initialData={initialData}
+          onSubmit={handleSubmit}
+          onCancel={() => navigate("/dna")}
+          isSubmitting={loading}
+        />
+      </section>
 
+      {/* AÇÃO PERIGOSA (DISCRETA) */}
       {!isNew && (
-        <Button
-          variant="destructive"
-          onClick={handleDelete}
-          disabled={loading}
+        <div
+          className="
+            pt-2
+            flex
+            justify-end
+          "
         >
-          Excluir DNA
-        </Button>
+          <Button
+            variant="ghost"
+            onClick={handleDelete}
+            disabled={loading}
+            className="
+              flex
+              items-center
+              gap-2
+              text-sm
+              text-error
+              hover:text-error
+            "
+          >
+            <FaTrash size={14} />
+            Excluir DNA
+          </Button>
+        </div>
       )}
     </div>
   );

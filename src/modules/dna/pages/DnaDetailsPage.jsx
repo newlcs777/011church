@@ -1,8 +1,15 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import {
+  FaEdit,
+  FaTrash,
+  FaArrowLeft,
+  FaUser,
+  FaClock,
+  FaCalendarDay,
+} from "react-icons/fa";
 
 import PageHeader from "@/components/ui/PageHeader";
-import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 
 import useAuth from "@/modules/auth/hooks/useAuth";
@@ -39,7 +46,7 @@ export default function DnaDetailsPage() {
 
   if (loading) {
     return (
-      <p className="text-sm text-base-content/60">
+      <p className="text-sm text-base-content/60 text-center">
         Carregando DNA...
       </p>
     );
@@ -56,62 +63,159 @@ export default function DnaDetailsPage() {
   const canDelete = canDeleteDna(user?.role);
 
   const handleDelete = async () => {
-    if (!confirm("Deseja realmente excluir este DNA?")) return;
+    if (!confirm("Deseja realmente excluir este DNA?"))
+      return;
 
     await remove(dna.id);
     navigate("/dna");
   };
 
   return (
-    <div className="flex flex-col gap-6 max-w-xl">
+    <div
+      className="
+        max-w-xl
+        mx-auto
+        flex
+        flex-col
+        gap-6
+        pb-6
+      "
+    >
+      {/* HEADER */}
       <PageHeader
         title={dna.nome}
         subtitle="Detalhes do DNA"
+        right={
+          <Button
+            variant="ghost"
+            onClick={() => navigate("/dna")}
+            className="
+              flex
+              items-center
+              gap-2
+            "
+          >
+            <FaArrowLeft size={14} />
+            Voltar
+          </Button>
+        }
       />
 
-      <Card>
-        <div className="flex flex-col gap-2 text-sm">
-          <p>
-            <strong>Dia:</strong> {dna.dia}
-          </p>
+      {/* INFORMAÇÕES */}
+      <section
+        className="
+          bg-base-100
+          rounded-2xl
+          p-6
+          flex
+          flex-col
+          gap-4
+        "
+      >
+        <h3
+          className="
+            text-base
+            font-semibold
+          "
+        >
+          Informações do grupo
+        </h3>
 
-          <p>
-            <strong>Horário:</strong> {dna.horario}
-          </p>
-
-          <p>
-            <strong>Líder:</strong> {dna.liderNome}
-          </p>
+        <div
+          className="
+            flex
+            items-center
+            gap-2
+            text-sm
+            text-base-content/80
+          "
+        >
+          <FaCalendarDay className="text-base-content/60" />
+          <span>
+            <strong className="font-medium">Dia:</strong>{" "}
+            {dna.dia}
+          </span>
         </div>
-      </Card>
+
+        <div
+          className="
+            flex
+            items-center
+            gap-2
+            text-sm
+            text-base-content/80
+          "
+        >
+          <FaClock className="text-base-content/60" />
+          <span>
+            <strong className="font-medium">
+              Horário:
+            </strong>{" "}
+            {dna.horario}
+          </span>
+        </div>
+
+        <div
+          className="
+            flex
+            items-center
+            gap-2
+            text-sm
+            text-base-content/80
+          "
+        >
+          <FaUser className="text-base-content/60" />
+          <span>
+            <strong className="font-medium">Líder:</strong>{" "}
+            {dna.liderNome}
+          </span>
+        </div>
+      </section>
 
       {/* AÇÕES */}
-      <div className="flex gap-3">
+      <div
+        className="
+          flex
+          items-center
+          gap-3
+          pt-2
+        "
+      >
         {canEdit && (
           <Button
+            variant="ghost"
             onClick={() =>
               navigate(`/dna/editar/${dna.id}`)
             }
+            className="
+              flex
+              items-center
+              gap-2
+              text-sm
+            "
           >
+            <FaEdit size={14} />
             Editar
           </Button>
         )}
 
         {canDelete && (
           <Button
-            variant="outline"
+            variant="ghost"
             onClick={handleDelete}
+            className="
+              flex
+              items-center
+              gap-2
+              text-sm
+              text-error
+              hover:text-error
+            "
           >
+            <FaTrash size={14} />
             Excluir
           </Button>
         )}
-
-        <Button
-          variant="ghost"
-          onClick={() => navigate("/dna")}
-        >
-          Voltar
-        </Button>
       </div>
     </div>
   );

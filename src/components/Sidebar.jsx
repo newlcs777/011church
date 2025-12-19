@@ -2,16 +2,34 @@ import { NavLink } from "react-router-dom";
 import { useState } from "react";
 import useAuth from "../modules/auth/hooks/useAuth";
 
+import {
+  HiOutlineHome,
+  HiOutlineBookOpen,
+  HiOutlineCalendarDays,
+  HiOutlineMegaphone,
+  HiOutlineBeaker,
+  HiOutlineClipboardDocumentList,
+  HiOutlineAcademicCap,
+  HiOutlineUsers,
+  HiOutlineWrenchScrewdriver,
+} from "react-icons/hi2";
+
+import {
+  FaSpotify,
+  FaInstagram,
+  FaYoutube,
+  FaHeart,
+} from "react-icons/fa";
+
 const links = [
-  { to: "/", label: "Início", icon: "🏠" },
-  { to: "/bible", label: "Bíblia", icon: "📖" },
-  { to: "/eventos", label: "Eventos", icon: "📅" },
-  { to: "/comunicados", label: "Comunicados", icon: "📢" },
-  { to: "/dna", label: "DNA", icon: "🧬" },
-  { to: "/escalas", label: "Escalas", icon: "📝" },
+  { to: "/", label: "Início", icon: HiOutlineHome },
+  { to: "/bible", label: "Bíblia", icon: HiOutlineBookOpen },
+  { to: "/eventos", label: "Eventos", icon: HiOutlineCalendarDays },
+  { to: "/comunicados", label: "Comunicados", icon: HiOutlineMegaphone },
+  { to: "/dna", label: "DNA", icon: HiOutlineBeaker },
+  { to: "/escalas", label: "Escalas", icon: HiOutlineClipboardDocumentList },
 ];
 
-// Ministérios
 const ministryLinks = [
   { to: "/ministerios/presbiterio", label: "Presbitério" },
   { to: "/ministerios/louvor", label: "Louvor" },
@@ -29,13 +47,13 @@ const ministryLinks = [
 export default function Sidebar({ onClose }) {
   const { user, logout } = useAuth();
   const [openMinistries, setOpenMinistries] = useState(false);
+  const [openCourses, setOpenCourses] = useState(false);
 
-  // 🔐 AUTH MINISTÉRIOS (APENAS VISIBILIDADE)
   const canSeeMinistries =
-    user?.role === "admin" ||
-    user?.role === "pastor" ||
-    user?.role === "lider" ||
-    user?.role === "obreiro";
+    ["admin", "pastor", "lider", "obreiro"].includes(user?.role);
+
+  const canSeeCourses =
+    ["admin", "pastor", "lider"].includes(user?.role);
 
   const baseLinkClass = `
     group flex items-center gap-3 rounded-2xl px-3 py-2.5
@@ -48,14 +66,7 @@ export default function Sidebar({ onClose }) {
     "text-base-100/80 hover:bg-base-100/5 hover:text-base-100";
 
   return (
-    <aside
-      className="
-        flex flex-col h-full
-        overflow-y-auto
-        scrollbar-thin scrollbar-thumb-base-300/20 scrollbar-track-transparent
-        px-1
-      "
-    >
+    <aside className="flex flex-col h-full overflow-y-auto px-1">
       {/* HEADER */}
       <div className="border-b border-white/10 px-4 pb-4 pt-5">
         <p className="text-xs font-semibold uppercase tracking-[0.16em] text-base-100/60">
@@ -68,11 +79,11 @@ export default function Sidebar({ onClose }) {
 
       {/* NAV */}
       <nav className="flex-1 space-y-1 px-3 pt-4">
-        {/* Links padrão */}
-        {links.map((item) => (
+        {/* LINKS PRINCIPAIS */}
+        {links.map(({ to, label, icon: Icon }) => (
           <NavLink
-            key={item.to}
-            to={item.to}
+            key={to}
+            to={to}
             onClick={onClose}
             className={({ isActive }) =>
               `${baseLinkClass} ${
@@ -80,61 +91,70 @@ export default function Sidebar({ onClose }) {
               }`
             }
           >
-            <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-base-100/10 text-lg">
-              {item.icon}
+            <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-base-100/10">
+              <Icon className="text-lg" />
             </span>
-            <span>{item.label}</span>
+            <span>{label}</span>
           </NavLink>
         ))}
 
-        {/* ===============================
-            MENU DE MINISTÉRIOS (COM AUTH)
-        ================================ */}
-        {canSeeMinistries && (
+        {/* CURSOS */}
+        {canSeeCourses && (
           <>
             <button
-              onClick={() =>
-                setOpenMinistries(!openMinistries)
-              }
+              onClick={() => setOpenCourses(!openCourses)}
               className={`${baseLinkClass} ${inactiveClass} w-full flex justify-between`}
             >
               <div className="flex items-center gap-3">
-                <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-base-100/10 text-lg">
-                  🙏
+                <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-base-100/10">
+                  <HiOutlineAcademicCap className="text-lg" />
+                </span>
+                <span>Curso</span>
+              </div>
+              <span>{openCourses ? "▲" : "▼"}</span>
+            </button>
+
+            {openCourses && (
+              <div className="ml-10 mt-1 flex flex-col gap-1 border-l border-white/10 pl-3">
+                <NavLink to="/cursos" className="text-sm py-1.5 text-base-100/70 hover:text-base-100">
+                  Ver cursos
+                </NavLink>
+
+                {canSeeCourses && (
+                  <NavLink to="/cursos/novo" className="text-sm py-1.5 text-base-100/70 hover:text-base-100">
+                    Criar curso
+                  </NavLink>
+                )}
+              </div>
+            )}
+          </>
+        )}
+
+        {/* MINISTÉRIOS */}
+        {canSeeMinistries && (
+          <>
+            <button
+              onClick={() => setOpenMinistries(!openMinistries)}
+              className={`${baseLinkClass} ${inactiveClass} w-full flex justify-between`}
+            >
+              <div className="flex items-center gap-3">
+                <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-base-100/10">
+                  <HiOutlineUsers className="text-lg" />
                 </span>
                 <span>Ministérios</span>
               </div>
-              <span className="text-base-100/70">
-                {openMinistries ? "▲" : "▼"}
-              </span>
+              <span>{openMinistries ? "▲" : "▼"}</span>
             </button>
 
-            {/* SUBMENU MINISTÉRIOS */}
             {openMinistries && (
-              <div
-                className="
-                  ml-10 mt-1 flex flex-col gap-1 
-                  border-l border-white/10 pl-3
-                  animate-fadeIn
-                "
-              >
-                {ministryLinks.map((sub) => (
+              <div className="ml-10 mt-1 flex flex-col gap-1 border-l border-white/10 pl-3">
+                {ministryLinks.map((m) => (
                   <NavLink
-                    key={sub.to}
-                    to={sub.to}
-                    onClick={onClose}
-                    className={({ isActive }) =>
-                      `
-                      text-sm py-1.5 rounded-lg transition 
-                      ${
-                        isActive
-                          ? "text-primary font-semibold"
-                          : "text-base-100/70 hover:text-base-100"
-                      }
-                      `
-                    }
+                    key={m.to}
+                    to={m.to}
+                    className="text-sm py-1.5 text-base-100/70 hover:text-base-100"
                   >
-                    {sub.label}
+                    {m.label}
                   </NavLink>
                 ))}
               </div>
@@ -142,93 +162,38 @@ export default function Sidebar({ onClose }) {
           </>
         )}
 
-        {/* Admin */}
-        {user?.role === "admin" && (
-          <NavLink
-            to="/admin"
-            onClick={onClose}
-            className={({ isActive }) =>
-              `${baseLinkClass} mt-3 ${
-                isActive ? activeClass : inactiveClass
-              }`
-            }
-          >
-            <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-base-100/10 text-lg">
-              🛠️
-            </span>
-            <span>Admin</span>
-          </NavLink>
-        )}
+        {/* LINKS EXTERNOS */}
+        <div className="mt-6 border-t border-white/10 pt-4 space-y-1">
+          <a href="https://open.spotify.com" target="_blank" className={`${baseLinkClass} ${inactiveClass}`}>
+            <FaSpotify />
+            <span>Spotify</span>
+          </a>
 
-        {/* ===============================
-            LINKS EXTERNOS
-        ================================ */}
-        <div className="mt-6">
-          <div className="border-t border-white/10 pt-4 space-y-1">
-            <a
-              href="https://open.spotify.com/show/3EA0VR82RfeiktPW4SqgJT"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`${baseLinkClass} ${inactiveClass}`}
-            >
-              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-base-100/10 text-lg">
-                🎧
-              </span>
-              <span>Spotify (Cultos)</span>
-            </a>
+          <a href="https://instagram.com" target="_blank" className={`${baseLinkClass} ${inactiveClass}`}>
+            <FaInstagram />
+            <span>Instagram</span>
+          </a>
 
-            <a
-              href="https://www.instagram.com/011church/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`${baseLinkClass} ${inactiveClass}`}
-            >
-              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-base-100/10 text-lg">
-                📸
-              </span>
-              <span>Instagram</span>
-            </a>
+          <a href="https://youtube.com" target="_blank" className={`${baseLinkClass} ${inactiveClass}`}>
+            <FaYoutube />
+            <span>YouTube</span>
+          </a>
 
-            <a
-              href="https://www.youtube.com/@011church-sede"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`${baseLinkClass} ${inactiveClass}`}
-            >
-              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-base-100/10 text-lg">
-                ▶️
-              </span>
-              <span>YouTube</span>
-            </a>
-
-            <a
-              href="#"
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`${baseLinkClass} ${inactiveClass}`}
-            >
-              <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-base-100/10 text-lg">
-                💙
-              </span>
-              <span>Doações</span>
-            </a>
-          </div>
+          <a href="#" className={`${baseLinkClass} ${inactiveClass}`}>
+            <FaHeart />
+            <span>Doações</span>
+          </a>
         </div>
       </nav>
 
       {/* LOGOUT */}
       <div className="border-t border-white/10 px-4 py-4">
         <button
-          type="button"
           onClick={() => {
             logout();
-            if (onClose) onClose();
+            onClose?.();
           }}
-          className="
-            w-full rounded-2xl border border-base-100/20 bg-base-100/5 
-            px-3 py-2 text-sm font-medium text-base-100 
-            transition duration-200 hover:bg-base-100/10
-          "
+          className="w-full rounded-2xl border border-base-100/20 bg-base-100/5 px-3 py-2 text-sm hover:bg-base-100/10"
         >
           Sair
         </button>

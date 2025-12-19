@@ -5,43 +5,48 @@ export default function Header({ onOpenMenu }) {
   const firstName = user?.nome?.split(" ")[0] || "Visitante";
 
   return (
-    <header className="w-full border-b border-base-200 bg-base-100/80 backdrop-blur">
+    <header className="w-full border-b border-base-200 bg-base-100/90 backdrop-blur">
       <div className="max-w-5xl mx-auto flex items-center justify-between px-4 py-3 md:px-6">
 
-        {/* BOTÃO MOBILE (hambúrguer) */}
+        {/* BOTÃO MOBILE */}
         <button
-          className="md:hidden text-secondary text-2xl mr-2"
+          className="md:hidden text-base-content text-2xl mr-2"
           onClick={onOpenMenu}
+          aria-label="Abrir menu"
         >
           ☰
         </button>
 
-        {/* LOGO */}
+        {/* LOGO + TÍTULO */}
         <div className="flex items-center gap-3">
-          <span className="h-8 w-8 flex items-center justify-center rounded-xl bg-primary text-primary-content font-bold shadow-md">
+          <span className="h-9 w-9 flex items-center justify-center rounded-xl bg-primary text-primary-content font-bold shadow-md">
             011
           </span>
 
-          <div>
-            <h1 className="text-base font-semibold text-neutral md:text-lg">
+          <div className="leading-tight">
+            <h1 className="text-sm font-semibold text-base-content">
               011 Church
             </h1>
-            <p className="text-xs text-neutral/60">Painel administrativo</p>
+
+            {/* ⬇️ SOME NO MOBILE */}
+            <p className="hidden md:block text-[11px] text-base-content/60">
+              Painel administrativo
+            </p>
           </div>
         </div>
 
-        {/* USER */}
-        <div className="flex items-center gap-3">
-          <div className="hidden sm:block text-right">
-            <p className="text-sm font-medium text-neutral">
+        {/* USUÁRIO */}
+        <div className="flex items-center gap-2">
+          <div className="hidden sm:block text-right leading-tight">
+            <p className="text-sm font-medium text-base-content">
               {user?.nome || "Visitante"}
             </p>
-            <p className="text-[11px] text-neutral/60 uppercase tracking-wide">
+            <p className="text-[10px] uppercase tracking-wider text-base-content/50">
               {user?.role || "membro"}
             </p>
           </div>
 
-          <div className="h-9 w-9 flex items-center justify-center rounded-full bg-primary text-primary-content font-semibold shadow-md md:h-10 md:w-10">
+          <div className="h-9 w-9 flex items-center justify-center rounded-full bg-primary text-primary-content font-semibold shadow-md">
             {firstName.charAt(0)}
           </div>
         </div>

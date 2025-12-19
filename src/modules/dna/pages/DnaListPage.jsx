@@ -1,147 +1,236 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { FaPlus, FaMapMarkerAlt } from "react-icons/fa";
 
 import PageHeader from "@/components/ui/PageHeader";
 import Button from "@/components/ui/Button";
-import Card from "@/components/ui/Card";
 
-import useAuth from "@/modules/auth/hooks/useAuth";
 import useDna from "../hooks/useDna";
 import useDnaSearch from "../hooks/useDnaSearch";
-import { canCreateDna } from "../utils/dnaPermissions";
 
 import DnaCard from "../components/DnaCard";
 
-export default function DnaPage() {
+export default function DnaListPage() {
   const navigate = useNavigate();
-  const { user } = useAuth();
 
   const { getAll } = useDna();
   const { searchNearby } = useDnaSearch();
 
+  const [allDnas, setAllDnas] = useState([]);
+  const [filteredDnas, setFilteredDnas] = useState([]);
+
   const [loading, setLoading] = useState(true);
   const [searching, setSearching] = useState(false);
   const [searched, setSearched] = useState(false);
-  const [dnas, setDnas] = useState([]);
-
-  const canCreate = canCreateDna(user?.role);
+  const [geoError, setGeoError] = useState(null);
 
   useEffect(() => {
-    let mounted = true;
-
     async function load() {
-      try {
-        const data = await getAll();
-        if (mounted) setDnas(data);
-      } finally {
-        if (mounted) setLoading(false);
-      }
+      const data = await getAll();
+      setAllDnas(data);
+      setLoading(false);
     }
 
     load();
-    return () => (mounted = false);
   }, [getAll]);
-async function handleSearchNearby() {
-  setSearching(true);
-  setSearched(true);
 
-  const result = await searchNearby();
+  async function handleSearchNearby() {
+    if (!("geolocation" in navigator)) {
+      setGeoError(
+        "Seu dispositivo não permite usar a localização."
+      );
+      setSearched(true);
+      return;
+    }
 
-  // ✅ SEM CONDIÇÃO
-  setDnas(result || []);
+    setSearching(true);
+    setGeoError(null);
 
-  setSearching(false);
-}
+    try {
+      if (navigator.permissions) {
+        const permission = await navigator.permissions.query({
+          name: "geolocation",
+        });
 
+        if (permission.state === "denied") {
+          setGeoError(
+            "Para encontrar um grupo perto de você, é necessário permitir o acesso à localização nas configurações do navegador."
+          );
+          setSearching(false);
+          setSearched(true);
+          return;
+        }
+      }
+    } catch {
+      // Safari iOS segue fluxo normal
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const userLocation = {
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude,
+        };
+
+        const result = await searchNearby(userLocation);
+        setFilteredDnas(result);
+        setSearching(false);
+        setSearched(true);
+      },
+      () => {
+        setGeoError(
+          "Não foi possível acessar sua localização agora. Você pode ver todos os grupos disponíveis."
+        );
+        setSearching(false);
+        setSearched(true);
+      },
+      {
+        enableHighAccuracy: true,
+        timeout: 10000,
+        maximumAge: 0,
+      }
+    );
+  }
+
+  const listToRender = searched ? filteredDnas : allDnas;
 
   return (
-    <div className="flex flex-col gap-6">
-      {/* HEADER DA PÁGINA */}
-<div className="flex flex-col gap-4 mt-8">
-  {/* Título 100% centralizado */}
-  <div className="w-full text-center">
-    <PageHeader
-      title="Grupos DNA"
-      subtitle="Pequenos grupos para viver a fé, criar comunhão e crescer juntos"
-      center
-    />
-  </div>
-
-  {/* Ações do header (embaixo do título) */}
-  <div className="flex items-center justify-between px-2">
-    {canCreate ? (
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => navigate("/dna/novo")}
-      >
-        Criar DNA
-      </Button>
-    ) : (
-      <span />
-    )}
-
-    <Button
-      variant="ghost"
-      size="sm"
-      onClick={() => navigate(-1)}
+    <div
+      className="
+        flex
+        flex-col
+        gap-6
+        pb-6
+      "
     >
-      Voltar
-    </Button>
-  </div>
-</div>
-
-      {/* Ação principal */}
-      <Card>
-        <div className="flex flex-col gap-3">
-          <p className="text-sm text-base-content/70 text-center">
-            Encontre um grupo DNA perto de você e conecte-se com a igreja
-            durante a semana.
-          </p>
-
+      {/* HEADER */}
+      <PageHeader
+        title="Grupos DNA"
+        subtitle="Pequenos grupos para caminhar juntos, criar comunhão e crescer na fé"
+        right={
           <Button
             variant="ghost"
-            onClick={handleSearchNearby}
-            disabled={searching}
-            className="mx-auto"
+            onClick={() => navigate("/dna")}
           >
-            {searching
-              ? "Procurando DNAs próximos..."
-              : "📍 Encontrar um DNA perto de mim"}
+            Voltar
           </Button>
-        </div>
-      </Card>
+        }
+      />
 
-      {/* Estados */}
-      {(loading || searching) && (
+      {/* AÇÃO ADMIN */}
+      <div className="flex justify-start">
+        <Button
+          variant="ghost"
+          onClick={() => navigate("/dna/novo")}
+          className="
+            flex
+            items-center
+            gap-3
+            text-sm
+          "
+        >
+          <FaPlus className="opacity-70" />
+          Criar DNA
+        </Button>
+      </div>
+
+      {/* CTA PRINCIPAL */}
+      <section
+        className="
+          flex
+          flex-col
+          items-center
+          gap-3
+          text-center
+          pt-2
+        "
+      >
+        <button
+          type="button"
+          onClick={handleSearchNearby}
+          disabled={searching}
+          className="
+            flex
+            items-center
+            justify-center
+            gap-3
+            w-full
+            max-w-md
+            rounded-lg
+            border
+            border-base-300
+            px-4
+            py-2.5
+            text-sm
+            font-medium
+            transition
+            hover:bg-base-200
+            active:scale-[0.98]
+            disabled:opacity-50
+            disabled:cursor-not-allowed
+          "
+        >
+          <FaMapMarkerAlt className="opacity-70" />
+          Encontrar um grupo perto de mim
+        </button>
+
+        {/* ERRO GEO */}
+        {geoError && (
+          <p className="text-xs text-warning max-w-xs">
+            {geoError}
+          </p>
+        )}
+
+        {/* RESET */}
+        {searched && !geoError && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => {
+              setSearched(false);
+              setFilteredDnas([]);
+            }}
+          >
+            Ver todos os grupos
+          </Button>
+        )}
+      </section>
+
+      {/* FEEDBACK */}
+      {loading && (
         <p className="text-sm text-base-content/60 text-center">
-          {searching
-            ? "Estamos procurando grupos próximos de você..."
-            : "Carregando grupos DNA..."}
+          Carregando grupos DNA...
         </p>
       )}
 
-      {searched && !searching && dnas.length === 0 && (
-        <p className="text-sm text-base-content/60 text-center">
-          No momento, não encontramos nenhum grupo DNA próximo de você.
+      {searching && (
+        <p className="text-sm text-primary text-center">
+          Procurando grupos próximos de você...
         </p>
       )}
 
-      {/* Lista */}
-      {dnas.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {dnas.map((dna) => (
-            <DnaCard
-              key={dna.id}
-              dna={dna}
-              canEdit={
-                user?.role === "admin" ||
-                user?.role === "pastor" ||
-                (user?.role === "lider" &&
-                  dna.liderId === user?.id)
-              }
-              onEdit={() => navigate(`/dna/${dna.id}`)}
-            />
+      {!loading &&
+        !searching &&
+        searched &&
+        listToRender.length === 0 && (
+          <p className="text-sm text-base-content/60 text-center">
+            Ainda não encontramos um grupo próximo, mas você é
+            muito bem-vindo em qualquer um deles.
+          </p>
+        )}
+
+      {/* LISTA */}
+      {!loading && (
+        <div
+          className="
+            grid
+            gap-6
+            sm:grid-cols-2
+            lg:grid-cols-3
+          "
+        >
+          {listToRender.map((dna) => (
+            <DnaCard key={dna.id} dna={dna} />
           ))}
         </div>
       )}

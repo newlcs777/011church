@@ -20,7 +20,7 @@ import ComunicadoDetails from "../modules/comunicados/pages/ComunicadoDetails";
 import ComunicadoEditor from "../modules/comunicados/pages/ComunicadoEditor";
 
 /* ===================== DNA ===================== */
-import DnaPage from "../modules/dna/pages/oldpage.jsx";
+import DnaListPage from "@/modules/dna/pages/DnaListPage";
 import DnaEditorPage from "../modules/dna/pages/DnaEditorPage";
 import DnaDetailsPage from "../modules/dna/pages/DnaDetailsPage";
 
@@ -158,34 +158,43 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       />
+{/* ===================== DNA ===================== */}
+<Route
+  path="/dna"
+  element={
+    <ProtectedRoute>
+      <DnaListPage />
+    </ProtectedRoute>
+  }
+/>
 
-      {/* ===================== DNA ===================== */}
-      <Route
-        path="/dna"
-        element={
-          <ProtectedRoute>
-            <DnaPage />
-          </ProtectedRoute>
-        }
-      />
+<Route
+  path="/dna/novo"
+  element={
+    <ProtectedRoute>
+      <DnaEditorPage />
+    </ProtectedRoute>
+  }
+/>
 
-      <Route
-        path="/dna/novo"
-        element={
-          <ProtectedRoute>
-            <DnaEditorPage />
-          </ProtectedRoute>
-        }
-      />
+<Route
+  path="/dna/editar/:id"
+  element={
+    <ProtectedRoute>
+      <DnaEditorPage />
+    </ProtectedRoute>
+  }
+/>
 
-      <Route
-        path="/dna/:id"
-        element={
-          <ProtectedRoute>
-            <DnaDetailsPage />
-          </ProtectedRoute>
-        }
-      />
+<Route
+  path="/dna/:id"
+  element={
+    <ProtectedRoute>
+      <DnaDetailsPage />
+    </ProtectedRoute>
+  }
+/>
+
 
       {/* ===================== MINISTÉRIO — ÁUDIO ===================== */}
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
@@ -7,7 +7,15 @@ export default function AppLayout({ children }) {
   const location = useLocation();
   const [openMenu, setOpenMenu] = useState(false);
 
-  if (location.pathname === "/login" || location.pathname === "/register") {
+  // 🔒 GARANTE que o menu mobile fecha ao trocar de rota
+  useEffect(() => {
+    setOpenMenu(false);
+  }, [location.pathname]);
+
+  if (
+    location.pathname === "/login" ||
+    location.pathname === "/register"
+  ) {
     return <>{children}</>;
   }
 
@@ -17,19 +25,21 @@ export default function AppLayout({ children }) {
       {/* MENU MOBILE (overlay) */}
       {openMenu && (
         <div className="fixed inset-0 z-40 flex lg:hidden">
+          {/* OVERLAY ESCURO – AGORA NÃO BLOQUEIA QUANDO NÃO ATIVO */}
           <div
-            className="absolute inset-0 bg-black/40"
+            className="absolute inset-0 bg-black/40 pointer-events-auto"
             onClick={() => setOpenMenu(false)}
           />
 
-          {/* MOBILE SIDEBAR CORRIGIDO */}
+          {/* SIDEBAR MOBILE */}
           <aside
             className="
-              relative z-50 
-              w-72 
-              h-full 
-              bg-secondary 
-              shadow-xl 
+              relative
+              z-50
+              w-72
+              h-full
+              bg-secondary
+              shadow-xl
               animate-slideIn
               overflow-y-auto
               scrollbar-thin
@@ -43,8 +53,21 @@ export default function AppLayout({ children }) {
       )}
 
       {/* WRAPPER GERAL */}
-      <div className="flex w-full max-w-6xl mx-auto overflow-hidden rounded-none md:rounded-3xl bg-base-100 shadow-xl ring-1 ring-base-300/70">
-
+      <div
+        className="
+          flex
+          w-full
+          max-w-6xl
+          mx-auto
+          overflow-hidden
+          rounded-none
+          md:rounded-3xl
+          bg-base-100
+          shadow-xl
+          ring-1
+          ring-base-300/70
+        "
+      >
         {/* SIDEBAR DESKTOP */}
         <aside
           className="
@@ -58,7 +81,7 @@ export default function AppLayout({ children }) {
             via-secondary
             to-neutral
             text-base-100
-            overflow-y-auto       /* DESKTOP TBEM FICA COM SCROLL */
+            overflow-y-auto
           "
         >
           <Sidebar />
