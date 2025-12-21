@@ -49,6 +49,12 @@ import AudioSchedulePage from "../modules/ministries/audio/pages/AudioSchedulePa
 import AudioScheduleCreate from "../modules/ministries/audio/schedule/AudioScheduleCreate.jsx";
 import AudioScheduleEdit from "../modules/ministries/audio/schedule/AudioScheduleEdit.jsx";
 
+//=====================adicionar pessoas//
+/* ===================== PEOPLE ===================== */
+import PeopleCreatePage from "@/modules/people/pages/PeopleCreatePage";
+import PeopleListPage from "@/modules/people/pages/PeopleListPage";
+import PeopleByDnaPage from "@/modules/people/pages/PeopleByDnaPage";
+
 export default function AppRoutes() {
   return (
     <Routes>
@@ -191,6 +197,33 @@ export default function AppRoutes() {
   element={
     <ProtectedRoute>
       <DnaDetailsPage />
+    </ProtectedRoute>
+  }
+/>
+{/* ===================== PEOPLE ===================== */}
+<Route
+  path="/people/create"
+  element={
+    <ProtectedRoute>
+      <PeopleCreatePage />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/people"
+  element={
+    <ProtectedRoute>
+      <PeopleListPage />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/people/meu-dna"
+  element={
+    <ProtectedRoute>
+      <PeopleByDnaPage />
     </ProtectedRoute>
   }
 />

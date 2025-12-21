@@ -10,6 +10,11 @@ import {
 
 import { db } from "@/firebase/firebase";
 
+import { getDistanceKm } from "../utils/distance";
+import { geocodeAddress } from "./geoService";
+
+import emailjs from "@emailjs/browser";
+
 const COLLECTION = "dna";
 
 /**
@@ -53,6 +58,7 @@ export async function createDna(dna) {
     liderId: dna.liderId || null,
     liderNome: dna.liderNome || "",
     whatsapp: dna.whatsapp || "",
+    liderEmail: dna.liderEmail || "",
 
     cep: dna.cep || "",
     endereco: dna.endereco || "",
@@ -60,7 +66,6 @@ export async function createDna(dna) {
     cidade: dna.cidade || "",
     estado: dna.estado || "",
 
-    // localização (obrigatória para busca por distância)
     location: dna.location || null,
 
     createdAt: new Date(),
@@ -89,6 +94,7 @@ export async function updateDna(id, data) {
     liderId: data.liderId || null,
     liderNome: data.liderNome || "",
     whatsapp: data.whatsapp || "",
+    liderEmail: data.liderEmail || "",
 
     cep: data.cep || "",
     endereco: data.endereco || "",
@@ -111,4 +117,63 @@ export async function updateDna(id, data) {
 export async function deleteDna(id) {
   const ref = doc(db, COLLECTION, id);
   await deleteDoc(ref);
+}
+
+export async function notifyLeaderNearestDna(person) {
+  if (!person) return;
+
+  // 🔧 CORREÇÃO: garante endereço em STRING
+  let addressString = "";
+
+  if (typeof person.endereco === "string") {
+    addressString = person.endereco;
+  } else if (person.endereco && typeof person.endereco === "object") {
+    addressString = `
+      ${person.endereco.rua || ""},
+      ${person.endereco.numero || ""},
+      ${person.endereco.bairro || ""},
+      ${person.endereco.cidade || ""},
+      ${person.endereco.estado || ""},
+      ${person.endereco.cep || ""}
+    `;
+  }
+
+  if (!addressString.trim()) return;
+
+  const userLocation = await geocodeAddress(addressString);
+  if (!userLocation) return;
+
+  const dnas = await getDnas();
+
+  const dnasWithLocation = dnas.filter(
+    (dna) => dna.location && dna.liderEmail
+  );
+
+  if (!dnasWithLocation.length) return;
+
+  const nearest = dnasWithLocation
+    .map((dna) => ({
+      ...dna,
+      distance: getDistanceKm(
+        userLocation,
+        dna.location
+      ),
+    }))
+    .sort((a, b) => a.distance - b.distance)[0];
+
+  if (!nearest?.liderEmail) return;
+
+  // ✅ ENVIO REAL DO E-MAIL (EmailJS)
+await emailjs.send(
+  "service_2ni01j9",
+    "template_h71guyn", // ✅ ID CORRETO
+
+  {
+    lider_email: nearest.liderEmail,
+    dna_nome: nearest.nome,
+    pessoa_nome: person.nome,
+    pessoa_telefone: person.telefone || "",
+  }
+);
+
 }

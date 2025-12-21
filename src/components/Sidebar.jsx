@@ -11,7 +11,6 @@ import {
   HiOutlineClipboardDocumentList,
   HiOutlineAcademicCap,
   HiOutlineUsers,
-  HiOutlineWrenchScrewdriver,
 } from "react-icons/hi2";
 
 import {
@@ -26,7 +25,6 @@ const links = [
   { to: "/bible", label: "Bíblia", icon: HiOutlineBookOpen },
   { to: "/eventos", label: "Eventos", icon: HiOutlineCalendarDays },
   { to: "/comunicados", label: "Comunicados", icon: HiOutlineMegaphone },
-  { to: "/dna", label: "DNA", icon: HiOutlineBeaker },
   { to: "/escalas", label: "Escalas", icon: HiOutlineClipboardDocumentList },
 ];
 
@@ -46,14 +44,23 @@ const ministryLinks = [
 
 export default function Sidebar({ onClose }) {
   const { user, logout } = useAuth();
+
   const [openMinistries, setOpenMinistries] = useState(false);
   const [openCourses, setOpenCourses] = useState(false);
+  const [openDna, setOpenDna] = useState(false);
 
   const canSeeMinistries =
     ["admin", "pastor", "lider", "obreiro"].includes(user?.role);
 
   const canSeeCourses =
     ["admin", "pastor", "lider"].includes(user?.role);
+
+  const canCreatePeople =
+    ["admin", "pastor", "obreiro"].includes(user?.role);
+
+  const isLeader = user?.role === "lider";
+  const isAdminOrPastor =
+    ["admin", "pastor"].includes(user?.role);
 
   const baseLinkClass = `
     group flex items-center gap-3 rounded-2xl px-3 py-2.5
@@ -98,6 +105,58 @@ export default function Sidebar({ onClose }) {
           </NavLink>
         ))}
 
+        {/* DNA + PEOPLE */}
+        <button
+          onClick={() => setOpenDna(!openDna)}
+          className={`${baseLinkClass} ${inactiveClass} w-full flex justify-between`}
+        >
+          <div className="flex items-center gap-3">
+            <span className="flex h-8 w-8 items-center justify-center rounded-xl bg-base-100/10">
+              <HiOutlineBeaker className="text-lg" />
+            </span>
+            <span>DNA</span>
+          </div>
+          <span>{openDna ? "▲" : "▼"}</span>
+        </button>
+
+        {openDna && (
+          <div className="ml-10 mt-1 flex flex-col gap-1 border-l border-white/10 pl-3">
+            <NavLink
+              to="/dna"
+              className="text-sm py-1.5 text-base-100/70 hover:text-base-100"
+            >
+              Ver DNAs
+            </NavLink>
+
+            {canCreatePeople && (
+              <NavLink
+                to="/people/create"
+                className="text-sm py-1.5 text-base-100/70 hover:text-base-100"
+              >
+                Cadastrar Visitante
+              </NavLink>
+            )}
+
+            {isLeader && (
+              <NavLink
+                to="/people/meu-dna"
+                className="text-sm py-1.5 text-base-100/70 hover:text-base-100"
+              >
+                Meu DNA
+              </NavLink>
+            )}
+
+            {isAdminOrPastor && (
+              <NavLink
+                to="/people"
+                className="text-sm py-1.5 text-base-100/70 hover:text-base-100"
+              >
+                Todas as Pessoas
+              </NavLink>
+            )}
+          </div>
+        )}
+
         {/* CURSOS */}
         {canSeeCourses && (
           <>
@@ -120,11 +179,9 @@ export default function Sidebar({ onClose }) {
                   Ver cursos
                 </NavLink>
 
-                {canSeeCourses && (
-                  <NavLink to="/cursos/novo" className="text-sm py-1.5 text-base-100/70 hover:text-base-100">
-                    Criar curso
-                  </NavLink>
-                )}
+                <NavLink to="/cursos/novo" className="text-sm py-1.5 text-base-100/70 hover:text-base-100">
+                  Criar curso
+                </NavLink>
               </div>
             )}
           </>

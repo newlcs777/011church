@@ -15,6 +15,7 @@ export default function DnaForm({
     nome: "",
     liderNome: "",
     liderWhatsapp: "",
+    liderEmail: "",
     dia: "",
     horario: "",
     endereco: "",
@@ -31,6 +32,7 @@ export default function DnaForm({
       nome: initialData.nome || "",
       liderNome: initialData.liderNome || "",
       liderWhatsapp: initialData.liderWhatsapp || "",
+      liderEmail: initialData.liderEmail || "",
       dia: initialData.dia || "",
       horario: initialData.horario || "",
       endereco: initialData.endereco || "",
@@ -52,6 +54,7 @@ export default function DnaForm({
       !form.nome ||
       !form.liderNome ||
       !form.liderWhatsapp ||
+      !form.liderEmail ||
       !form.dia ||
       !form.horario ||
       !form.endereco ||
@@ -136,6 +139,15 @@ export default function DnaForm({
           label="WhatsApp do líder"
           placeholder="Ex: (11) 91234-5678"
           value={form.liderWhatsapp}
+          onChange={handleChange}
+          required
+        />
+
+        <Input
+          name="liderEmail"
+          label="E-mail do líder"
+          placeholder="Ex: lider@email.com"
+          value={form.liderEmail}
           onChange={handleChange}
           required
         />

@@ -6,6 +6,7 @@ import scheduleReducer from "../modules/ministries/store/scheduleSlice";
 import homeReducer from "../modules/home/store/homeSlice";
 import eventsReducer from "../modules/events/store/eventsSlice"; // ✅ ADD
 import dnaReducer from "../modules/dna/store/dnaSlice"; // ✅ ADD
+import peopleReducer from "../modules/people/store/peopleSlice"; // ✅ ADD
 
 export const store = configureStore({
   reducer: {
@@ -15,6 +16,7 @@ export const store = configureStore({
     home: homeReducer,
     events: eventsReducer, // ✅ ADD
     dna: dnaReducer, // ✅ ADD
+    people: peopleReducer, // ✅ ADD
   },
 });
 
