@@ -9,6 +9,7 @@ import {
 
 import PageHeader from "@/components/ui/PageHeader";
 import PersonCard from "../components/PersonCard";
+import PersonCardSkeleton from "../components/PersonCardSkeleton";
 
 export default function PeopleListPage() {
   const dispatch = useDispatch();
@@ -35,26 +36,68 @@ export default function PeopleListPage() {
   }
 
   return (
-    <div className="flex flex-col gap-6 pb-6">
+    <div
+      className="
+        flex
+        flex-col
+        gap-6
+        pb-6
+      "
+    >
       <PageHeader
         title="Pessoas cadastradas"
         subtitle="Visitantes e membros registrados no sistema."
       />
 
+      {/* LOADING */}
       {loading && (
-        <p className="text-sm text-base-content/60">
-          Carregando pessoas...
-        </p>
+        <section
+          className="
+            bg-base-100
+            rounded-2xl
+            border
+            border-base-300
+            p-4
+            sm:p-6
+            flex
+            flex-col
+            gap-3
+          "
+        >
+          <PersonCardSkeleton />
+          <PersonCardSkeleton />
+          <PersonCardSkeleton />
+        </section>
       )}
 
+      {/* EMPTY STATE */}
       {!loading && list.length === 0 && (
-        <p className="text-sm text-base-content/60">
+        <div
+          className="
+            bg-base-100
+            rounded-2xl
+            border
+            border-base-300
+            p-4
+            sm:p-6
+            text-sm
+            text-base-content/60
+          "
+        >
           Nenhuma pessoa cadastrada até o momento.
-        </p>
+        </div>
       )}
 
+      {/* LISTA */}
       {!loading && list.length > 0 && (
-        <div className="flex flex-col gap-3">
+        <section
+          className="
+            flex
+            flex-col
+            gap-3
+          "
+          aria-label="Lista de pessoas"
+        >
           {list.map((person) => (
             <PersonCard
               key={person.id}
@@ -63,7 +106,7 @@ export default function PeopleListPage() {
               onDelete={handleDelete}
             />
           ))}
-        </div>
+        </section>
       )}
     </div>
   );

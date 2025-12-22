@@ -55,12 +55,15 @@ export default function Sidebar({ onClose }) {
   const canSeeCourses =
     ["admin", "pastor", "lider"].includes(user?.role);
 
+  // ✅ líder e obreiro também podem criar pessoas
   const canCreatePeople =
-    ["admin", "pastor", "obreiro"].includes(user?.role);
+    ["admin", "pastor", "lider", "obreiro"].includes(user?.role);
 
   const isLeader = user?.role === "lider";
-  const isAdminOrPastor =
-    ["admin", "pastor"].includes(user?.role);
+
+  // ✅ líder e obreiro também podem ver todas as pessoas
+  const canViewPeopleList =
+    ["admin", "pastor", "lider", "obreiro"].includes(user?.role);
 
   const baseLinkClass = `
     group flex items-center gap-3 rounded-2xl px-3 py-2.5
@@ -146,7 +149,7 @@ export default function Sidebar({ onClose }) {
               </NavLink>
             )}
 
-            {isAdminOrPastor && (
+            {canViewPeopleList && (
               <NavLink
                 to="/people"
                 className="text-sm py-1.5 text-base-100/70 hover:text-base-100"
@@ -175,11 +178,17 @@ export default function Sidebar({ onClose }) {
 
             {openCourses && (
               <div className="ml-10 mt-1 flex flex-col gap-1 border-l border-white/10 pl-3">
-                <NavLink to="/cursos" className="text-sm py-1.5 text-base-100/70 hover:text-base-100">
+                <NavLink
+                  to="/cursos"
+                  className="text-sm py-1.5 text-base-100/70 hover:text-base-100"
+                >
                   Ver cursos
                 </NavLink>
 
-                <NavLink to="/cursos/novo" className="text-sm py-1.5 text-base-100/70 hover:text-base-100">
+                <NavLink
+                  to="/cursos/novo"
+                  className="text-sm py-1.5 text-base-100/70 hover:text-base-100"
+                >
                   Criar curso
                 </NavLink>
               </div>
@@ -221,22 +230,37 @@ export default function Sidebar({ onClose }) {
 
         {/* LINKS EXTERNOS */}
         <div className="mt-6 border-t border-white/10 pt-4 space-y-1">
-          <a href="https://open.spotify.com" target="_blank" className={`${baseLinkClass} ${inactiveClass}`}>
+          <a
+            href="https://open.spotify.com"
+            target="_blank"
+            className={`${baseLinkClass} ${inactiveClass}`}
+          >
             <FaSpotify />
             <span>Spotify</span>
           </a>
 
-          <a href="https://instagram.com" target="_blank" className={`${baseLinkClass} ${inactiveClass}`}>
+          <a
+            href="https://instagram.com"
+            target="_blank"
+            className={`${baseLinkClass} ${inactiveClass}`}
+          >
             <FaInstagram />
             <span>Instagram</span>
           </a>
 
-          <a href="https://youtube.com" target="_blank" className={`${baseLinkClass} ${inactiveClass}`}>
+          <a
+            href="https://youtube.com"
+            target="_blank"
+            className={`${baseLinkClass} ${inactiveClass}`}
+          >
             <FaYoutube />
             <span>YouTube</span>
           </a>
 
-          <a href="#" className={`${baseLinkClass} ${inactiveClass}`}>
+          <a
+            href="#"
+            className={`${baseLinkClass} ${inactiveClass}`}
+          >
             <FaHeart />
             <span>Doações</span>
           </a>

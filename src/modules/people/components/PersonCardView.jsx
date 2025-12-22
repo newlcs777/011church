@@ -1,12 +1,19 @@
 import {
+  FaUser,
+  FaWhatsapp,
+  FaRoute,
   FaEdit,
   FaMapMarkerAlt,
-  FaPhone,
-  FaUser,
-  FaDna,
 } from "react-icons/fa";
 
-import PersonStatusBadge from "./PersonStatusBadge";
+/**
+ * Mapeamento de tipo salvo no banco → label humano
+ */
+const TIPO_LABEL = {
+  visitante: "Visitante",
+  novo_convertido: "Novo convertido",
+  membro: "Membro",
+};
 
 export default function PersonCardView({
   person,
@@ -14,132 +21,142 @@ export default function PersonCardView({
   whatsappLink,
   onEdit,
 }) {
+  const mapsLink = person.endereco?.texto
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+        person.endereco.texto
+      )}`
+    : null;
+
+  const tipoLabel =
+    TIPO_LABEL[person.tipo] || "Pessoa";
+
   return (
     <>
-      {/* HEADER (igual DNA) */}
+      {/* BOTÃO EDITAR — MOBILE SEMPRE VISÍVEL / DESKTOP COM HOVER */}
+      <button
+        onClick={onEdit}
+        className="
+          absolute
+          top-3
+          right-3
+          text-base-content/50
+          hover:text-primary
+          transition
+          opacity-100
+          sm:opacity-0
+          sm:group-hover:opacity-100
+        "
+        aria-label="Editar pessoa"
+      >
+        <FaEdit size={14} />
+      </button>
+
       <div
         className="
           flex
-          items-start
-          justify-between
+          flex-col
+          sm:flex-row
           gap-3
+          sm:gap-6
         "
       >
-        <h3
-          className="
-            text-base
-            font-semibold
-          "
-        >
-          {person.nome}
-        </h3>
-
-        <button
-          onClick={onEdit}
-          className="
-            text-base-content/40
-            hover:text-primary
-            opacity-0
-            group-hover:opacity-100
-            transition
-          "
-          aria-label="Editar pessoa"
-        >
-          <FaEdit size={14} />
-        </button>
-      </div>
-
-      {/* STATUS (discreto, não full width) */}
-      <div>
-        <PersonStatusBadge status={person.tipo} />
-      </div>
-
-      {/* ENDEREÇO (linha única, igual DNA) */}
-      {person.endereco && (
+        {/* BLOCO VISUAL */}
         <div
           className="
             flex
+            flex-row
+            sm:flex-col
             items-center
+            sm:justify-center
+            rounded-lg
+            bg-base-200
+            px-3
+            py-2
+            sm:px-4
+            sm:py-3
+            min-w-0
+            sm:min-w-[72px]
+            text-base-content/70
             gap-2
-            text-sm
-            text-base-content/80
           "
         >
-          <FaMapMarkerAlt size={12} className="opacity-70" />
-          <span>
-            {person.endereco.texto}
-            {person.endereco.numero &&
-              `, ${person.endereco.numero}`}
+          <FaUser size={15} />
+          <span className="text-[11px] uppercase">
+            {tipoLabel}
           </span>
         </div>
-      )}
 
-      {/* DNA (linha única) */}
-      {nearestDna && (
-        <div
-          className="
-            flex
-            items-center
-            gap-2
-            text-sm
-            text-primary
-          "
-        >
-          <FaDna size={12} className="opacity-70" />
-          <span>
-            <strong className="font-medium">
-              {nearestDna.nome}
-            </strong>
-            {typeof nearestDna.distance === "number" && (
-              <span className="text-base-content/60">
-                {" "}
-                ({nearestDna.distance.toFixed(1)} km)
+        {/* CONTEÚDO */}
+        <div className="flex flex-col gap-2 flex-1">
+          {/* NOME */}
+          <h3 className="text-sm sm:text-base font-medium">
+            {person.nome}
+          </h3>
+
+          {/* INFOS */}
+          <div
+            className="
+              flex
+              flex-wrap
+              gap-3
+              text-sm
+              text-base-content/60
+              items-center
+            "
+          >
+            {nearestDna && (
+              <span className="flex items-center gap-1">
+                <FaRoute size={11} />
+                {nearestDna.nome}
               </span>
             )}
-          </span>
-        </div>
-      )}
 
-      {/* LÍDER (linha simples, sem quebra) */}
-      {nearestDna?.liderNome && (
-        <div
-          className="
-            flex
-            items-center
-            gap-2
-            text-sm
-            text-base-content/80
-          "
-        >
-          <FaUser size={12} className="opacity-70" />
-          <span>
-            Liderado por{" "}
-            <strong className="font-medium">
-              {nearestDna.liderNome}
-            </strong>
-          </span>
-        </div>
-      )}
+            {whatsappLink && (
+              <a
+                href={whatsappLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="
+                  inline-flex
+                  items-center
+                  gap-1
+                  text-green-600
+                  hover:text-green-700
+                  transition
+                "
+                aria-label="Chamar no WhatsApp"
+                title="Chamar no WhatsApp"
+              >
+                <FaWhatsapp size={14} />
+              </a>
+            )}
+          </div>
 
-      {/* WHATSAPP (link simples, igual endereço) */}
-      {whatsappLink && (
-        <a
-          href={whatsappLink}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="
-            flex
-            items-center
-            gap-2
-            text-sm
-            text-primary
-            hover:underline
-          "
-        >
-          <FaPhone size={12} className="opacity-70" />
-          <span>{person.telefone}</span>
-        </a>
-      )}
+          {/* ENDEREÇO — ÍCONE REAL + MAPS */}
+          {mapsLink && (
+            <a
+              href={mapsLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="
+                flex
+                items-start
+                gap-2
+                text-sm
+                text-primary
+                hover:underline
+              "
+              aria-label="Abrir endereço no Google Maps"
+              title="Abrir no Google Maps"
+            >
+              <FaMapMarkerAlt size={13} />
+              <span className="leading-snug">
+                {person.endereco.texto}
+              </span>
+            </a>
+          )}
+        </div>
+      </div>
     </>
   );
 }

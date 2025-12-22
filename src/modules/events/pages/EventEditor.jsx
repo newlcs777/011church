@@ -94,31 +94,7 @@ export default function EventEditor() {
           align="center"
         />
 
-        <button
-          type="button"
-          onClick={() => navigate(-1)}
-          className="
-            inline-flex
-            items-center
-            justify-center
-            gap-2
-            rounded-xl
-            px-3
-            py-1.5
-            text-xs
-            font-medium
-            tracking-wide
-            transition-all
-            duration-200
-            focus:outline-none
-            focus-visible:ring-2
-            focus-visible:ring-primary
-            text-neutral/70
-            hover:bg-base-200/70
-          "
-        >
-          Voltar
-        </button>
+        <span className="w-[60px]" />
       </div>
 
       {/* FORM */}

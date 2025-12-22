@@ -3,7 +3,6 @@ import { useNavigate, useParams } from "react-router-dom";
 import {
   FaEdit,
   FaTrash,
-  FaArrowLeft,
   FaUser,
   FaClock,
   FaCalendarDay,
@@ -81,24 +80,10 @@ export default function DnaDetailsPage() {
         pb-6
       "
     >
-      {/* HEADER */}
+      {/* HEADER — sem botão Voltar */}
       <PageHeader
         title={dna.nome}
         subtitle="Detalhes do DNA"
-        right={
-          <Button
-            variant="ghost"
-            onClick={() => navigate("/dna")}
-            className="
-              flex
-              items-center
-              gap-2
-            "
-          >
-            <FaArrowLeft size={14} />
-            Voltar
-          </Button>
-        }
       />
 
       {/* INFORMAÇÕES */}
@@ -172,7 +157,7 @@ export default function DnaDetailsPage() {
         </div>
       </section>
 
-      {/* AÇÕES */}
+      {/* AÇÕES — intactas */}
       <div
         className="
           flex

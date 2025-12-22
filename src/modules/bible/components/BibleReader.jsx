@@ -6,7 +6,7 @@ const STORAGE_KEY = "bible_reader_mode";
 export default function BibleReader({
   bookName,
   chapter,
-  focusVerse, // 🔹 versículo que veio do Home
+  focusVerse,
 }) {
   const [verses, setVerses] = useState([]);
   const [nightMode, setNightMode] = useState(false);
@@ -16,9 +16,7 @@ export default function BibleReader({
   ========================= */
   useEffect(() => {
     const savedMode = localStorage.getItem(STORAGE_KEY);
-    if (savedMode === "night") {
-      setNightMode(true);
-    }
+    if (savedMode === "night") setNightMode(true);
   }, []);
 
   /* =========================
@@ -40,15 +38,12 @@ export default function BibleReader({
   }, [bookName, chapter]);
 
   /* =========================
-     IR ATÉ O VERSÍCULO
+     FOCO EM VERSÍCULO
   ========================= */
   useEffect(() => {
     if (!focusVerse || !verses.length) return;
 
-    const el = document.getElementById(
-      `verse-${focusVerse}`
-    );
-
+    const el = document.getElementById(`verse-${focusVerse}`);
     if (el) {
       el.scrollIntoView({
         behavior: "smooth",
@@ -66,47 +61,52 @@ export default function BibleReader({
   }
 
   return (
-    <div className="w-full max-w-3xl mx-auto px-1 md:px-0">
-      {/* CONTROLE DE LEITURA */}
-      <div className="flex justify-end mb-3">
+    <div className="w-full">
+      {/* BOTÃO MODO (APENAS ÍCONE) */}
+      <div className="flex justify-end mb-2 px-2 sm:px-0">
         <button
           type="button"
-          onClick={() => setNightMode((v) => !v)}
-          className={`
-            text-xs
-            px-3
-            py-1
-            rounded-md
+          aria-label="Alternar modo de leitura"
+          onClick={() => setNightMode(v => !v)}
+          className="
+            p-2
+            rounded-lg
             border
+            border-base-300
+            bg-transparent
+            text-base-content/70
+            hover:bg-base-200
+            active:scale-[0.96]
             transition
-            ${
-              nightMode
-                ? "border-[#D1D5DB] text-[#4B5563] bg-[#F3F4F6] hover:bg-[#E5E7EB]"
-                : "border-base-300 text-base-content/70 hover:bg-base-200"
-            }
-          `}
+          "
         >
-          {nightMode ? "☀️ Modo claro" : "🌙 Modo leitura"}
+          {nightMode ? "☀️" : "🌙"}
         </button>
       </div>
 
       {/* TEXTO BÍBLICO */}
       <div
         className={`
-          rounded-xl
-          px-4
-          py-6
+          w-full
+          px-2
+          py-4
           leading-relaxed
           space-y-6
-          transition-colors
+
+          sm:max-w-3xl
+          sm:mx-auto
+          sm:px-6
+          sm:py-6
+          sm:rounded-xl
+
           ${
             nightMode
-              ? "bg-[#F4F5F7] text-[#1F2937]"
+              ? "bg-[#111827] text-[#E5E7EB]"
               : "bg-transparent text-base-content"
           }
         `}
       >
-        {verses.map((v) => {
+        {verses.map(v => {
           const isFocused = v.verse === focusVerse;
 
           return (
@@ -125,7 +125,7 @@ export default function BibleReader({
                 }
               `}
             >
-              {/* Nº DO VERSÍCULO */}
+              {/* NÚMERO */}
               <span
                 className={`
                   text-xs
@@ -135,7 +135,7 @@ export default function BibleReader({
                   select-none
                   ${
                     nightMode
-                      ? "text-[#9CA3AF]"
+                      ? "text-[#6B7280]"
                       : "text-base-content/40"
                   }
                 `}

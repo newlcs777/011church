@@ -23,9 +23,7 @@ export default function AudioScheduleCreate() {
 
   const members = useSelector((state) => state.members.audio || []);
 
-  /* ===============================
-     DATA VINDO DO CALENDÁRIO
-  ================================ */
+  /* DATA VINDO DO CALENDÁRIO */
   const params = new URLSearchParams(location.search);
   const presetDate = params.get("date");
 
@@ -36,37 +34,29 @@ export default function AudioScheduleCreate() {
   const [notes, setNotes] = useState("");
   const [saving, setSaving] = useState(false);
 
-  /* ===============================
-     BUSCA MEMBROS
-  ================================ */
   useEffect(() => {
     dispatch(fetchMembers("audio"));
   }, [dispatch]);
 
-  /* ===============================
-     SUBMIT
-  ================================ */
   async function handleSubmit(e) {
     e.preventDefault();
     if (!canEdit || saving) return;
 
     if (!date || !cult || !role || !memberId) {
-      alert("Preencha data, culto, função e membro.");
+      alert("Preencha todos os campos obrigatórios.");
       return;
     }
 
     setSaving(true);
 
     try {
-      const safeDate = date;
-      const dateObj = new Date(`${safeDate}T00:00:00`);
-      const month = safeDate.slice(0, 7);
-      const year = dateObj.getFullYear();
+      const dateObj = new Date(`${date}T00:00:00`);
+      const month = date.slice(0, 7);
 
       const payload = {
-        date: safeDate,
+        date,
         month,
-        year,
+        year: dateObj.getFullYear(),
         cult,
         role,
         memberId,
@@ -85,84 +75,50 @@ export default function AudioScheduleCreate() {
 
       navigate("/ministerios/audio/schedule", { replace: true });
     } catch (err) {
-      console.error("Erro ao criar escala:", err);
-      alert("Erro ao salvar a escala. Tente novamente.");
+      console.error(err);
+      alert("Não foi possível salvar a escala. Tente novamente.");
     } finally {
       setSaving(false);
     }
   }
 
-  /* ===============================
-     RENDER
-  ================================ */
   return (
     <MinistryPageWrapper>
-      {/* HEADER CENTRALIZADO */}
-      <div className="mb-8 flex items-center justify-center relative">
-        <button
-          onClick={() => navigate(-1)}
-          className="
-            absolute
-            left-0
-            h-9
-            w-9
-            flex
-            items-center
-            justify-center
-            rounded-full
-            border
-            border-base-300
-            bg-base-100
-            text-base-content/60
-            hover:bg-base-200
-            transition
-          "
-          aria-label="Voltar"
-        >
-          ←
-        </button>
-
-        <div className="text-center">
-          <h1 className="text-lg font-semibold">
-            Criar Escala
-          </h1>
-          <p className="text-sm text-base-content/60">
-            Ministério de Áudio
-          </p>
-        </div>
+      {/* TÍTULO */}
+      <div className="mb-6 text-center">
+        <h1 className="text-lg sm:text-xl font-semibold">
+          Criar escala
+        </h1>
+        <p className="mt-1 text-sm text-base-content/60">
+          Ministério de Áudio
+        </p>
       </div>
 
-      {/* FORM (SEM CARD INTERNO) */}
+      {/* FORMULÁRIO (SEM BORDA / SEM CARD) */}
       <form
         onSubmit={handleSubmit}
-        className="
-          max-w-xl
-          mx-auto
-          space-y-4
-        "
+        className="max-w-xl mx-auto flex flex-col gap-4"
       >
         {!canEdit && (
-          <p className="text-sm text-base-content/60">
-            Visualização somente leitura
+          <p className="text-xs text-center text-base-content/60">
+            Você está visualizando esta escala em modo leitura.
           </p>
         )}
 
-        {/* DATA */}
         <div>
           <label className="block text-sm font-medium mb-1">
-            Data
+            Data da escala
           </label>
           <input
             type="date"
             className="input input-bordered w-full"
             value={date}
             onChange={(e) => setDate(e.target.value)}
-            required
             disabled={!canEdit}
+            required
           />
         </div>
 
-        {/* CULTO */}
         <div>
           <label className="block text-sm font-medium mb-1">
             Culto
@@ -171,8 +127,8 @@ export default function AudioScheduleCreate() {
             className="select select-bordered w-full"
             value={cult}
             onChange={(e) => setCult(e.target.value)}
-            required
             disabled={!canEdit}
+            required
           >
             <option value="">Selecione o culto</option>
             <option value="manha">Manhã</option>
@@ -180,32 +136,31 @@ export default function AudioScheduleCreate() {
           </select>
         </div>
 
-        {/* FUNÇÃO */}
         <div>
           <label className="block text-sm font-medium mb-1">
-            Função
+            Função na escala
           </label>
           <input
             type="text"
+            placeholder="Ex: Operador de som"
             className="input input-bordered w-full"
             value={role}
             onChange={(e) => setRole(e.target.value)}
-            required
             disabled={!canEdit}
+            required
           />
         </div>
 
-        {/* MEMBRO */}
         <div>
           <label className="block text-sm font-medium mb-1">
-            Membro
+            Membro escalado
           </label>
           <select
             className="select select-bordered w-full"
             value={memberId}
             onChange={(e) => setMemberId(e.target.value)}
-            required
             disabled={!canEdit}
+            required
           >
             <option value="">Selecione um membro</option>
             {members.map((m) => (
@@ -216,35 +171,44 @@ export default function AudioScheduleCreate() {
           </select>
         </div>
 
-        {/* OBSERVAÇÕES */}
         <div>
           <label className="block text-sm font-medium mb-1">
-            Observações
+            Observações (opcional)
           </label>
           <textarea
-            className="textarea textarea-bordered w-full"
-            rows={3}
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            disabled={!canEdit}
-          />
+  rows={3}
+  placeholder="Alguma observação importante para este dia?"
+  className="
+    textarea
+    textarea-bordered
+    w-full
+    resize-none
+  "
+  value={notes}
+  onChange={(e) => setNotes(e.target.value)}
+  disabled={!canEdit}
+/>
+
         </div>
 
-        {/* AÇÕES PADRONIZADAS */}
-        <div className="pt-6 flex justify-end gap-3">
+        {/* AÇÕES – PADRÃO DO APP */}
+        <div className="pt-4 flex flex-col-reverse sm:flex-row justify-end gap-2">
           <button
             type="button"
             onClick={() => navigate(-1)}
             className="
-              h-9
-              px-4
+              inline-flex
+              items-center
+              justify-center
+              gap-2
               rounded-lg
-              border
-              border-base-300
-              bg-base-100
+              px-4
+              py-2.5
               text-sm
-              hover:bg-base-200
+              font-medium
               transition
+              text-neutral/70
+              hover:bg-base-200/70
             "
           >
             Cancelar
@@ -255,18 +219,17 @@ export default function AudioScheduleCreate() {
               type="submit"
               disabled={saving}
               className="
-                h-9
-                px-4
-                rounded-lg
-                border
-                border-base-300
-                bg-base-200
-                text-sm
-                hover:bg-base-300
-                transition
-                disabled:opacity-50
-                disabled:cursor-not-allowed
-              "
+  h-9
+  px-4
+  rounded-lg
+  text-sm
+  font-medium
+  text-neutral/70
+  transition
+  hover:bg-base-200/70
+  active:scale-[0.98]
+"
+
             >
               {saving ? "Salvando..." : "Salvar escala"}
             </button>

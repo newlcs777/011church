@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate, Link, useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 import SearchVerse from "../components/SearchVerse";
 import PageHeader from "../../../components/ui/PageHeader";
@@ -14,127 +14,120 @@ export default function BiblePage() {
 
   const [testament, setTestament] = useState("AT"); // AT | NT
 
-  const handleSearch = ({ book, chapter }) => {
+  function handleSearch({ book, chapter }) {
     if (!book || !chapter) return;
 
     navigate("/bible/read", {
-      state: {
-        book,
-        chapter,
-      },
+      state: { book, chapter },
     });
-  };
+  }
 
   return (
-    <div className="flex flex-col w-full">
+    <div className="flex w-full justify-center">
       <div
         className="
           w-full
-          max-w-3xl
-          mx-auto
+          max-w-md
           px-4
+          pb-10
           flex
           flex-col
-          gap-8
+          gap-6
         "
       >
-        {/* HEADER */}
-        <div className="relative flex items-center justify-center">
-          <div className="absolute right-0">
-            <Link to="/">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="
-                  text-base-content/60
-                  hover:text-base-content
-                "
-              >
-                ← Voltar
-              </Button>
-            </Link>
-          </div>
+        {/* TÍTULO */}
+        <PageHeader
+          title="Bíblia Sagrada"
+          subtitle="Separe um momento para a leitura da Palavra"
+          align="center"
+        />
 
-          <PageHeader
-            title="Bíblia Sagrada"
-            className="text-center"
-          />
-        </div>
-
-        {/* TEXTO INTRODUTÓRIO */}
+        {/* TEXTO DE APOIO */}
         <p
           className="
+            text-center
             text-sm
             text-base-content/70
-            text-center
-            max-w-md
-            mx-auto
             leading-relaxed
+            px-2
           "
         >
-          Separe um momento para a leitura da Palavra.
-          Escolha o testamento, o livro e o capítulo.
+          Escolha o testamento, o livro e o capítulo
+          para iniciar a leitura.
         </p>
 
         {/* SELETOR DE TESTAMENTO */}
-        <div
-          className="
-            flex
-            justify-center
-            gap-2
-          "
-        >
-          {/* SELETOR DE TESTAMENTO */}
-<div
-  className="
-    flex
-    justify-center
-    gap-1
-    bg-base-200/40
-    p-1
-    rounded-xl
-    w-fit
-    mx-auto
-  "
->
-  <Button
-    variant="ghost"
-    size="sm"
-    onClick={() => setTestament("AT")}
-    className={`
-      rounded-lg
-      px-4
-      ${
-        testament === "AT"
-          ? "bg-base-100 shadow-sm text-base-content"
-          : "text-base-content/60"
-      }
-    `}
+        <div className="flex justify-center">
+  <div
+    className="
+      flex
+      gap-1
+      bg-base-200/40
+      p-1
+      rounded-xl
+    "
   >
-    Velho Testamento
-  </Button>
+    <Button
+      variant="ghost"
+      size="sm"
+      onClick={() => setTestament("AT")}
+      className={`
+        px-4
+        rounded-lg
+        transition-all
+        bg-base-100
+        ${
+          testament === "AT"
+            ? `
+              shadow-md
+              text-base-content
+              font-semibold
+              opacity-100
+            `
+            : `
+              text-base-content/40
+              opacity-70
+              hover:opacity-90
+            `
+        }
+      `}
+    >
+      Velho Testamento
+    </Button>
 
-  <Button
-    variant="ghost"
-    size="sm"
-    onClick={() => setTestament("NT")}
-    className={`
-      rounded-lg
-      px-4
-      ${
-        testament === "NT"
-          ? "bg-base-100 shadow-sm text-base-content"
-          : "text-base-content/60"
-      }
-    `}
-  >
-    Novo Testamento
-  </Button>
+    <Button
+      variant="ghost"
+      size="sm"
+      onClick={() => setTestament("NT")}
+      className={`
+        px-4
+        rounded-lg
+        transition-all
+        bg-base-100
+        ${
+          testament === "NT"
+            ? `
+              shadow-md
+              text-base-content
+              font-semibold
+              opacity-100
+            `
+            : `
+              text-base-content/40
+              opacity-70
+              hover:opacity-90
+            `
+        }
+      `}
+    >
+      Novo Testamento
+    </Button>
+  </div>
 </div>
-        </div>
 
-        {/* SELEÇÃO */}
-        <div className="w-full max-w-sm mx-auto">
+
+        {/* BUSCA */}
+        <div className="pt-2">
           <SearchVerse
             testament={testament}
             onSelect={handleSearch}

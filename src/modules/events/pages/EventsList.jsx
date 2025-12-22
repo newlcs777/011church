@@ -38,9 +38,16 @@ export default function EventsList() {
 
   return (
     <div className="flex flex-col gap-6">
-      {/* BARRA DE AÇÕES */}
-      <div className="flex items-center justify-between">
-        {canCreate ? (
+      {/* HEADER */}
+      <PageHeader
+        title="Eventos"
+        subtitle="Veja os próximos eventos da igreja"
+        align="center"
+      />
+
+      {/* AÇÃO ADMIN — MESMO PADRÃO DO DNA */}
+      {canCreate && (
+        <div className="flex justify-end">
           <Link
             to="/eventos/novo"
             className="
@@ -49,9 +56,9 @@ export default function EventsList() {
               justify-center
               gap-2
               rounded-xl
-              px-3
-              py-1.5
-              text-xs
+              px-4
+              py-2.5
+              text-sm
               font-medium
               tracking-wide
               transition-all
@@ -66,43 +73,8 @@ export default function EventsList() {
           >
             + Novo evento
           </Link>
-        ) : (
-          <span />
-        )}
-
-        <button
-          type="button"
-          onClick={() => navigate("/")}
-          className="
-            inline-flex
-            items-center
-            justify-center
-            gap-2
-            rounded-xl
-            px-3
-            py-1.5
-            text-xs
-            font-medium
-            tracking-wide
-            transition-all
-            duration-200
-            focus:outline-none
-            focus-visible:ring-2
-            focus-visible:ring-primary
-            text-neutral/70
-            hover:bg-base-200/70
-          "
-        >
-          Voltar
-        </button>
-      </div>
-
-      {/* HEADER */}
-      <PageHeader
-        title="Eventos"
-        subtitle="Veja os próximos eventos da igreja"
-        align="center"
-      />
+        </div>
+      )}
 
       {/* LISTA */}
       <div className="flex flex-col gap-4">

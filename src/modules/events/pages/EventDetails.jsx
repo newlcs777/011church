@@ -1,5 +1,6 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
+import { FaEdit, FaCalendarAlt, FaClock, FaMapMarkerAlt } from "react-icons/fa";
 
 import useAuth from "../../auth/hooks/useAuth";
 import useEvents from "../hooks/useEvents";
@@ -15,7 +16,6 @@ export default function EventDetails() {
 
   const [confirmDelete, setConfirmDelete] = useState(false);
 
-  /* ✅ SKELETON ENQUANTO CARREGA */
   if (!event) {
     return (
       <div className="p-6">
@@ -31,104 +31,87 @@ export default function EventDetails() {
     navigate("/eventos");
   };
 
+  const mapsLink = event.local
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+        event.local
+      )}`
+    : null;
+
   return (
     <div className="flex justify-center px-4">
       <div className="w-full max-w-3xl flex flex-col gap-6">
-        {/* BARRA DE AÇÕES */}
-        <div className="flex items-center justify-between">
-          {canEdit ? (
-            <Link
-              to={`/eventos/editar/${event.id}`}
-              className="
-                inline-flex
-                items-center
-                justify-center
-                gap-2
-                rounded-xl
-                px-3
-                py-1.5
-                text-xs
-                font-medium
-                tracking-wide
-                text-neutral/70
-                transition-all
-                duration-200
-                hover:bg-base-200/70
-                focus:outline-none
-                focus-visible:ring-2
-                focus-visible:ring-primary
-              "
-            >
-              Editar
-            </Link>
-          ) : (
-            <span />
-          )}
 
-          <Link
-            to="/eventos"
-            className="
-              inline-flex
-              items-center
-              justify-center
-              gap-2
-              rounded-xl
-              px-3
-              py-1.5
-              text-xs
-              font-medium
-              tracking-wide
-              text-neutral/70
-              transition-all
-              duration-200
-              hover:bg-base-200/70
-              focus:outline-none
-              focus-visible:ring-2
-              focus-visible:ring-primary
-            "
-          >
-            Voltar
-          </Link>
-        </div>
-
-        {/* CARD */}
+        {/* CARD — MESMO PADRÃO DE PESSOAS */}
         <div
           className="
+            group
+            relative
             rounded-xl
             border
             border-base-300
             bg-base-100
             p-6
-            flex
-            flex-col
-            gap-6
+            shadow-sm
+            transition
+            hover:shadow-md
           "
         >
-          {/* CONTEÚDO */}
-          <div className="flex gap-6">
+          {/* BOTÃO EDITAR — DENTRO DO CARD */}
+          {canEdit && (
+            <Link
+              to={`/eventos/editar/${event.id}`}
+              className="
+                absolute
+                top-3
+                right-3
+                text-base-content/50
+                hover:text-primary
+                transition
+                opacity-100
+                sm:opacity-0
+                sm:group-hover:opacity-100
+              "
+              aria-label="Editar evento"
+            >
+              <FaEdit size={14} />
+            </Link>
+          )}
+
+          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
+            {/* BLOCO VISUAL (DATA) */}
             <div
               className="
                 flex
-                flex-col
+                flex-row
+                sm:flex-col
                 items-center
-                justify-center
+                sm:justify-center
                 rounded-lg
                 bg-base-200
-                px-4
-                py-3
-                min-w-[72px]
+                px-3
+                py-2
+                sm:px-4
+                sm:py-3
+                min-w-0
+                sm:min-w-[72px]
+                text-base-content/70
+                gap-2
               "
             >
-              <span className="text-lg font-semibold">
-                {event.data?.slice(8, 10)}
-              </span>
-              <span className="text-[11px] text-base-content/60 uppercase">
-                {event.data?.slice(5, 7)}/{event.data?.slice(0, 4)}
-              </span>
+              <FaCalendarAlt size={14} />
+              <div className="flex sm:flex-col items-center gap-1 text-xs">
+                <span className="font-semibold">
+                  {event.data?.slice(8, 10)}
+                </span>
+                <span className="uppercase text-base-content/60">
+                  {event.data?.slice(5, 7)}/{event.data?.slice(0, 4)}
+                </span>
+              </div>
             </div>
 
-            <div className="flex flex-col gap-3 flex-1">
-              <h1 className="text-lg font-semibold">
+            {/* CONTEÚDO */}
+            <div className="flex flex-col gap-2 flex-1">
+              <h1 className="text-sm sm:text-base font-medium">
                 {event.titulo}
               </h1>
 
@@ -138,55 +121,53 @@ export default function EventDetails() {
                 </p>
               )}
 
-              <div className="flex flex-wrap gap-4 text-sm text-base-content/60 items-center">
-                <span
-                  className="
-                    inline-flex
-                    items-center
-                    gap-2
-                    rounded-full
-                    bg-base-200
-                    px-3
-                    py-1
-                    text-sm
-                    font-medium
-                  "
-                >
-                  ⏰ {event.horario}
+              {/* INFOS */}
+              <div
+                className="
+                  flex
+                  flex-wrap
+                  gap-3
+                  text-sm
+                  text-base-content/60
+                  items-center
+                "
+              >
+                <span className="flex items-center gap-1">
+                  <FaClock size={12} />
+                  {event.horario}
                 </span>
 
-                <span>
-                  📍 {event.local || "Não informado"}
-                </span>
+                {mapsLink && (
+                  <a
+                    href={mapsLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="
+                      flex
+                      items-center
+                      gap-1
+                      text-primary
+                      hover:underline
+                    "
+                  >
+                    <FaMapMarkerAlt size={12} />
+                    {event.local}
+                  </a>
+                )}
               </div>
             </div>
           </div>
 
-          {/* EXCLUIR — DENTRO DO CARD */}
+          {/* EXCLUIR — IGUAL PADRÃO DE AÇÃO INTERNA */}
           {canEdit && (
-            <div className="pt-4 border-t border-base-300 flex flex-col items-center gap-3">
+            <div className="pt-4 border-t border-base-300 flex justify-end">
               {!confirmDelete ? (
                 <button
-                  type="button"
                   onClick={() => setConfirmDelete(true)}
                   className="
-                    inline-flex
-                    items-center
-                    justify-center
-                    gap-2
-                    rounded-xl
-                    px-3
-                    py-1.5
                     text-xs
-                    font-medium
-                    tracking-wide
                     text-error
-                    transition-all
-                    duration-200
-                    hover:bg-error/10
-                    focus:outline-none
-                    focus-visible:ring-2
-                    focus-visible:ring-error
+                    hover:underline
                   "
                 >
                   Excluir evento
@@ -194,56 +175,26 @@ export default function EventDetails() {
               ) : (
                 <div className="flex items-center gap-3">
                   <span className="text-sm text-base-content/60">
-                    Você tem certeza?
+                    Confirmar exclusão?
                   </span>
 
                   <button
-                    type="button"
                     onClick={handleDelete}
                     className="
-                      inline-flex
-                      items-center
-                      justify-center
-                      gap-2
-                      rounded-xl
-                      px-3
-                      py-1.5
                       text-xs
-                      font-medium
-                      tracking-wide
                       text-error
-                      transition-all
-                      duration-200
-                      hover:bg-error/10
-                      focus:outline-none
-                      focus-visible:ring-2
-                      focus-visible:ring-error
+                      hover:underline
                     "
                   >
-                    Sim, excluir
+                    Sim
                   </button>
 
                   <button
-                    type="button"
                     onClick={() => setConfirmDelete(false)}
                     className="
-                      inline-flex
-                      items-center
-                      justify-center
-                      gap-2
-                      rounded-xl
-                      px-3
-                      py-1.5
                       text-xs
-                      font-medium
-                      tracking-wide
-                      text-neutral/70
-                      transition-all
-                      duration-200
-                      hover:bg-base-200/70
-                      focus:outline-none
-                      focus-visible:ring-2
-                      focus-visible:ring-primary
+                      text-base-content/60
+                      hover:underline
                     "
                   >
                     Não
@@ -252,6 +203,11 @@ export default function EventDetails() {
               )}
             </div>
           )}
+        </div>
+
+        {/* VOLTAR */}
+        <div className="flex justify-end">
+         
         </div>
       </div>
     </div>

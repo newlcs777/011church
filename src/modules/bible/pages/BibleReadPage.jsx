@@ -17,21 +17,12 @@ export default function BibleReadPage() {
   const touchStartY = useRef(0);
   const bookDropdownRef = useRef(null);
 
-  const [readingMode] = useState(true);
   const [openBooks, setOpenBooks] = useState(false);
 
+  // fallback defensivo
   if (!state?.book || !state?.chapter) {
-    return (
-      <div className="p-6">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => navigate("/bible")}
-        >
-          ← Voltar
-        </Button>
-      </div>
-    );
+    navigate("/bible");
+    return null;
   }
 
   const { book, chapter, verse } = state;
@@ -40,19 +31,9 @@ export default function BibleReadPage() {
   const hasPrev = chapter > 1;
   const hasNext = chapter < totalChapters;
 
-  /* =========================
-     TESTAMENTO ATUAL
-  ========================= */
-  const isNT = useMemo(
-    () => livrosNT.includes(book),
-    [book]
-  );
-
+  const isNT = useMemo(() => livrosNT.includes(book), [book]);
   const booksList = isNT ? livrosNT : livrosAT;
 
-  /* =========================
-     NAVEGAÇÕES
-  ========================= */
   const goToChapter = (ch) => {
     navigate("/bible/read", {
       state: { book, chapter: ch },
@@ -62,15 +43,12 @@ export default function BibleReadPage() {
   const goToBook = (newBook) => {
     setOpenBooks(false);
     navigate("/bible/read", {
-      state: {
-        book: newBook,
-        chapter: 1,
-      },
+      state: { book: newBook, chapter: 1 },
     });
   };
 
   /* =========================
-     SWIPE HANDLERS
+     SWIPE
   ========================= */
   const handleTouchStart = (e) => {
     touchStartX.current = e.touches[0].clientX;
@@ -83,82 +61,41 @@ export default function BibleReadPage() {
     const deltaY =
       e.changedTouches[0].clientY - touchStartY.current;
 
-    const MIN_SWIPE = 60;
-
     if (
-      Math.abs(deltaX) < MIN_SWIPE ||
+      Math.abs(deltaX) < 60 ||
       Math.abs(deltaX) < Math.abs(deltaY)
     ) {
       return;
     }
 
-    if (deltaX < 0 && hasNext) {
-      goToChapter(chapter + 1);
-    }
-
-    if (deltaX > 0 && hasPrev) {
-      goToChapter(chapter - 1);
-    }
+    if (deltaX < 0 && hasNext) goToChapter(chapter + 1);
+    if (deltaX > 0 && hasPrev) goToChapter(chapter - 1);
   };
 
   return (
     <div
-      className="
-        flex
-        flex-col
-        min-h-screen
-      "
+      className="flex flex-col min-h-screen"
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
     >
-      {/* HEADER */}
-      <div className="border-b bg-base-100">
-        <div
-          className="
-            max-w-3xl
-            mx-auto
-            px-4
-            py-4
-            relative
-            text-center
-          "
-        >
-          {/* VOLTAR */}
-          <button
-            onClick={() => navigate("/bible")}
-            className="
-              absolute
-              right-4
-              top-4
-              text-sm
-              text-base-content/70
-              hover:text-base-content
-              transition
-            "
-          >
-            ← Voltar
-          </button>
-
-          {/* DROPDOWN DE LIVRO (CUSTOM) */}
-          <div
-            ref={bookDropdownRef}
-            className="relative inline-block"
-          >
+      {/* HEADER DE LEITURA */}
+      <div className="border-b border-base-200 bg-base-100">
+        <div className="px-4 pt-3 pb-2 text-center">
+          {/* LIVRO */}
+          <div ref={bookDropdownRef} className="relative inline-block">
             <button
               onClick={() => setOpenBooks((v) => !v)}
               className="
                 inline-flex
                 items-center
                 gap-1
-                text-xl
+                text-base
                 font-semibold
-                tracking-wide
                 text-base-content
-                hover:underline
               "
             >
               {book}
-              <span className="text-base-content/60">▾</span>
+              <span className="text-base-content/50">▾</span>
             </button>
 
             {openBooks && (
@@ -185,10 +122,10 @@ export default function BibleReadPage() {
                     onClick={() => goToBook(b)}
                     className={`
                       w-full
-                      text-left
                       px-4
                       py-2
                       text-sm
+                      text-left
                       transition
                       ${
                         b === book
@@ -205,89 +142,68 @@ export default function BibleReadPage() {
           </div>
 
           {/* CAPÍTULO */}
-          <p className="text-sm text-base-content/70 mt-0.5">
+          <p className="mt-0.5 text-xs text-base-content/50">
             Capítulo {chapter}
           </p>
-        </div>
 
-        {/* CONTROLES DE CAPÍTULO */}
-        <div
-          className="
-            max-w-3xl
-            mx-auto
-            px-4
-            pb-3
-            grid
-            grid-cols-3
-            items-center
-            gap-2
-          "
-        >
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => goToChapter(chapter - 1)}
-            disabled={!hasPrev}
-            className="
-              justify-start
-              text-base-content/80
-              truncate
-            "
-          >
-            ← Capítulo {chapter - 1}
-          </Button>
+          {/* CONTROLES */}
+          <div className="mt-2 flex items-center justify-between">
+            <Button
+              variant="ghost"
+              size="sm"
+              disabled={!hasPrev}
+              onClick={() => goToChapter(chapter - 1)}
+              className="px-2"
+            >
+              ←
+            </Button>
 
-          <select
-            value={chapter}
-            onChange={(e) =>
-              goToChapter(Number(e.target.value))
-            }
-            className="
-              select
-              select-ghost
-              select-sm
-              text-base-content/90
-              mx-auto
-            "
-          >
-            {Array.from({ length: totalChapters }).map((_, i) => (
-              <option key={i + 1} value={i + 1}>
-                Capítulo {i + 1}
-              </option>
-            ))}
-          </select>
+            <select
+              value={chapter}
+              onChange={(e) =>
+                goToChapter(Number(e.target.value))
+              }
+              className="
+                select
+                select-ghost
+                select-xs
+                text-base-content/70
+              "
+            >
+              {Array.from({ length: totalChapters }).map((_, i) => (
+                <option key={i + 1} value={i + 1}>
+                  Capítulo {i + 1}
+                </option>
+              ))}
+            </select>
 
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => goToChapter(chapter + 1)}
-            disabled={!hasNext}
-            className="
-              justify-end
-              text-base-content/80
-              truncate
-            "
-          >
-            Capítulo {chapter + 1} →
-          </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              disabled={!hasNext}
+              onClick={() => goToChapter(chapter + 1)}
+              className="px-2"
+            >
+              →
+            </Button>
+          </div>
         </div>
       </div>
 
-      {/* TEXTO */}
-      <div
-        className="
-          px-4
-          py-5
-          sm:py-8
-          flex-1
-        "
-      >
-        <div className="max-w-3xl mx-auto">
+      {/* TEXTO BÍBLICO — NÃO INTERFERIR NO FUNDO */}
+      <div className="flex-1 pt-2 pb-12">
+        <div
+          className="
+            w-full
+            sm:max-w-3xl
+            sm:mx-auto
+          "
+        >
           <BibleReader
             bookName={book}
             chapter={chapter}
             focusVerse={verse}
-            readingMode={readingMode}
+            readingMode
           />
         </div>
       </div>

@@ -17,6 +17,8 @@ export default function PersonForm({ onSubmit }) {
     observacao: "",
   });
 
+  const [submitting, setSubmitting] = useState(false);
+
   function handleChange(e) {
     const { name, value } = e.target;
 
@@ -26,8 +28,10 @@ export default function PersonForm({ onSubmit }) {
     }));
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
+
+    if (submitting) return; // 🔒 bloqueia duplo clique
 
     if (!form.nome || !form.cep || !form.cidade || !form.estado) {
       alert(
@@ -36,24 +40,31 @@ export default function PersonForm({ onSubmit }) {
       return;
     }
 
-    onSubmit({
-      nome: form.nome.trim(),
-      telefone: form.telefone.trim(),
-      tipo: form.tipo,
-      observacao: form.observacao.trim(),
+    try {
+      setSubmitting(true);
 
-      endereco: {
-        texto: form.enderecoTexto.trim(),
-        numero: form.numero.trim(),
-        cep: form.cep.trim(),
-        cidade: form.cidade.trim(),
-        estado: form.estado.trim(),
-      },
-    });
+      await onSubmit({
+        nome: form.nome.trim(),
+        telefone: form.telefone.trim(),
+        tipo: form.tipo,
+        observacao: form.observacao.trim(),
+        endereco: {
+          texto: form.enderecoTexto.trim(),
+          numero: form.numero.trim(),
+          cep: form.cep.trim(),
+          cidade: form.cidade.trim(),
+          estado: form.estado.trim(),
+        },
+      });
+    } finally {
+      // ⚠️ não resetamos o form aqui
+      // quem decide navegação/reset é a página pai
+      setSubmitting(false);
+    }
   }
 
   return (
-    <div className="flex flex-col gap-6 pb-6">
+    <div className="flex flex-col gap-4 sm:gap-6 pb-6">
       <PageHeader
         title="Cadastrar visitante"
         subtitle="Essas informações nos ajudam a direcionar a pessoa ao DNA mais próximo."
@@ -67,11 +78,11 @@ export default function PersonForm({ onSubmit }) {
           mx-auto
           flex
           flex-col
-          gap-4
-          sm:gap-8
+          gap-3
+          sm:gap-6
         "
       >
-        {/* INFORMAÇÕES DA PESSOA */}
+        {/* INFORMAÇÕES */}
         <section
           className="
             bg-base-100
@@ -80,8 +91,8 @@ export default function PersonForm({ onSubmit }) {
             sm:p-6
             flex
             flex-col
-            gap-4
-            sm:gap-5
+            gap-3
+            sm:gap-4
           "
         >
           <h3 className="text-base font-semibold">
@@ -94,6 +105,7 @@ export default function PersonForm({ onSubmit }) {
             value={form.nome}
             onChange={handleChange}
             required
+            disabled={submitting}
           />
 
           <Input
@@ -101,6 +113,7 @@ export default function PersonForm({ onSubmit }) {
             name="telefone"
             value={form.telefone}
             onChange={handleChange}
+            disabled={submitting}
           />
 
           <textarea
@@ -109,7 +122,9 @@ export default function PersonForm({ onSubmit }) {
             onChange={handleChange}
             rows={2}
             placeholder="Observação pastoral ou administrativa"
+            disabled={submitting}
             className="
+              w-full
               rounded-xl
               border
               border-base-300
@@ -121,6 +136,7 @@ export default function PersonForm({ onSubmit }) {
               focus:outline-none
               focus:ring-2
               focus:ring-primary/40
+              disabled:opacity-60
             "
           />
         </section>
@@ -134,8 +150,8 @@ export default function PersonForm({ onSubmit }) {
             sm:p-6
             flex
             flex-col
-            gap-4
-            sm:gap-5
+            gap-3
+            sm:gap-4
           "
         >
           <h3 className="text-base font-semibold">
@@ -145,26 +161,27 @@ export default function PersonForm({ onSubmit }) {
           <Input
             label="Endereço completo"
             name="enderecoTexto"
-            placeholder="Rua, bairro"
             value={form.enderecoTexto}
             onChange={handleChange}
+            disabled={submitting}
           />
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
             <Input
               label="Número"
               name="numero"
               value={form.numero}
               onChange={handleChange}
+              disabled={submitting}
             />
 
             <Input
               label="CEP"
               name="cep"
-              placeholder="00000-000"
               value={form.cep}
               onChange={handleChange}
               required
+              disabled={submitting}
             />
 
             <Input
@@ -173,15 +190,16 @@ export default function PersonForm({ onSubmit }) {
               value={form.cidade}
               onChange={handleChange}
               required
+              disabled={submitting}
             />
 
             <Input
               label="UF"
               name="estado"
-              placeholder="UF"
               value={form.estado}
               onChange={handleChange}
               required
+              disabled={submitting}
             />
           </div>
         </section>
@@ -196,7 +214,6 @@ export default function PersonForm({ onSubmit }) {
             flex
             flex-col
             gap-3
-            sm:gap-5
           "
         >
           <label className="text-sm font-medium">
@@ -207,6 +224,7 @@ export default function PersonForm({ onSubmit }) {
             name="tipo"
             value={form.tipo}
             onChange={handleChange}
+            disabled={submitting}
             className="
               h-11
               rounded-xl
@@ -218,6 +236,7 @@ export default function PersonForm({ onSubmit }) {
               focus:outline-none
               focus:ring-2
               focus:ring-primary/40
+              disabled:opacity-60
             "
           >
             <option value="visitante">Visitante</option>
@@ -229,9 +248,14 @@ export default function PersonForm({ onSubmit }) {
         </section>
 
         {/* AÇÃO */}
-        <div className="flex justify-center pt-1">
-          <Button type="submit" variant="ghost" className="px-6">
-            Salvar visitante
+        <div className="flex justify-center pt-0">
+          <Button
+            type="submit"
+            variant="ghost"
+            disabled={submitting}
+            className="w-full sm:w-auto px-6"
+          >
+            {submitting ? "Salvando..." : "Salvar visitante"}
           </Button>
         </div>
       </form>

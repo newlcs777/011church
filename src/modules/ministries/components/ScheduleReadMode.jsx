@@ -42,44 +42,59 @@ export default function ScheduleReadMode({
     });
 
   return (
-    <div className="max-w-5xl mx-auto">
+    <div className="w-full max-w-4xl mx-auto">
       {/* ===============================
-          FILTRO (SEMPRE VISÍVEL)
+          FILTRO
       ================================ */}
-      <input
-        type="text"
-        placeholder="Filtrar por nome (ex: Lucas)"
-        value={filter}
-        onChange={(e) => setFilter(e.target.value)}
-        className="
-          input
-          input-bordered
-          input-sm
-          w-full
-          mb-4
-        "
-      />
+      <div className="mb-4">
+        <input
+          type="text"
+          placeholder="Buscar voluntário pelo nome…"
+          value={filter}
+          onChange={(e) => setFilter(e.target.value)}
+          className="
+            w-full
+            h-9
+            px-3
+            rounded-lg
+            border
+            border-base-300
+            bg-base-100
+            text-sm
+            placeholder:text-base-content/40
+            focus:outline-none
+            focus:ring-1
+            focus:ring-base-300
+          "
+        />
+      </div>
 
       {/* ===============================
           SEM RESULTADOS
       ================================ */}
       {dates.length === 0 && (
-        <p className="text-sm text-base-content/60 text-center py-6">
-          Nenhuma escala encontrada.
+        <p className="text-sm text-base-content/50 text-center py-8">
+          Nenhuma escala encontrada com esse filtro.
         </p>
       )}
 
       {/* ===============================
-          DESKTOP / TABLET → TABELA
+          DESKTOP / TABLET → TABELA LIMPA
       ================================ */}
       {dates.length > 0 && (
-        <div className="hidden sm:block overflow-x-auto">
-          <table className="table table-zebra table-sm w-full">
-            <thead>
+        <div className="hidden sm:block overflow-hidden rounded-2xl border border-base-300">
+          <table className="w-full text-sm">
+            <thead className="bg-base-200/60">
               <tr>
-                <th className="w-36">Dia</th>
-                <th>Manhã</th>
-                <th>Noite</th>
+                <th className="px-4 py-3 text-left font-medium w-32">
+                  Dia
+                </th>
+                <th className="px-4 py-3 text-left font-medium">
+                  Manhã
+                </th>
+                <th className="px-4 py-3 text-left font-medium">
+                  Noite
+                </th>
               </tr>
             </thead>
 
@@ -107,18 +122,21 @@ export default function ScheduleReadMode({
                   });
 
                 return (
-                  <tr key={date}>
-                    <td className="font-medium">
+                  <tr
+                    key={date}
+                    className="border-t border-base-300"
+                  >
+                    <td className="px-4 py-3 font-medium">
                       {formatShortDate(date)}
                     </td>
 
-                    <td className="text-sm">
+                    <td className="px-4 py-3 text-base-content/80">
                       {morning.length > 0
                         ? morning.join(", ")
                         : "—"}
                     </td>
 
-                    <td className="text-sm">
+                    <td className="px-4 py-3 text-base-content/80">
                       {night.length > 0
                         ? night.join(", ")
                         : "—"}
@@ -132,7 +150,7 @@ export default function ScheduleReadMode({
       )}
 
       {/* ===============================
-          MOBILE → CARDS
+          MOBILE → CARDS (PADRÃO IGREJA)
       ================================ */}
       {dates.length > 0 && (
         <div className="sm:hidden flex flex-col gap-3">
@@ -162,29 +180,33 @@ export default function ScheduleReadMode({
               <div
                 key={date}
                 className="
+                  bg-base-100
                   border
                   border-base-300
-                  rounded-xl
-                  p-3
-                  bg-base-100
+                  rounded-2xl
+                  p-4
                 "
               >
                 <div className="text-sm font-semibold mb-2">
                   {formatShortDate(date)}
                 </div>
 
-                <div className="text-sm text-base-content/70">
-                  <span className="font-medium">Manhã:</span>{" "}
+                <div className="text-sm text-base-content/70 mb-1">
+                  <span className="font-medium">
+                    Manhã:
+                  </span>{" "}
                   {morning.length > 0
                     ? morning.join(", ")
-                    : "—"}
+                    : "Nenhum voluntário"}
                 </div>
 
                 <div className="text-sm text-base-content/70">
-                  <span className="font-medium">Noite:</span>{" "}
+                  <span className="font-medium">
+                    Noite:
+                  </span>{" "}
                   {night.length > 0
                     ? night.join(", ")
-                    : "—"}
+                    : "Nenhum voluntário"}
                 </div>
               </div>
             );

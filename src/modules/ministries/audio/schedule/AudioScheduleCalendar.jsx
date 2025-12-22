@@ -21,7 +21,7 @@ function getDaysInMonth(year, month) {
 }
 
 function getFirstWeekDay(year, month) {
-  return new Date(year, month, 1).getDay(); // 0 = domingo
+  return new Date(year, month, 1).getDay();
 }
 
 /* ===============================
@@ -39,9 +39,6 @@ export default function AudioScheduleCalendar({
   const grouped = groupSchedulesByDate(schedules || []);
   const today = new Date();
 
-  /* ===============================
-     PERMISSÕES
-  ================================ */
   const canManageSchedule =
     user?.role === "admin" ||
     user?.role === "pastor" ||
@@ -75,9 +72,6 @@ export default function AudioScheduleCalendar({
     return member ? member.name : "—";
   };
 
-  /* ===============================
-     NAVEGAÇÃO
-  ================================ */
   const goPrevMonth = () => {
     if (currentMonth === 0) {
       setCurrentMonth(11);
@@ -98,13 +92,13 @@ export default function AudioScheduleCalendar({
 
   return (
     <>
-      {/* HEADER */}
-      <div className="mb-6 flex items-center justify-between">
+      {/* HEADER DO MÊS */}
+      <div className="mb-4 flex items-center justify-between">
         <button
           onClick={goPrevMonth}
           className="
-            h-9
-            w-9
+            h-8
+            w-8
             flex
             items-center
             justify-center
@@ -121,10 +115,10 @@ export default function AudioScheduleCalendar({
         </button>
 
         <div className="text-center">
-          <h2 className="text-base font-semibold capitalize">
+          <h2 className="text-sm sm:text-base font-semibold capitalize">
             {monthLabel}
           </h2>
-          <p className="text-xs text-base-content/50">
+          <p className="text-[11px] text-base-content/50">
             Toque em um dia para gerenciar a escala
           </p>
         </div>
@@ -132,8 +126,8 @@ export default function AudioScheduleCalendar({
         <button
           onClick={goNextMonth}
           className="
-            h-9
-            w-9
+            h-8
+            w-8
             flex
             items-center
             justify-center
@@ -152,16 +146,14 @@ export default function AudioScheduleCalendar({
 
       {/* TOGGLE */}
       {canManageSchedule && (
-        <div className="flex justify-center mb-6">
+        <div className="flex justify-center mb-4">
           <div
             className="
               inline-flex
-              gap-1
-              rounded-xl
-              border
-              border-base-300
-              bg-base-100
+              rounded-full
+              bg-base-200
               p-1
+              gap-1
             "
           >
             {["calendar", "read"].map((mode) => (
@@ -169,15 +161,15 @@ export default function AudioScheduleCalendar({
                 key={mode}
                 onClick={() => setViewMode(mode)}
                 className={`
-                  h-8
+                  h-7
                   px-4
-                  rounded-lg
-                  text-sm
+                  rounded-full
+                  text-xs
                   transition
                   ${
                     viewMode === mode
-                      ? "bg-base-200 text-base-content"
-                      : "text-base-content/60 hover:bg-base-200"
+                      ? "bg-base-100 text-base-content shadow-sm"
+                      : "text-base-content/60 hover:bg-base-100/60"
                   }
                 `}
               >
@@ -189,7 +181,7 @@ export default function AudioScheduleCalendar({
       )}
 
       {!canManageSchedule && (
-        <p className="text-xs text-center text-base-content/50 mb-4">
+        <p className="text-xs text-center text-base-content/50 mb-3">
           Visualização somente leitura
         </p>
       )}
@@ -202,11 +194,11 @@ export default function AudioScheduleCalendar({
         />
       )}
 
-      {/* CALENDÁRIO LIMPO */}
+      {/* CALENDÁRIO */}
       {viewMode === "calendar" && canManageSchedule && (
         <>
           {/* DIAS DA SEMANA */}
-          <div className="grid grid-cols-7 text-[11px] font-medium text-center text-base-content/60 mb-3">
+          <div className="grid grid-cols-7 text-[10px] font-medium text-center text-base-content/60 mb-2">
             {["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"].map((d, i) => (
               <div
                 key={d}
@@ -218,7 +210,7 @@ export default function AudioScheduleCalendar({
           </div>
 
           {/* DIAS */}
-          <div className="grid grid-cols-7 gap-y-3">
+          <div className="grid grid-cols-7 gap-y-2">
             {Array.from({ length: firstWeekDay }).map((_, i) => (
               <div key={`empty-${i}`} />
             ))}
@@ -236,13 +228,12 @@ export default function AudioScheduleCalendar({
                 today.toDateString() ===
                 new Date(currentYear, currentMonth, day).toDateString();
 
-              const weekDayIndex = new Date(
-                currentYear,
-                currentMonth,
-                day
-              ).getDay();
-
-              const isSunday = weekDayIndex === 0;
+              const isSunday =
+                new Date(
+                  currentYear,
+                  currentMonth,
+                  day
+                ).getDay() === 0;
 
               return (
                 <button
@@ -252,13 +243,12 @@ export default function AudioScheduleCalendar({
                     relative
                     mx-auto
                     flex
-                    h-10
-                    w-10
+                    h-9
+                    w-9
                     items-center
                     justify-center
                     rounded-full
                     text-sm
-                    font-medium
                     transition
                     hover:bg-base-200
                   "
@@ -281,8 +271,8 @@ export default function AudioScheduleCalendar({
                       className="
                         absolute
                         bottom-1
-                        h-1.5
-                        w-1.5
+                        h-1
+                        w-1
                         rounded-full
                         bg-primary
                       "

@@ -107,18 +107,11 @@ export default function DnaListPage() {
       <PageHeader
         title="Grupos DNA"
         subtitle="Pequenos grupos para caminhar juntos, criar comunhão e crescer na fé"
-        right={
-          <Button
-            variant="ghost"
-            onClick={() => navigate("/dna")}
-          >
-            Voltar
-          </Button>
-        }
+        showBack={false}
       />
 
-      {/* AÇÃO ADMIN */}
-      <div className="flex justify-start">
+      {/* AÇÃO ADMIN — MESMO LUGAR, SÓ À DIREITA */}
+      <div className="flex justify-end">
         <Button
           variant="ghost"
           onClick={() => navigate("/dna/novo")}
@@ -174,14 +167,12 @@ export default function DnaListPage() {
           Encontrar um grupo perto de mim
         </button>
 
-        {/* ERRO GEO */}
         {geoError && (
           <p className="text-xs text-warning max-w-xs">
             {geoError}
           </p>
         )}
 
-        {/* RESET */}
         {searched && !geoError && (
           <Button
             variant="ghost"
@@ -196,7 +187,6 @@ export default function DnaListPage() {
         )}
       </section>
 
-      {/* FEEDBACK */}
       {loading && (
         <p className="text-sm text-base-content/60 text-center">
           Carregando grupos DNA...
@@ -219,7 +209,6 @@ export default function DnaListPage() {
           </p>
         )}
 
-      {/* LISTA */}
       {!loading && (
         <div
           className="

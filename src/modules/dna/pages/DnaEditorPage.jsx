@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { FaTrash, FaArrowLeft } from "react-icons/fa";
+import { FaTrash } from "react-icons/fa";
 
 import PageHeader from "@/components/ui/PageHeader";
 import Button from "@/components/ui/Button";
@@ -93,24 +93,10 @@ export default function DnaEditorPage() {
         pb-6
       "
     >
-      {/* HEADER */}
+      {/* HEADER (sem Voltar, sem Criar DNA) */}
       <PageHeader
         title={isNew ? "Criar DNA" : "Editar DNA"}
         subtitle="Cadastro do grupo DNA"
-        right={
-          <Button
-            variant="ghost"
-            onClick={() => navigate("/dna")}
-            className="
-              flex
-              items-center
-              gap-2
-            "
-          >
-            <FaArrowLeft size={14} />
-            Voltar
-          </Button>
-        }
       />
 
       {/* FORMULÁRIO */}
@@ -130,13 +116,7 @@ export default function DnaEditorPage() {
 
       {/* AÇÃO PERIGOSA (DISCRETA) */}
       {!isNew && (
-        <div
-          className="
-            pt-2
-            flex
-            justify-end
-          "
-        >
+        <div className="pt-2 flex justify-end">
           <Button
             variant="ghost"
             onClick={handleDelete}

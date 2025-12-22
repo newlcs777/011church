@@ -1,4 +1,5 @@
 import Card from "../../../components/ui/Card";
+import { FaMapMarkerAlt } from "react-icons/fa";
 
 const MAPS_LINK =
   "https://www.google.com/maps/dir//Estr.+de+Itapecerica,+1449+-+Vila+das+Belezas,+São+Paulo+-+SP,+05835-005/@-23.6879872,-46.7992576,14z/data=!4m8!4m7!1m0!1m5!1m1!1s0x94ce51001760dffd:0x13e31a96301eeedd!2m2!1d-46.7477551!2d-23.6480612";
@@ -70,7 +71,7 @@ export default function NextEventCard({ loading = false }) {
             Domingo · 10h e 18h
           </div>
 
-          {/* ONDE */}
+          {/* ONDE — ÍCONE IGUAL AO APP */}
           <div
             className="
               flex
@@ -81,8 +82,13 @@ export default function NextEventCard({ loading = false }) {
               delay-100
             "
           >
-            <span className="text-base">📍</span>
-            <span>
+            <FaMapMarkerAlt
+              size={13}
+              className="
+                text-primary
+              "
+            />
+            <span className="text-primary">
               011 Church · Capão Redondo
             </span>
           </div>

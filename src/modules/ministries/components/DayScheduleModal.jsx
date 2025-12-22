@@ -11,10 +11,13 @@ export default function DayScheduleModal({
 }) {
   const { user } = useAuthContext();
 
-  const canEdit =
+  const canManage =
     user?.role === "admin" ||
     user?.role === "pastor" ||
     user?.role === "lider";
+
+  const canSelfAssign =
+    user?.role === "obreiro";
 
   const formattedDate = new Date(date).toLocaleDateString("pt-BR", {
     weekday: "long",
@@ -22,6 +25,10 @@ export default function DayScheduleModal({
     month: "long",
     year: "numeric",
   });
+
+  const alreadyAssigned = schedules.some(
+    (s) => s.memberId === user?.uid
+  );
 
   return (
     <div
@@ -31,10 +38,9 @@ export default function DayScheduleModal({
         z-50
         bg-black/40
         flex
-        items-end
-        sm:items-center
+        items-center
         justify-center
-        px-2
+        px-3
       "
       onClick={onClose}
     >
@@ -42,52 +48,63 @@ export default function DayScheduleModal({
         onClick={(e) => e.stopPropagation()}
         className="
           w-full
-          sm:max-w-md
+          max-w-md
           bg-base-100
-          rounded-t-3xl
-          sm:rounded-2xl
-          shadow-2xl
-          p-5
-          animate-fade-in
+          rounded-2xl
+          shadow-xl
+          p-4
+          sm:p-5
+          -mt-16
+          sm:mt-0
         "
       >
         {/* HEADER */}
         <div className="flex items-start justify-between mb-3">
           <div className="flex flex-col gap-0.5">
-            <h3 className="text-lg font-bold">
-              Escala do dia
+            <h3 className="text-base sm:text-lg font-semibold">
+              Escala deste dia
             </h3>
 
-            <p className="text-sm text-base-content/60 capitalize">
+            <p className="text-xs sm:text-sm text-base-content/60 capitalize">
               {formattedDate}
             </p>
           </div>
 
           <button
             onClick={onClose}
-            className="btn btn-ghost btn-sm rounded-full"
+            className="
+              h-8
+              w-8
+              inline-flex
+              items-center
+              justify-center
+              rounded-full
+              text-base-content/60
+              hover:bg-base-200
+              transition
+            "
             aria-label="Fechar"
           >
             ✕
           </button>
         </div>
 
-        <div className="divider my-2" />
+        <div className="border-b border-base-200 mb-3" />
 
-        {/* AVISO PARA LEITURA */}
-        {!canEdit && (
-          <p className="text-xs text-center text-base-content/50 mb-3">
-            Visualização somente leitura
+        {/* AVISO */}
+        {!canManage && !canSelfAssign && (
+          <p className="text-xs text-center text-base-content/50 mb-4">
+            Você pode apenas visualizar a escala deste dia.
           </p>
         )}
 
-        {/* CONTEÚDO */}
+        {/* LISTA */}
         {schedules.length === 0 ? (
-          <div className="py-6 text-center text-sm text-base-content/60">
-            Nenhuma pessoa escalada neste dia.
+          <div className="py-6 text-center text-sm text-base-content/50">
+            Ainda não há ninguém escalado aqui.
           </div>
         ) : (
-          <div className="flex flex-col gap-3 mb-5">
+          <div className="flex flex-col gap-2 mb-4">
             {schedules.map((s) => (
               <div
                 key={s.id}
@@ -99,13 +116,11 @@ export default function DayScheduleModal({
                   border-base-300
                   rounded-xl
                   p-3
-                  transition
-                  hover:bg-base-200
+                  text-sm
                 "
               >
-                {/* INFO */}
                 <div className="flex flex-col">
-                  <span className="text-sm font-semibold">
+                  <span className="font-medium">
                     {getMemberName(s.memberId)}
                   </span>
 
@@ -116,12 +131,20 @@ export default function DayScheduleModal({
                   )}
                 </div>
 
-                {/* AÇÕES (SÓ GESTÃO) */}
-                {canEdit && (
-                  <div className="flex items-center gap-1">
+                {canManage && (
+                  <div className="flex gap-1">
                     <button
                       onClick={() => onEdit(s.id)}
-                      className="btn btn-ghost btn-xs"
+                      className="
+                        inline-flex
+                        items-center
+                        px-2
+                        py-1
+                        text-xs
+                        rounded-lg
+                        text-base-content/70
+                        hover:bg-base-200
+                      "
                     >
                       Editar
                     </button>
@@ -136,7 +159,16 @@ export default function DayScheduleModal({
                         await onRemove(s.id);
                         onClose();
                       }}
-                      className="btn btn-ghost btn-xs text-error"
+                      className="
+                        inline-flex
+                        items-center
+                        px-2
+                        py-1
+                        text-xs
+                        rounded-lg
+                        text-error
+                        hover:bg-base-200
+                      "
                     >
                       Remover
                     </button>
@@ -149,23 +181,48 @@ export default function DayScheduleModal({
 
         {/* FOOTER */}
         <div className="flex gap-2">
-          {canEdit && (
+          {(canManage || canSelfAssign) && !alreadyAssigned && (
             <button
               onClick={() => {
                 onClose();
                 onCreate(date);
               }}
-              className="btn btn-outline btn-sm flex-1"
+              className="
+                inline-flex
+                items-center
+                justify-center
+                flex-1
+                h-9
+                rounded-lg
+                border
+                border-base-300
+                text-sm
+                text-base-content/70
+                transition
+                hover:bg-base-200
+                active:scale-[0.98]
+              "
             >
-              + Adicionar pessoa
+              + Quero servir neste dia
             </button>
           )}
 
           <button
             onClick={onClose}
-            className="btn btn-ghost btn-sm flex-1"
+            className="
+              inline-flex
+              items-center
+              justify-center
+              flex-1
+              h-9
+              rounded-lg
+              text-sm
+              text-base-content/70
+              transition
+              hover:bg-base-200
+            "
           >
-            Fechar
+            Voltar
           </button>
         </div>
       </div>
