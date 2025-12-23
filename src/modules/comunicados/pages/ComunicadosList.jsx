@@ -4,7 +4,7 @@ import ComunicadoCard from "../components/ComunicadoCard";
 import ComunicadoCardSkeleton from "../components/ComunicadoCardSkeleton";
 import useComunicados from "../hooks/useComunicados";
 import useAuth from "../../auth/hooks/useAuth";
-import { canCreateComunicado } from "../utils/comunicadopermissions";
+import { canCreateComunicado } from "../utils/comunicadoPermissions";
 
 import PageHeader from "../../../components/ui/PageHeader";
 

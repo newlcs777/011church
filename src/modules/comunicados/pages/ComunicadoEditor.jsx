@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 
 import useAuth from "../../auth/hooks/useAuth";
 import useComunicados from "../hooks/useComunicados";
-import { canCreateComunicado } from "../utils/comunicadopermissions";
+import { canCreateComunicado } from "../utils/comunicadoPermissions";
 
 import PageHeader from "../../../components/ui/PageHeader";
 import ComunicadoForm from "../components/ComunicadoForm";
