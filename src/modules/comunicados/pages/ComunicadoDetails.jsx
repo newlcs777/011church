@@ -1,15 +1,31 @@
-
 import { useParams, Link, useNavigate } from "react-router-dom";
-import { getComunicado, deleteComunicado } from "../services/comunicadosService";
+import { useState } from "react";
+import { FaEdit, FaCalendarAlt, FaClock } from "react-icons/fa";
+
 import useAuth from "../../auth/hooks/useAuth";
+import useComunicados from "../hooks/useComunicados";
+import ComunicadoCardSkeleton from "../components/ComunicadoCardSkeleton";
 
 export default function ComunicadoDetails() {
   const { id } = useParams();
-  const comunicado = getComunicado(id);
-  const { user } = useAuth();
   const navigate = useNavigate();
+  const { user } = useAuth();
 
-  if (!comunicado) return <p className="p-4">Comunicado não encontrado.</p>;
+  const { getComunicadoById, deleteComunicado } = useComunicados();
+  const comunicado = getComunicadoById(id);
+
+  const [confirmDelete, setConfirmDelete] = useState(false);
+
+  if (!comunicado) {
+    return (
+      <div className="p-6">
+        <ComunicadoCardSkeleton />
+      </div>
+    );
+  }
+
+  const canEdit =
+    user?.role === "admin" || user?.role === "pastor";
 
   const handleDelete = () => {
     deleteComunicado(comunicado.id);
@@ -17,31 +33,167 @@ export default function ComunicadoDetails() {
   };
 
   return (
-    <div className="flex flex-col gap-4">
-      <Link
-        to="/comunicados"
-        className="btn btn-outline btn-sm w-24"
-      >
-        ← Voltar
-      </Link>
+    <div className="flex justify-center px-4">
+      <div className="w-full max-w-3xl flex flex-col gap-6">
+        {/* CARD */}
+        <div
+          className="
+            group
+            relative
+            rounded-xl
+            border
+            border-base-300
+            bg-base-100
+            p-6
+            shadow-sm
+            transition
+            hover:shadow-md
+          "
+        >
+          {/* EDITAR */}
+          {canEdit && (
+            <Link
+              to={`/comunicados/${comunicado.id}/editar`}
+              className="
+                absolute
+                top-3
+                right-3
+                text-base-content/50
+                hover:text-primary
+                transition
+                opacity-100
+                sm:opacity-0
+                sm:group-hover:opacity-100
+              "
+              aria-label="Editar comunicado"
+            >
+              <FaEdit size={14} />
+            </Link>
+          )}
 
-      <h1 className="text-2xl font-bold">{comunicado.titulo}</h1>
-      <p className="opacity-70">{comunicado.data}</p>
-      <p>{comunicado.mensagem}</p>
+          <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
+            {/* DATA */}
+            <div
+              className="
+                flex
+                flex-row
+                sm:flex-col
+                items-center
+                sm:justify-center
+                rounded-lg
+                bg-base-200
+                px-3
+                py-2
+                sm:px-4
+                sm:py-3
+                min-w-0
+                sm:min-w-[72px]
+                text-base-content/70
+                gap-2
+              "
+            >
+              <FaCalendarAlt size={14} />
+              <div className="flex sm:flex-col items-center gap-1 text-xs">
+                <span className="font-semibold">
+                  {comunicado.data?.slice(8, 10)}
+                </span>
+                <span className="uppercase text-base-content/60">
+                  {comunicado.data?.slice(5, 7)}/{comunicado.data?.slice(0, 4)}
+                </span>
+              </div>
+            </div>
 
-      {(user.role === "admin" || user.role === "pastor") && (
-        <div className="flex gap-3 mt-4">
-          <Link
-            to={`/comunicados/editar/${comunicado.id}`}
-            className="btn btn-warning"
-          >
-            Editar
-          </Link>
-          <button onClick={handleDelete} className="btn btn-error">
-            Excluir
-          </button>
+            {/* CONTEÚDO */}
+            <div className="flex flex-col gap-2 flex-1">
+              <h1 className="text-sm sm:text-base font-medium">
+                {comunicado.titulo}
+              </h1>
+
+              {comunicado.descricao && (
+                <p className="text-sm text-base-content/70">
+                  {comunicado.descricao}
+                </p>
+              )}
+
+              {/* INFORMAÇÕES */}
+              {comunicado.horario && (
+                <div
+                  className="
+                    flex
+                    items-center
+                    gap-1
+                    text-sm
+                    text-base-content/60
+                  "
+                >
+                  <FaClock size={12} />
+                  <span>{comunicado.horario}</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* EXCLUIR */}
+          {canEdit && (
+            <div className="pt-4 border-t border-base-300 flex justify-end">
+              {!confirmDelete ? (
+                <button
+                  onClick={() => setConfirmDelete(true)}
+                  className="
+                    text-xs
+                    text-error
+                    hover:underline
+                  "
+                >
+                  Excluir comunicado
+                </button>
+              ) : (
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-base-content/60">
+                    Confirmar exclusão deste comunicado?
+                  </span>
+
+                  <button
+                    onClick={handleDelete}
+                    className="
+                      text-xs
+                      text-error
+                      hover:underline
+                    "
+                  >
+                    Sim
+                  </button>
+
+                  <button
+                    onClick={() => setConfirmDelete(false)}
+                    className="
+                      text-xs
+                      text-base-content/60
+                      hover:underline
+                    "
+                  >
+                    Não
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
         </div>
-      )}
+
+        {/* VOLTAR */}
+        <div className="flex justify-end">
+          <Link
+            to="/comunicados"
+            className="
+              text-xs
+              text-base-content/60
+              hover:underline
+            "
+          >
+            Voltar aos comunicados
+          </Link>
+        </div>
+      </div>
     </div>
   );
 }

@@ -1,15 +1,12 @@
-
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import {
-  getComunicado,
-  createComunicado,
-  updateComunicado,
-} from "../services/comunicadosService";
+
 import useAuth from "../../auth/hooks/useAuth";
-import Input from "../../../components/ui/Input";
-import Button from "../../../components/ui/Button";
+import useComunicados from "../hooks/useComunicados";
+import { canCreateComunicado } from "../utils/comunicadopermissions";
+
 import PageHeader from "../../../components/ui/PageHeader";
+import ComunicadoForm from "../components/ComunicadoForm";
 
 export default function ComunicadoEditor() {
   const { id } = useParams();
@@ -17,78 +14,117 @@ export default function ComunicadoEditor() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
+  const canCreate = canCreateComunicado(user?.role);
+
+  const {
+    getComunicadoById,
+    createComunicado,
+    updateComunicado,
+    loading,
+  } = useComunicados();
+
   const [form, setForm] = useState({
     titulo: "",
-    mensagem: "",
+    descricao: "",
     data: "",
+    horario: "",
+    local: "",
   });
 
   useEffect(() => {
-    if (editing) {
-      const c = getComunicado(id);
-      if (c) setForm(c);
-    }
-  }, [id, editing]);
+    if (!editing) return;
 
-  const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const comunicado = getComunicadoById(id);
+    if (!comunicado) return;
+
+    setForm({
+      titulo: comunicado.titulo ?? "",
+      descricao: comunicado.descricao ?? "",
+      data: comunicado.data ?? "",
+      horario: comunicado.horario ?? "",
+      local: comunicado.local ?? "",
+    });
+  }, [editing, id]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+
+    setForm((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (editing) updateComunicado(form);
-    else createComunicado(form);
+
+    if (editing) {
+      updateComunicado({
+        id,
+        ...form,
+      });
+    } else {
+      createComunicado(form);
+    }
+
     navigate("/comunicados");
   };
 
-  if (user.role !== "admin" && user.role !== "pastor")
-    return <p className="p-4">Acesso negado.</p>;
+  if (!canCreate) {
+    return (
+      <p className="p-6 text-sm text-base-content/60 text-center">
+        Este acesso é reservado à liderança da igreja.
+      </p>
+    );
+  }
 
   return (
-    <div className="flex flex-col gap-4 max-w-xl">
-      <PageHeader
-        title={editing ? "Editar Comunicado" : "Novo Comunicado"}
-        subtitle="Use comunicados para avisos importantes da igreja"
-      />
+    <div className="flex flex-col gap-6 pb-6">
+      {/* TOPO */}
+      <div className="flex items-center justify-between">
+        <span className="w-[60px]" />
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-        <Input
-          label="Título"
-          name="titulo"
-          placeholder="Ex: Reunião de Líderes"
-          value={form.titulo}
-          onChange={handleChange}
-        />
-        <div className="flex flex-col gap-1">
-          <label className="text-sm font-medium">Mensagem</label>
-          <textarea
-            className="textarea textarea-bordered"
-            name="mensagem"
-            placeholder="Digite o comunicado completo"
-            value={form.mensagem}
-            onChange={handleChange}
-          />
-        </div>
-        <Input
-          label="Data"
-          name="data"
-          type="date"
-          value={form.data}
-          onChange={handleChange}
+        <PageHeader
+          title={editing ? "Editar comunicado" : "Novo comunicado"}
+          subtitle={
+            editing
+              ? "Edite com cuidado a mensagem que será compartilhada com a igreja"
+              : "Escreva um comunicado para edificação e orientação da igreja"
+          }
+          align="center"
         />
 
-        <div className="flex gap-2 mt-2">
-          <Button type="submit">
-            Salvar
-          </Button>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => navigate("/comunicados")}
-          >
-            Cancelar
-          </Button>
+        <span className="w-[60px]" />
+      </div>
+
+      {/* FORMULÁRIO */}
+      <section className="flex flex-col gap-2">
+        <div className="rounded-xl bg-base-100 p-6">
+          {editing && loading ? (
+            <div className="flex flex-col gap-4 animate-pulse">
+              <div className="h-10 rounded bg-base-200" />
+              <div className="h-28 rounded bg-base-200" />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="h-10 rounded bg-base-200" />
+                <div className="h-10 rounded bg-base-200" />
+              </div>
+              <div className="h-10 rounded bg-base-200" />
+            </div>
+          ) : (
+            <ComunicadoForm
+              values={form}
+              onChange={handleChange}
+              onSubmit={handleSubmit}
+              onCancel={() => navigate(-1)}
+              submitLabel={
+                editing
+                  ? "Salvar alterações"
+                  : "Publicar comunicado"
+              }
+            />
+          )}
         </div>
-      </form>
+      </section>
     </div>
   );
 }

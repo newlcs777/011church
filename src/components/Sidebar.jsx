@@ -228,43 +228,47 @@ export default function Sidebar({ onClose }) {
           </>
         )}
 
-        {/* LINKS EXTERNOS */}
-        <div className="mt-6 border-t border-white/10 pt-4 space-y-1">
-          <a
-            href="https://open.spotify.com"
-            target="_blank"
-            className={`${baseLinkClass} ${inactiveClass}`}
-          >
-            <FaSpotify />
-            <span>Spotify</span>
-          </a>
+     {/* LINKS EXTERNOS */}
+<div className="mt-6 border-t border-white/10 pt-4 space-y-1">
+  <a
+    href="https://open.spotify.com/show/3EA0VR82RfeiktPW4SqgJT"
+    target="_blank"
+    rel="noopener noreferrer"
+    className={`${baseLinkClass} ${inactiveClass}`}
+  >
+    <FaSpotify />
+    <span>Spotify</span>
+  </a>
 
-          <a
-            href="https://instagram.com"
-            target="_blank"
-            className={`${baseLinkClass} ${inactiveClass}`}
-          >
-            <FaInstagram />
-            <span>Instagram</span>
-          </a>
+  <a
+    href="https://www.instagram.com/011church/"
+    target="_blank"
+    rel="noopener noreferrer"
+    className={`${baseLinkClass} ${inactiveClass}`}
+  >
+    <FaInstagram />
+    <span>Instagram</span>
+  </a>
 
-          <a
-            href="https://youtube.com"
-            target="_blank"
-            className={`${baseLinkClass} ${inactiveClass}`}
-          >
-            <FaYoutube />
-            <span>YouTube</span>
-          </a>
+  <a
+    href="https://www.youtube.com/@011church-sede"
+    target="_blank"
+    rel="noopener noreferrer"
+    className={`${baseLinkClass} ${inactiveClass}`}
+  >
+    <FaYoutube />
+    <span>YouTube</span>
+  </a>
 
-          <a
-            href="#"
-            className={`${baseLinkClass} ${inactiveClass}`}
-          >
-            <FaHeart />
-            <span>Doações</span>
-          </a>
-        </div>
+  <a
+    href="#"
+    className={`${baseLinkClass} ${inactiveClass}`}
+  >
+    <FaHeart />
+    <span>Doações</span>
+  </a>
+</div>
+
       </nav>
 
       {/* LOGOUT */}

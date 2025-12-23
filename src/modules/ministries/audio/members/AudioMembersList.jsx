@@ -29,77 +29,45 @@ export default function AudioMembersList() {
   }, [dispatch]);
 
   return (
-    <MinistryPageWrapper title="Membros — Ministério de Áudio">
-      {/* HEADER */}
-      <div
-        className="
-          flex
-          items-center
-          justify-between
-          mb-4
-        "
-      >
-        {/* 🔙 VOLTAR */}
-        <button
-          type="button"
-          onClick={() => navigate(-1)}
-          className="
-            btn
-            btn-ghost
-            btn-xs
-            text-base-content/70
-            hover:text-base-content
-            focus:outline-none
-            focus:ring-0
-          "
-        >
-          ← Voltar
-        </button>
-
-        {/* ➕ NOVO MEMBRO */}
-        {canEdit && (
+    <MinistryPageWrapper
+      title="Membros do Ministério de Áudio"
+      subtitle="Pessoas que servem e colaboram nos cultos e atividades"
+    >
+      {/* AÇÃO PRINCIPAL — PADRÃO EVENTCARD */}
+      {canEdit && (
+        <div className="flex justify-end mb-4">
           <button
             type="button"
             onClick={() =>
               navigate("/ministerios/audio/members/create")
             }
             className="
-               btn
-            btn-ghost
-            btn-xs
-            text-base-content/70
-            hover:text-base-content
-            focus:outline-none
-            focus:ring-0
+              text-xs
+              font-medium
+              text-base-content/60
+              hover:bg-base-200
+              rounded-lg
+              px-3
+              py-1.5
+              transition
+              active:scale-[0.98]
             "
           >
-            + Novo
+            + Novo membro
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
       {!canEdit && (
-        <p
-          className="
-            text-xs
-            text-base-content/60
-            mb-3
-          "
-        >
+        <p className="text-sm text-base-content/60 mb-4">
           Visualização somente leitura
         </p>
       )}
 
       {/* CONTEÚDO */}
       {loading ? (
-        <p
-          className="
-            text-sm
-            text-base-content/60
-            p-4
-          "
-        >
-          Carregando…
+        <p className="text-sm text-base-content/60 p-4">
+          Carregando membros…
         </p>
       ) : (
         <MembersTable

@@ -18,10 +18,11 @@ export default function AudioSchedulePage() {
   const navigate = useNavigate();
   const { user } = useAuthContext();
 
-  const canManage =
-    user?.role === "admin" ||
-    user?.role === "pastor" ||
-    user?.role === "lider";
+const canManage =
+  user?.role === "admin" ||
+  user?.role === "pastor" ||
+  user?.role === "lider" ||
+  user?.role === "obreiro";
 
   const {
     items = [],

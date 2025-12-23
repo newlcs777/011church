@@ -1,10 +1,11 @@
+import { useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
 import MinistryPageWrapper from "../../components/MinistryPageWrapper";
 import MemberForm from "../../components/MemberForm";
 
-import { editMember } from "../../store/membersSlice";
+import { editMember, fetchMembers } from "../../store/membersSlice";
 
 // 🔐 AUTH
 import { useAuthContext } from "../../../auth/context/AuthContext";
@@ -21,48 +22,46 @@ export default function AudioMemberEdit() {
     user?.role === "pastor" ||
     user?.role === "lider";
 
-  const member = useSelector((state) =>
-    state.members.audio.find((m) => m.id === id)
+  const members = useSelector(
+    (state) => state.members.audio
   );
 
-  if (!member) {
+  const loading = useSelector(
+    (state) => state.members.loading
+  );
+
+  useEffect(() => {
+    if (!members || members.length === 0) {
+      dispatch(fetchMembers("audio"));
+    }
+  }, [dispatch, members]);
+
+  const member = members?.find(
+    (m) => m.id === id
+  );
+
+  if (loading || !member) {
     return (
       <MinistryPageWrapper>
-        <p className="text-sm text-base-content/60">
-          Carregando...
+        <p className="text-sm text-base-content/60 p-4 text-center">
+          Carregando informações do membro…
         </p>
       </MinistryPageWrapper>
     );
   }
 
-  // ⛔ BLOQUEIO TOTAL PARA QUEM NÃO PODE EDITAR
   if (!canEdit) {
     return (
       <MinistryPageWrapper>
-        <div className="text-center mt-12">
+        <div className="text-center mt-12 px-4">
           <p className="text-sm text-base-content/60">
-            Você não tem permissão para editar membros.
+            Você não possui permissão para ajustar dados de membros.
           </p>
-
-          <button
-            onClick={() => navigate(-1)}
-            className="
-              mt-4
-              btn
-              btn-ghost
-              btn-sm
-            "
-          >
-            Voltar
-          </button>
         </div>
       </MinistryPageWrapper>
     );
   }
 
-  // ===============================
-  // NORMALIZAÇÃO COMPLETA (OBRIGATÓRIA)
-  // ===============================
   const normalizedMember = {
     name: member.name || "",
     phone: member.phone || "",
@@ -92,38 +91,32 @@ export default function AudioMemberEdit() {
 
   return (
     <MinistryPageWrapper>
-      {/* 🔙 VOLTAR */}
-      <div className="mb-4">
-        <button
-          type="button"
-          onClick={() => navigate(-1)}
-          className="
-            btn
-            btn-ghost
-            btn-sm
-            focus:outline-none
-            focus:ring-0
-          "
-        >
-          ← Voltar
-        </button>
-      </div>
-
-      {/* TÍTULO CENTRALIZADO */}
-      <div className="text-center mb-6">
-        <h1 className="text-2xl font-bold">
-          Editar Membro
+      {/* HEADER — PADRÃO EVENTCARD */}
+      <div className="text-center mb-6 px-4">
+        <h1 className="text-sm sm:text-base font-medium">
+          Ajustar dados do membro
         </h1>
-        <p className="text-sm text-base-content/70 mt-1">
+
+        <p className="text-sm text-base-content/60 mt-1">
           Ministério de Áudio
         </p>
       </div>
 
       {/* FORMULÁRIO */}
-      <MemberForm
-        initialData={normalizedMember}
-        onSubmit={handleSubmit}
-      />
+      <div
+        className="
+          w-full
+          max-w-xl
+          mx-auto
+          px-4
+          pb-6
+        "
+      >
+        <MemberForm
+          initialData={normalizedMember}
+          onSubmit={handleSubmit}
+        />
+      </div>
     </MinistryPageWrapper>
   );
 }

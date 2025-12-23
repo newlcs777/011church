@@ -1,13 +1,14 @@
 import { initializeApp } from "firebase/app";
 import {
   getFirestore,
-  getDocs,
-  getDoc,        // ✅ ADD
-  addDoc,        // ✅ ADD
-  updateDoc,     // ✅ ADD
-  deleteDoc,     // ✅ ADD
-  doc,           // ✅ ADD
   collection,
+  getDocs,
+  getDoc,
+  addDoc,
+  updateDoc,
+  deleteDoc,
+  doc,
+  serverTimestamp, // ✅ ADD (CRÍTICO)
 } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { getStorage } from "firebase/storage";
@@ -24,24 +25,27 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
-// Serviços
+// 🔥 SERVIÇOS
 export const db = getFirestore(app);
 export const auth = getAuth(app);
 export const storage = getStorage(app);
 
-// Debug manual no console
+// 🧪 DEBUG CONTROLADO (DEV)
 if (typeof window !== "undefined") {
   window.firebase = {
     db,
-    getDocs,
-    getDoc,      // ✅ ADD
-    addDoc,      // ✅ ADD
-    updateDoc,   // ✅ ADD
-    deleteDoc,   // ✅ ADD
-    doc,         // ✅ ADD
     collection,
+    doc,
+    getDocs,
+    getDoc,
+    addDoc,
+    updateDoc,
+    deleteDoc,
+    serverTimestamp,
   };
-  console.log("🔥 Firestore disponível no window");
+
+  console.log("🔥 Firebase conectado corretamente");
 }
 
+export { serverTimestamp };
 export default app;

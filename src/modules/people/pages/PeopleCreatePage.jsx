@@ -22,8 +22,13 @@ export default function PeopleCreatePage() {
         console.warn("Falha ao enviar e-mail do DNA:", e);
       }
 
-      // 3️⃣ navegação
-      navigate("/people");
+      // 3️⃣ navegação com mensagem de sucesso
+      navigate("/people", {
+        state: {
+          successMessage:
+            "🎉 Parabéns! Novo membro cadastrado com sucesso.",
+        },
+      });
     } catch (err) {
       console.error("Erro ao salvar pessoa:", err);
       alert("Erro ao salvar pessoa");

@@ -31,56 +31,50 @@ export default function AudioTasksList() {
   const handleDelete = async (id) => {
     if (!canEdit) return;
 
-    if (!confirm("Deseja realmente excluir esta tarefa?")) return;
+    if (!confirm("Deseja realmente remover este serviço?")) return;
 
     await dispatch(removeTask({ ministry: "audio", id }));
     dispatch(fetchTasks("audio"));
   };
 
   return (
-    <MinistryPageWrapper title="Tarefas – Ministério de Áudio">
-      {/* HEADER AÇÕES */}
-      <div className="flex items-center justify-between mb-4">
-        {/* 🔙 VOLTAR */}
-        <button
-          type="button"
-          onClick={() => navigate(-1)}
-          className="
-            btn
-            btn-ghost
-            btn-sm
-            focus:outline-none
-            focus:ring-0
-          "
-        >
-          ← Voltar
-        </button>
-
-        {/* ➕ NOVA TAREFA (SÓ GESTÃO) */}
-        {canEdit && (
+    <MinistryPageWrapper
+      title="Serviços do Ministério de Áudio"
+      subtitle="Organização dos serviços e responsabilidades no ministério"
+    >
+      {/* AÇÃO PRINCIPAL — IGUAL EVENTCARD */}
+      {canEdit && (
+        <div className="flex justify-end mb-4">
           <button
             onClick={() => navigate("create")}
             className="
-              btn
-              btn-ghost
-              btn-sm
-              focus:outline-none
-              focus:ring-0
+              text-xs
+              font-medium
+              text-base-content/60
+              hover:bg-base-200
+              rounded-lg
+              px-3
+              py-1.5
+              transition
+              active:scale-[0.98]
             "
           >
-            + Nova Tarefa
+            + Novo serviço
           </button>
-        )}
-      </div>
+        </div>
+      )}
 
-      <TasksTable
-        tasks={tasks}
-        onEdit={(id) => {
-          if (!canEdit) return;
-          navigate(`edit/${id}`);
-        }}
-        onDelete={handleDelete}
-      />
+      {/* LISTA — COMPONENTE INTACTO */}
+      <div className="flex flex-col gap-4">
+        <TasksTable
+          tasks={tasks}
+          onEdit={(id) => {
+            if (!canEdit) return;
+            navigate(`edit/${id}`);
+          }}
+          onDelete={handleDelete}
+        />
+      </div>
     </MinistryPageWrapper>
   );
 }

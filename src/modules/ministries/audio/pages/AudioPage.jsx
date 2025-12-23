@@ -24,135 +24,123 @@ export default function AudioIndex() {
   return (
     <MinistryPageWrapper
       title="Ministério de Áudio"
-      subtitle="Acompanhe e organize as pessoas, tarefas e escalas do ministério de áudio."
+      subtitle="Organize as pessoas e os serviços que sustentam cada culto."
     >
-      {/* CARD DE STATUS */}
-      <div
-        className="
-          mt-6
-          grid
-          grid-cols-1
-          sm:grid-cols-2
-          lg:grid-cols-3
-          gap-4
-        "
-      >
+      {/* STATUS — PADRÃO CARD EVENTOS */}
+      <div className="mt-6">
         <div
           className="
-            bg-base-100
+            rounded-xl
             border
             border-base-300
-            rounded-xl
-            p-4
+            bg-base-100
+            p-6
             shadow-sm
-            flex
-            flex-col
-            items-center
-            justify-center
             text-center
           "
         >
-          <h3
-            className="
-              text-sm
-              font-medium
-              text-base-content/70
-            "
-          >
-            Total de membros
-          </h3>
+          <p className="text-sm text-base-content/60">
+            Membros ativos
+          </p>
 
-          <p
-            className="
-              mt-1
-              text-3xl
-              font-semibold
-            "
-          >
+          <p className="mt-1 text-3xl font-semibold">
             {members.length}
           </p>
         </div>
       </div>
 
-      {/* AÇÕES PRINCIPAIS */}
-      <div
-        className="
-          mt-6
-          grid
-          grid-cols-1
-          gap-2
-          sm:grid-cols-2
-          lg:flex
-          lg:flex-wrap
-          lg:items-center
-        "
-      >
-        <button
-          className="
-            h-10
-            px-4
-            rounded-lg
-            border
-            border-base-300
-            bg-base-100
-            text-sm
-            hover:bg-base-200
-            transition
-          "
-          onClick={() => navigate("schedule")}
-        >
-          Escala do ministério
-        </button>
-
-        <button
-          className="
-            h-10
-            px-4
-            rounded-lg
-            border
-            border-base-300
-            bg-base-100
-            text-sm
-            hover:bg-base-200
-            transition
-          "
-          onClick={() => navigate("members")}
-        >
-          Lista de membros
-        </button>
-
+      {/* AÇÕES — PADRÃO EVENTOS (MOBILE) */}
+      <div className="mt-6 flex flex-col gap-4">
         {canEdit && (
           <button
+            onClick={() => navigate("members/create")}
             className="
-              h-10
-              px-4
-              rounded-lg
+              inline-flex
+              items-center
+              justify-center
+              text-center
+              rounded-xl
               border
               border-base-300
               bg-base-100
+              px-4
+              py-3
               text-sm
-              hover:bg-base-200
+              font-medium
+              text-base-content/70
+              hover:bg-base-200/70
               transition
             "
-            onClick={() => navigate("members/create")}
           >
-            Adicionar membro
+            Adicionar novo membro
           </button>
         )}
 
         <button
+          onClick={() => navigate("schedule")}
           className="
-            h-10
-            px-4
-            rounded-lg
+            inline-flex
+            items-center
+            justify-center
+            text-center
+            rounded-xl
             border
             border-base-300
             bg-base-100
+            px-4
+            py-3
             text-sm
-            hover:bg-base-200
+            font-medium
+            text-base-content/70
+            hover:bg-base-200/70
             transition
           "
+        >
+          Ver escala do áudio
+        </button>
+
+        <button
+          onClick={() => navigate("members")}
+          className="
+            inline-flex
+            items-center
+            justify-center
+            text-center
+            rounded-xl
+            border
+            border-base-300
+            bg-base-100
+            px-4
+            py-3
+            text-sm
+            font-medium
+            text-base-content/70
+            hover:bg-base-200/70
+            transition
+          "
+        >
+          Lista de membros
+        </button>
+
+        <button
           onClick={() => navigate("tasks")}
+          className="
+            inline-flex
+            items-center
+            justify-center
+            text-center
+            rounded-xl
+            border
+            border-base-300
+            bg-base-100
+            px-4
+            py-3
+            text-sm
+            font-medium
+            text-base-content/70
+            hover:bg-base-200/70
+            transition
+          "
         >
           Tarefas do ministério
         </button>

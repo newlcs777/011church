@@ -17,9 +17,12 @@ export default function AudioScheduleCreate() {
   const { user } = useAuthContext();
 
   const canEdit =
-    user?.role === "admin" ||
-    user?.role === "pastor" ||
-    user?.role === "lider";
+  user?.role === "admin" ||
+  user?.role === "pastor" ||
+  user?.role === "lider" ||
+  user?.role === "obreiro";
+
+
 
   const members = useSelector((state) => state.members.audio || []);
 

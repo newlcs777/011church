@@ -16,13 +16,19 @@ export default function MinistryPageWrapper({
     >
       {/* HEADER */}
       {(title || subtitle) && (
-        <div className="mb-4 md:mb-6">
+        <div
+          className="
+            mb-4
+            md:mb-6
+            text-center
+          "
+        >
           {title && (
             <h1
               className="
                 text-xl
                 md:text-2xl
-                font-bold
+                font-semibold
                 leading-tight
               "
             >
@@ -36,6 +42,8 @@ export default function MinistryPageWrapper({
                 mt-1
                 text-sm
                 text-base-content/70
+                max-w-xl
+                mx-auto
               "
             >
               {subtitle}
@@ -54,7 +62,7 @@ export default function MinistryPageWrapper({
           md:border-base-300
 
           rounded-none
-          md:rounded-xl
+          md:rounded-2xl
 
           p-0
           md:p-6

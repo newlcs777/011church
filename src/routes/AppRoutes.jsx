@@ -19,19 +19,28 @@ import ComunicadosList from "../modules/comunicados/pages/ComunicadosList";
 import ComunicadoDetails from "../modules/comunicados/pages/ComunicadoDetails";
 import ComunicadoEditor from "../modules/comunicados/pages/ComunicadoEditor";
 
+/* ===================== CURSOS ===================== */
+import CursosList from "../modules/cursos/pages/CursosList";
+import CursoDetails from "../modules/cursos/pages/CursoDetails";
+import CursoEditor from "../modules/cursos/pages/CursoEditor";
+
+/* ===================== MANUTENÇÃO ===================== */
+import MaintenancePage from "@/components/system/MaintenancePage";
+
 /* ===================== DNA ===================== */
 import DnaListPage from "@/modules/dna/pages/DnaListPage";
 import DnaEditorPage from "../modules/dna/pages/DnaEditorPage";
 import DnaDetailsPage from "../modules/dna/pages/DnaDetailsPage";
 
+/* ===================== PEOPLE ===================== */
+import PeopleCreatePage from "@/modules/people/pages/PeopleCreatePage";
+import PeopleListPage from "@/modules/people/pages/PeopleListPage";
+import PeopleByDnaPage from "@/modules/people/pages/PeopleByDnaPage";
+
 /* ===================== ADMIN ===================== */
 import AdminDashboard from "../modules/admin/pages/AdminDashboard";
 
-/* ================================================================
-   ===================== MINISTÉRIO: ÁUDIO =========================
-   ================================================================ */
-
-/* Página principal do ministério */
+/* ===================== MINISTÉRIO: ÁUDIO ===================== */
 import AudioPage from "../modules/ministries/audio/pages/AudioPage.jsx";
 
 /* MEMBERS */
@@ -49,16 +58,9 @@ import AudioSchedulePage from "../modules/ministries/audio/pages/AudioSchedulePa
 import AudioScheduleCreate from "../modules/ministries/audio/schedule/AudioScheduleCreate.jsx";
 import AudioScheduleEdit from "../modules/ministries/audio/schedule/AudioScheduleEdit.jsx";
 
-//=====================adicionar pessoas//
-/* ===================== PEOPLE ===================== */
-import PeopleCreatePage from "@/modules/people/pages/PeopleCreatePage";
-import PeopleListPage from "@/modules/people/pages/PeopleListPage";
-import PeopleByDnaPage from "@/modules/people/pages/PeopleByDnaPage";
-
 export default function AppRoutes() {
   return (
     <Routes>
-
       {/* ===================== LOGIN ===================== */}
       <Route path="/login" element={<Login />} />
 
@@ -81,7 +83,6 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       />
-
       <Route
         path="/bible/read"
         element={
@@ -100,7 +101,6 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       />
-
       <Route
         path="/eventos/novo"
         element={
@@ -109,7 +109,6 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       />
-
       <Route
         path="/eventos/editar/:id"
         element={
@@ -118,7 +117,6 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       />
-
       <Route
         path="/eventos/:id"
         element={
@@ -137,7 +135,6 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       />
-
       <Route
         path="/comunicados/novo"
         element={
@@ -146,16 +143,14 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       />
-
       <Route
-        path="/comunicados/editar/:id"
+        path="/comunicados/:id/editar"
         element={
           <ProtectedRoute>
             <ComunicadoEditor />
           </ProtectedRoute>
         }
       />
-
       <Route
         path="/comunicados/:id"
         element={
@@ -164,74 +159,102 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       />
-{/* ===================== DNA ===================== */}
-<Route
-  path="/dna"
-  element={
-    <ProtectedRoute>
-      <DnaListPage />
-    </ProtectedRoute>
-  }
-/>
 
-<Route
-  path="/dna/novo"
-  element={
-    <ProtectedRoute>
-      <DnaEditorPage />
-    </ProtectedRoute>
-  }
-/>
+      {/* ===================== CURSOS ===================== */}
+      <Route
+        path="/cursos"
+        element={
+          <ProtectedRoute>
+            <CursosList />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/cursos/novo"
+        element={
+          <ProtectedRoute>
+            <CursoEditor />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/cursos/:id"
+        element={
+          <ProtectedRoute>
+            <CursoDetails />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/cursos/editar/:id"
+        element={
+          <ProtectedRoute>
+            <CursoEditor />
+          </ProtectedRoute>
+        }
+      />
 
-<Route
-  path="/dna/editar/:id"
-  element={
-    <ProtectedRoute>
-      <DnaEditorPage />
-    </ProtectedRoute>
-  }
-/>
+      {/* ===================== DNA ===================== */}
+      <Route
+        path="/dna"
+        element={
+          <ProtectedRoute>
+            <DnaListPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/dna/novo"
+        element={
+          <ProtectedRoute>
+            <DnaEditorPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/dna/editar/:id"
+        element={
+          <ProtectedRoute>
+            <DnaEditorPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/dna/:id"
+        element={
+          <ProtectedRoute>
+            <DnaDetailsPage />
+          </ProtectedRoute>
+        }
+      />
 
-<Route
-  path="/dna/:id"
-  element={
-    <ProtectedRoute>
-      <DnaDetailsPage />
-    </ProtectedRoute>
-  }
-/>
-{/* ===================== PEOPLE ===================== */}
-<Route
-  path="/people/create"
-  element={
-    <ProtectedRoute>
-      <PeopleCreatePage />
-    </ProtectedRoute>
-  }
-/>
+      {/* ===================== PEOPLE ===================== */}
+      <Route
+        path="/people"
+        element={
+          <ProtectedRoute>
+            <PeopleListPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/people/create"
+        element={
+          <ProtectedRoute>
+            <PeopleCreatePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/people/meu-dna"
+        element={
+          <ProtectedRoute>
+            <PeopleByDnaPage />
+          </ProtectedRoute>
+        }
+      />
 
-<Route
-  path="/people"
-  element={
-    <ProtectedRoute>
-      <PeopleListPage />
-    </ProtectedRoute>
-  }
-/>
-
-<Route
-  path="/people/meu-dna"
-  element={
-    <ProtectedRoute>
-      <PeopleByDnaPage />
-    </ProtectedRoute>
-  }
-/>
-
-
-      {/* ===================== MINISTÉRIO — ÁUDIO ===================== */}
-
-      {/* Página principal */}
+      {/* ===================== MINISTÉRIO — ÁUDIO (ÚNICO FEITO) ===================== */}
       <Route
         path="/ministerios/audio"
         element={
@@ -240,8 +263,6 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       />
-
-      {/* MEMBERS */}
       <Route
         path="/ministerios/audio/members"
         element={
@@ -250,7 +271,6 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       />
-
       <Route
         path="/ministerios/audio/members/create"
         element={
@@ -259,7 +279,6 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       />
-
       <Route
         path="/ministerios/audio/members/edit/:id"
         element={
@@ -268,8 +287,6 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       />
-
-      {/* TASKS */}
       <Route
         path="/ministerios/audio/tasks"
         element={
@@ -278,7 +295,6 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       />
-
       <Route
         path="/ministerios/audio/tasks/create"
         element={
@@ -287,7 +303,6 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       />
-
       <Route
         path="/ministerios/audio/tasks/edit/:id"
         element={
@@ -296,8 +311,6 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       />
-
-      {/* ===================== ESCALA ===================== */}
       <Route
         path="/ministerios/audio/schedule"
         element={
@@ -306,7 +319,6 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       />
-
       <Route
         path="/ministerios/audio/schedule/create"
         element={
@@ -315,7 +327,6 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       />
-
       <Route
         path="/ministerios/audio/schedule/edit/:id"
         element={
@@ -324,6 +335,33 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       />
+
+      {/* ===================== MINISTÉRIOS — EM MANUTENÇÃO ===================== */}
+      {[
+        "presbiterio",
+        "louvor",
+        "impacto",
+        "intercessao",
+        "zelo",
+        "guardiao",
+        "boas-vindas",
+        "kids",
+        "diaconia",
+        "base",
+      ].map((slug) => (
+        <Route
+          key={slug}
+          path={`/ministerios/${slug}`}
+          element={
+            <ProtectedRoute>
+              <MaintenancePage
+                title="Ministério em preparação"
+                message="Estamos organizando este espaço com excelência."
+              />
+            </ProtectedRoute>
+          }
+        />
+      ))}
 
       {/* ===================== ADMIN ===================== */}
       <Route
@@ -334,7 +372,6 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       />
-
     </Routes>
   );
 }

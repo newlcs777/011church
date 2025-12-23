@@ -1,12 +1,10 @@
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
 
 export default function MemberForm({
   onSubmit,
   initialData = null,
   readOnly = false,
 }) {
-  const navigate = useNavigate();
   const isInitialized = useRef(false);
 
   const [form, setForm] = useState({
@@ -25,7 +23,7 @@ export default function MemberForm({
   const [errors, setErrors] = useState({});
 
   // ===============================
-  // CARREGAR DADOS INICIAIS (EDIT)
+  // CARREGAR DADOS (EDIT)
   // ===============================
   useEffect(() => {
     if (!initialData || isInitialized.current) return;
@@ -51,39 +49,31 @@ export default function MemberForm({
   // ===============================
   const validate = () => {
     const newErrors = {};
-
-    if (!form.name.trim()) newErrors.name = "Nome obrigatório.";
-    if (!form.phone.trim()) newErrors.phone = "Telefone obrigatório.";
-
+    if (!form.name.trim()) newErrors.name = "Informe o nome do membro.";
+    if (!form.phone.trim()) newErrors.phone = "Informe um telefone para contato.";
     if (!form.email.trim()) {
-      newErrors.email = "E-mail obrigatório.";
+      newErrors.email = "Informe um e-mail.";
     } else if (!/^\S+@\S+\.\S+$/.test(form.email)) {
       newErrors.email = "E-mail inválido.";
     }
-
-    if (!form.address.trim()) newErrors.address = "Endereço obrigatório.";
-    if (!form.role.trim()) newErrors.role = "Função obrigatória.";
+    if (!form.address.trim()) newErrors.address = "Informe o endereço.";
+    if (!form.role.trim()) newErrors.role = "Informe a função no ministério.";
     if (!form.availability.trim())
-      newErrors.availability = "Disponibilidade obrigatória.";
-
+      newErrors.availability = "Informe a disponibilidade.";
     return newErrors;
   };
 
   // ===============================
-  // HANDLE CHANGE
+  // HANDLERS
   // ===============================
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-
     setForm((prev) => ({
       ...prev,
       [name]: type === "checkbox" ? checked : value,
     }));
   };
 
-  // ===============================
-  // SUBMIT
-  // ===============================
   const handleSubmit = (e) => {
     e.preventDefault();
     if (readOnly) return;
@@ -92,12 +82,11 @@ export default function MemberForm({
     setErrors(validationErrors);
 
     if (Object.keys(validationErrors).length > 0) return;
-
     onSubmit(form);
   };
 
   // ===============================
-  // CLASSES PADRÃO
+  // CLASSES
   // ===============================
   const inputBase = `
     input
@@ -136,93 +125,66 @@ export default function MemberForm({
         flex
         flex-col
         gap-6
-        max-w-3xl
+        w-full
+        max-w-xl
+        mx-auto
+        px-4
+        pb-24
       "
     >
-      {/* HEADER */}
-      <div className="flex items-center justify-between">
-        <button
-          type="button"
-          onClick={() => navigate(-1)}
-          className="
-            btn
-            btn-ghost
-            btn-sm
-            focus:outline-none
-            focus:ring-0
-          "
-        >
-          ← Voltar
-        </button>
-      </div>
-
       {/* INFORMAÇÕES PESSOAIS */}
       <div className="flex flex-col gap-4">
-        <h3 className="text-lg font-semibold">Informações Pessoais</h3>
+        <h3 className="text-sm sm:text-base font-medium">
+          Informações pessoais
+        </h3>
 
-        <div className="form-control">
-          <input
-            name="name"
-            placeholder="Nome completo"
-            value={form.name}
-            onChange={handleChange}
-            disabled={readOnly}
-            className={`${inputBase} ${readOnly ? readOnlyClass : ""} ${
-              errors.name ? "input-error" : ""
-            }`}
-          />
-          {errors.name && (
-            <span className="text-xs text-error mt-1">{errors.name}</span>
-          )}
-        </div>
+        <p className="text-sm text-base-content/60">
+          Dados básicos para cuidado e contato com o membro.
+        </p>
 
-        <div className="form-control">
-          <input
-            name="phone"
-            placeholder="Telefone"
-            value={form.phone}
-            onChange={handleChange}
-            disabled={readOnly}
-            className={`${inputBase} ${readOnly ? readOnlyClass : ""} ${
-              errors.phone ? "input-error" : ""
-            }`}
-          />
-          {errors.phone && (
-            <span className="text-xs text-error mt-1">{errors.phone}</span>
-          )}
-        </div>
+        <input
+          name="name"
+          placeholder="Nome completo do membro"
+          value={form.name}
+          onChange={handleChange}
+          disabled={readOnly}
+          className={`${inputBase} ${readOnly ? readOnlyClass : ""} ${
+            errors.name ? "input-error" : ""
+          }`}
+        />
 
-        <div className="form-control">
-          <input
-            name="email"
-            placeholder="E-mail"
-            value={form.email}
-            onChange={handleChange}
-            disabled={readOnly}
-            className={`${inputBase} ${readOnly ? readOnlyClass : ""} ${
-              errors.email ? "input-error" : ""
-            }`}
-          />
-          {errors.email && (
-            <span className="text-xs text-error mt-1">{errors.email}</span>
-          )}
-        </div>
+        <input
+          name="phone"
+          placeholder="Telefone para contato"
+          value={form.phone}
+          onChange={handleChange}
+          disabled={readOnly}
+          className={`${inputBase} ${readOnly ? readOnlyClass : ""} ${
+            errors.phone ? "input-error" : ""
+          }`}
+        />
 
-        <div className="form-control">
-          <input
-            name="address"
-            placeholder="Endereço"
-            value={form.address}
-            onChange={handleChange}
-            disabled={readOnly}
-            className={`${inputBase} ${readOnly ? readOnlyClass : ""} ${
-              errors.address ? "input-error" : ""
-            }`}
-          />
-          {errors.address && (
-            <span className="text-xs text-error mt-1">{errors.address}</span>
-          )}
-        </div>
+        <input
+          name="email"
+          placeholder="E-mail do membro"
+          value={form.email}
+          onChange={handleChange}
+          disabled={readOnly}
+          className={`${inputBase} ${readOnly ? readOnlyClass : ""} ${
+            errors.email ? "input-error" : ""
+          }`}
+        />
+
+        <input
+          name="address"
+          placeholder="Endereço"
+          value={form.address}
+          onChange={handleChange}
+          disabled={readOnly}
+          className={`${inputBase} ${readOnly ? readOnlyClass : ""} ${
+            errors.address ? "input-error" : ""
+          }`}
+        />
 
         <input
           type="date"
@@ -236,41 +198,35 @@ export default function MemberForm({
 
       {/* INFORMAÇÕES MINISTERIAIS */}
       <div className="flex flex-col gap-4">
-        <h3 className="text-lg font-semibold">Informações Ministeriais</h3>
+        <h3 className="text-sm sm:text-base font-medium">
+          Informações ministeriais
+        </h3>
 
-        <div className="form-control">
-          <input
-            name="role"
-            placeholder="Função no ministério"
-            value={form.role}
-            onChange={handleChange}
-            disabled={readOnly}
-            className={`${inputBase} ${readOnly ? readOnlyClass : ""} ${
-              errors.role ? "input-error" : ""
-            }`}
-          />
-          {errors.role && (
-            <span className="text-xs text-error mt-1">{errors.role}</span>
-          )}
-        </div>
+        <p className="text-sm text-base-content/60">
+          Dados relacionados ao serviço e disponibilidade no ministério.
+        </p>
 
-        <div className="form-control">
-          <input
-            name="availability"
-            placeholder="Disponibilidade (ex: Domingos)"
-            value={form.availability}
-            onChange={handleChange}
-            disabled={readOnly}
-            className={`${inputBase} ${readOnly ? readOnlyClass : ""} ${
-              errors.availability ? "input-error" : ""
-            }`}
-          />
-          {errors.availability && (
-            <span className="text-xs text-error mt-1">
-              {errors.availability}
-            </span>
-          )}
-        </div>
+        <input
+          name="role"
+          placeholder="Função no ministério"
+          value={form.role}
+          onChange={handleChange}
+          disabled={readOnly}
+          className={`${inputBase} ${readOnly ? readOnlyClass : ""} ${
+            errors.role ? "input-error" : ""
+          }`}
+        />
+
+        <input
+          name="availability"
+          placeholder="Disponibilidade (ex: Domingos)"
+          value={form.availability}
+          onChange={handleChange}
+          disabled={readOnly}
+          className={`${inputBase} ${readOnly ? readOnlyClass : ""} ${
+            errors.availability ? "input-error" : ""
+          }`}
+        />
 
         <select
           value={form.isActive ? "true" : "false"}
@@ -283,8 +239,8 @@ export default function MemberForm({
           disabled={readOnly}
           className={`${selectBase} ${readOnly ? readOnlyClass : ""}`}
         >
-          <option value="true">Ativo</option>
-          <option value="false">Inativo</option>
+          <option value="true">Em atividade</option>
+          <option value="false">Temporariamente inativo</option>
         </select>
       </div>
 
@@ -298,13 +254,15 @@ export default function MemberForm({
           disabled={readOnly}
           className="checkbox checkbox-sm"
         />
-        <label className="text-sm">O membro assinou o termo?</label>
+        <span className="text-sm text-base-content/70">
+          O membro confirmou ciência e compromisso com o ministério
+        </span>
       </div>
 
-      {/* OBSERVAÇÕES (EDITÁVEL, SEM RESIZE) */}
+      {/* OBSERVAÇÕES */}
       <textarea
         name="notes"
-        placeholder="Observações"
+        placeholder="Observações pastorais ou informações importantes"
         value={form.notes}
         onChange={handleChange}
         disabled={readOnly}
@@ -312,19 +270,33 @@ export default function MemberForm({
         className={`${textareaBase} ${readOnly ? readOnlyClass : ""}`}
       />
 
-      {/* AÇÕES */}
+      {/* AÇÃO — VISÍVEL NO MOBILE */}
       {!readOnly && (
-        <div className="flex gap-2 pt-2">
+        <div
+          className="
+            sticky
+            bottom-0
+            bg-base-100
+            pt-4
+            pb-3
+            flex
+            justify-center
+            border-t
+            border-base-200
+          "
+        >
           <button
             type="submit"
             className="
-              btn
-              btn-outline
-              btn-sm
-              bg-base-200
-              hover:bg-base-300
-              focus:outline-none
-              focus:ring-0
+              text-xs
+              font-medium
+              text-base-content/60
+              hover:bg-base-200
+              rounded-lg
+              px-4
+              py-2
+              transition
+              active:scale-[0.98]
             "
           >
             Salvar

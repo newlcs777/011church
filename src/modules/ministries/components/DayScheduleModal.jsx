@@ -14,9 +14,7 @@ export default function DayScheduleModal({
   const canManage =
     user?.role === "admin" ||
     user?.role === "pastor" ||
-    user?.role === "lider";
-
-  const canSelfAssign =
+    user?.role === "lider" ||
     user?.role === "obreiro";
 
   const formattedDate = new Date(date).toLocaleDateString("pt-BR", {
@@ -25,10 +23,6 @@ export default function DayScheduleModal({
     month: "long",
     year: "numeric",
   });
-
-  const alreadyAssigned = schedules.some(
-    (s) => s.memberId === user?.uid
-  );
 
   return (
     <div
@@ -92,7 +86,7 @@ export default function DayScheduleModal({
         <div className="border-b border-base-200 mb-3" />
 
         {/* AVISO */}
-        {!canManage && !canSelfAssign && (
+        {!canManage && (
           <p className="text-xs text-center text-base-content/50 mb-4">
             Você pode apenas visualizar a escala deste dia.
           </p>
@@ -181,7 +175,7 @@ export default function DayScheduleModal({
 
         {/* FOOTER */}
         <div className="flex gap-2">
-          {(canManage || canSelfAssign) && !alreadyAssigned && (
+          {canManage && (
             <button
               onClick={() => {
                 onClose();
@@ -203,7 +197,7 @@ export default function DayScheduleModal({
                 active:scale-[0.98]
               "
             >
-              + Quero servir neste dia
+              + Criar escala
             </button>
           )}
 

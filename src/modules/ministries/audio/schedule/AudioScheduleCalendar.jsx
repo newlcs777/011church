@@ -39,10 +39,12 @@ export default function AudioScheduleCalendar({
   const grouped = groupSchedulesByDate(schedules || []);
   const today = new Date();
 
+  // ✅ ÚNICA ALTERAÇÃO: adiciona "obreiro"
   const canManageSchedule =
     user?.role === "admin" ||
     user?.role === "pastor" ||
-    user?.role === "lider";
+    user?.role === "lider" ||
+    user?.role === "obreiro";
 
   const [currentYear, setCurrentYear] = useState(today.getFullYear());
   const [currentMonth, setCurrentMonth] = useState(today.getMonth());
@@ -200,10 +202,7 @@ export default function AudioScheduleCalendar({
           {/* DIAS DA SEMANA */}
           <div className="grid grid-cols-7 text-[10px] font-medium text-center text-base-content/60 mb-2">
             {["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"].map((d, i) => (
-              <div
-                key={d}
-                className={i === 0 ? "text-error" : ""}
-              >
+              <div key={d} className={i === 0 ? "text-error" : ""}>
                 {d}
               </div>
             ))}
@@ -217,9 +216,10 @@ export default function AudioScheduleCalendar({
 
             {Array.from({ length: totalDays }, (_, i) => {
               const day = i + 1;
-              const date = `${currentYear}-${String(
-                currentMonth + 1
-              ).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+              const date = `${currentYear}-${String(currentMonth + 1).padStart(
+                2,
+                "0"
+              )}-${String(day).padStart(2, "0")}`;
 
               const daySchedules = grouped[date] || [];
               const hasSchedule = daySchedules.length > 0;
@@ -229,11 +229,7 @@ export default function AudioScheduleCalendar({
                 new Date(currentYear, currentMonth, day).toDateString();
 
               const isSunday =
-                new Date(
-                  currentYear,
-                  currentMonth,
-                  day
-                ).getDay() === 0;
+                new Date(currentYear, currentMonth, day).getDay() === 0;
 
               return (
                 <button
@@ -255,11 +251,7 @@ export default function AudioScheduleCalendar({
                 >
                   <span
                     className={`
-                      ${
-                        isSunday
-                          ? "text-error"
-                          : "text-base-content"
-                      }
+                      ${isSunday ? "text-error" : "text-base-content"}
                       ${isToday ? "font-bold" : ""}
                     `}
                   >
