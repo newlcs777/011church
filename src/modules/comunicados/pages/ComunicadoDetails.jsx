@@ -3,7 +3,7 @@ import { useState } from "react";
 import { FaEdit, FaCalendarAlt, FaClock } from "react-icons/fa";
 
 import useAuth from "../../auth/hooks/useAuth";
-import ComunicadoCardSkeleton from "../components/ComunicadoCardSkeleton";
+import ComunicadoCardSkeleton from "../components/ComunicadoCardSkeleton.jsx";
 
 
 

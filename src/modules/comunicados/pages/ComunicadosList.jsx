@@ -1,7 +1,7 @@
 import { Link } from "react-router-dom";
 
 import ComunicadoCard from "../components/ComunicadoCard";
-import ComunicadoCardSkeleton from "../components/ComunicadoCardSkeleton";
+import ComunicadoCardSkeleton from "../components/ComunicadoCardSkeleton.jsx";
 
 
 import useComunicados from "../hooks/useComunicados";
