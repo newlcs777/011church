@@ -3,8 +3,13 @@ import { useState } from "react";
 import { FaEdit, FaCalendarAlt, FaClock } from "react-icons/fa";
 
 import useAuth from "../../auth/hooks/useAuth";
-import useComunicados from "../hooks/useComunicados";
 import ComunicadoCardSkeleton from "../components/ComunicadoCardSkeleton";
+
+
+
+
+
+
 
 export default function ComunicadoDetails() {
   const { id } = useParams();
