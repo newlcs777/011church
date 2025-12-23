@@ -3,13 +3,8 @@ import { useState } from "react";
 import { FaEdit, FaCalendarAlt, FaClock } from "react-icons/fa";
 
 import useAuth from "../../auth/hooks/useAuth";
+import useComunicados from "../hooks/useComunicados";
 import ComunicadoCardSkeleton from "../components/ComunicadoCardSkeleton.jsx";
-
-
-
-
-
-
 
 export default function ComunicadoDetails() {
   const { id } = useParams();
@@ -40,7 +35,6 @@ export default function ComunicadoDetails() {
   return (
     <div className="flex justify-center px-4">
       <div className="w-full max-w-3xl flex flex-col gap-6">
-        {/* CARD */}
         <div
           className="
             group
@@ -55,7 +49,6 @@ export default function ComunicadoDetails() {
             hover:shadow-md
           "
         >
-          {/* EDITAR */}
           {canEdit && (
             <Link
               to={`/comunicados/${comunicado.id}/editar`}
@@ -77,7 +70,6 @@ export default function ComunicadoDetails() {
           )}
 
           <div className="flex flex-col sm:flex-row gap-4 sm:gap-6">
-            {/* DATA */}
             <div
               className="
                 flex
@@ -108,7 +100,6 @@ export default function ComunicadoDetails() {
               </div>
             </div>
 
-            {/* CONTEÚDO */}
             <div className="flex flex-col gap-2 flex-1">
               <h1 className="text-sm sm:text-base font-medium">
                 {comunicado.titulo}
@@ -120,7 +111,6 @@ export default function ComunicadoDetails() {
                 </p>
               )}
 
-              {/* INFORMAÇÕES */}
               {comunicado.horario && (
                 <div
                   className="
@@ -138,7 +128,6 @@ export default function ComunicadoDetails() {
             </div>
           </div>
 
-          {/* EXCLUIR */}
           {canEdit && (
             <div className="pt-4 border-t border-base-300 flex justify-end">
               {!confirmDelete ? (
@@ -185,7 +174,6 @@ export default function ComunicadoDetails() {
           )}
         </div>
 
-        {/* VOLTAR */}
         <div className="flex justify-end">
           <Link
             to="/comunicados"

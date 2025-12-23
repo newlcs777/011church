@@ -44,7 +44,7 @@ export default function ComunicadoEditor() {
       horario: comunicado.horario ?? "",
       local: comunicado.local ?? "",
     });
-  }, [editing, id]);
+  }, [editing, id, getComunicadoById]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

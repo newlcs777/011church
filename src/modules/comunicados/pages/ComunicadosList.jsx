@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import ComunicadoCard from "../components/ComunicadoCard";
 import ComunicadoCardSkeleton from "../components/ComunicadoCardSkeleton.jsx";
 
-
 import useComunicados from "../hooks/useComunicados";
 import useAuth from "../../auth/hooks/useAuth";
 import { canCreateComunicado } from "../utils/comunicadoPermissions";
@@ -12,7 +11,7 @@ import PageHeader from "../../../components/ui/PageHeader";
 
 export default function ComunicadosList() {
   const { user } = useAuth();
-  const { comunicados, loading } = useComunicados();
+  const { comunicados = [], loading } = useComunicados();
 
   const canCreate = canCreateComunicado(user?.role);
 
