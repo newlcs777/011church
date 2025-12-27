@@ -20,30 +20,31 @@ export default function AppLayout({ children }) {
   }
 
   return (
-    <div className="min-h-screen flex bg-base-200 md:bg-transparent">
+    <div className="min-h-screen flex bg-[#020617]">
 
-      {/* MENU MOBILE (overlay) */}
+      {/* MENU MOBILE */}
       {openMenu && (
         <div className="fixed inset-0 z-40 flex lg:hidden">
-          {/* OVERLAY ESCURO – AGORA NÃO BLOQUEIA QUANDO NÃO ATIVO */}
+          {/* OVERLAY */}
           <div
-            className="absolute inset-0 bg-black/40 pointer-events-auto"
+            className="absolute inset-0 bg-black/50"
             onClick={() => setOpenMenu(false)}
           />
 
-          {/* SIDEBAR MOBILE */}
+          {/* SIDEBAR MOBILE — IGUAL LOGIN */}
           <aside
             className="
               relative
               z-50
               w-72
               h-full
-              bg-secondary
+              bg-[#020617]
+              text-white
               shadow-xl
               animate-slideIn
               overflow-y-auto
               scrollbar-thin
-              scrollbar-thumb-base-300/30
+              scrollbar-thumb-white/10
               scrollbar-track-transparent
             "
           >
@@ -65,22 +66,19 @@ export default function AppLayout({ children }) {
           bg-base-100
           shadow-xl
           ring-1
-          ring-base-300/70
+          ring-black/10
         "
       >
-        {/* SIDEBAR DESKTOP */}
+        {/* SIDEBAR DESKTOP — IGUAL LOGIN */}
         <aside
           className="
             hidden
             lg:block
             w-72
+            bg-[#020617]
+            text-white
             border-r
-            border-base-300/70
-            bg-gradient-to-b
-            from-secondary
-            via-secondary
-            to-neutral
-            text-base-100
+            border-white/10
             overflow-y-auto
           "
         >
@@ -88,7 +86,7 @@ export default function AppLayout({ children }) {
         </aside>
 
         {/* CONTEÚDO */}
-        <div className="flex flex-1 flex-col bg-base-100/90">
+        <div className="flex flex-1 flex-col bg-base-100">
           <Header onOpenMenu={() => setOpenMenu(true)} />
 
           <main className="flex-1 px-4 py-4 md:px-6 md:py-6">
