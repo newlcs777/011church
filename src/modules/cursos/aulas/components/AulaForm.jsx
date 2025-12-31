@@ -1,0 +1,134 @@
+import { FaTrash } from "react-icons/fa";
+import Button from "@/components/ui/Button";
+import Input from "@/components/ui/Input";
+
+export default function AulaForm({
+  values = {},
+  onChange,
+  onSubmit,
+  onCancel,
+  onDelete,
+  isSubmitting = false,
+  canDelete = false,
+}) {
+  return (
+    <form
+      onSubmit={onSubmit}
+      className="flex flex-col gap-4 md:gap-6"
+    >
+      <section
+        className="
+          bg-base-100
+          border
+          border-base-200
+          rounded-2xl
+          p-4
+          md:p-6
+          flex
+          flex-col
+          gap-5
+        "
+      >
+        {/* HEADER */}
+        <div className="text-center">
+          <h2 className="text-base font-semibold">
+            Cadastro de Aula
+          </h2>
+          <p className="text-sm text-base-content/70">
+            Cadastre o conteúdo da aula dentro do curso.
+          </p>
+        </div>
+
+        {/* ORDEM DA AULA */}
+        <div className="flex flex-col gap-1">
+          <Input
+            label="Ordem da aula"
+            name="ordem"
+            type="number"
+            min={1}
+            step={1}
+            value={values.ordem ?? ""}
+            onChange={onChange}
+            required
+          />
+          <span className="text-xs text-base-content/60">
+            Define a posição da aula no curso (Aula 01, 02, 03…)
+          </span>
+        </div>
+
+        {/* TÍTULO */}
+        <Input
+          label="Título da aula"
+          name="titulo"
+          value={values.titulo ?? ""}
+          onChange={onChange}
+          required
+        />
+
+        {/* DESCRIÇÃO */}
+        <div className="flex flex-col gap-2">
+          <label className="text-sm text-base-content/70">
+            Descrição da aula
+          </label>
+          <textarea
+            name="descricao"
+            value={values.descricao ?? ""}
+            onChange={onChange}
+            rows={4}
+            className="
+              w-full
+              bg-base-100
+              border
+              border-base-300
+              rounded-lg
+              px-3
+              py-2
+              text-sm
+              resize-none
+              focus:outline-none
+              focus-visible:ring-2
+              focus-visible:ring-base-300
+            "
+          />
+        </div>
+
+        {/* LINK DO VÍDEO */}
+        <Input
+          label="Link do vídeo (YouTube)"
+          name="videoUrl"
+          value={values.videoUrl ?? ""}
+          onChange={onChange}
+          required
+        />
+
+        <div className="h-px bg-base-200" />
+
+        {/* AÇÕES */}
+        <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+          <Button type="button" variant="ghost" onClick={onCancel}>
+            Cancelar
+          </Button>
+
+          <Button type="submit" variant="ghost" disabled={isSubmitting}>
+            {isSubmitting ? "Salvando…" : "Salvar aula"}
+          </Button>
+        </div>
+
+        {canDelete && (
+          <>
+            <div className="h-px bg-base-200" />
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={onDelete}
+              className="text-error flex items-center gap-2"
+            >
+              <FaTrash />
+              Excluir aula
+            </Button>
+          </>
+        )}
+      </section>
+    </form>
+  );
+}

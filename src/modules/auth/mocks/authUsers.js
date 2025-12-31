@@ -1,0 +1,58 @@
+export const authUsers = [
+  {
+    id: 1,
+    nome: "Administrador",
+    email: "admin@011.com.br",
+    role: "admin",
+    senha: "011",
+  },
+  {
+    id: 2,
+    nome: "Secretaria",
+    email: "secretaria@011.com.br",
+    role: "secretaria",
+    senha: "011",
+  },
+  {
+    id: 3,
+    nome: "Pastor Principal",
+    email: "pastor@011.com.br",
+    role: "pastor",
+    senha: "011",
+  },
+  {
+    id: 4,
+    nome: "Líder Geral",
+    email: "lider@011.com.br",
+    role: "lider",
+    senha: "011",
+  },
+  {
+    id: 5,
+    nome: "Lucas Obreiro",
+    email: "lucasobreiro@011.com.br",
+    role: "obreiro",
+    senha: "011",
+  },
+  {
+    id: 6,
+    nome: "Jorge Líder",
+    email: "jorgelider@011.com.br",
+    role: "lider",
+    senha: "011",
+  },
+  {
+    id: 7,
+    nome: "Aluno",
+    email: "aluno@011.com.br",
+    role: "aluno",
+    senha: "011",
+  },
+  {
+    id: 8,
+    nome: "Visitante",
+    email: "visitante@011.com.br",
+    role: "visitante",
+    senha: "011",
+  },
+];

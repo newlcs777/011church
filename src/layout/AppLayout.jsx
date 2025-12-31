@@ -1,10 +1,13 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import { useAuthContext } from "@/modules/auth/context/AuthContext";
+
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 
 export default function AppLayout({ children }) {
   const location = useLocation();
+  const { user } = useAuthContext();
   const [openMenu, setOpenMenu] = useState(false);
 
   // 🔒 GARANTE que o menu mobile fecha ao trocar de rota
@@ -12,6 +15,7 @@ export default function AppLayout({ children }) {
     setOpenMenu(false);
   }, [location.pathname]);
 
+  // LOGIN / REGISTER continuam iguais
   if (
     location.pathname === "/login" ||
     location.pathname === "/register"
@@ -19,6 +23,42 @@ export default function AppLayout({ children }) {
     return <>{children}</>;
   }
 
+  // 🔒 ALUNO: sem sidebar, MAS com header (pra ter sair)
+  if (user?.role === "aluno") {
+    return (
+      <div className="min-h-screen flex bg-[#020617]">
+        {/* WRAPPER GERAL (mesmo padrão visual) */}
+        <div
+          className="
+            flex
+            w-full
+            max-w-6xl
+            mx-auto
+            overflow-hidden
+            rounded-none
+            md:rounded-3xl
+            bg-base-100
+            shadow-xl
+            ring-1
+            ring-black/10
+          "
+        >
+          {/* CONTEÚDO (SEM SIDEBAR) */}
+          <div className="flex flex-1 flex-col bg-base-100">
+            <Header onOpenMenu={() => {}} />
+
+            <main className="flex-1 px-4 py-4 md:px-6 md:py-6">
+              <div className="mx-auto w-full max-w-4xl flex flex-col gap-6">
+                {children}
+              </div>
+            </main>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 👥 OUTROS USUÁRIOS — LAYOUT ORIGINAL (INALTERADO)
   return (
     <div className="min-h-screen flex bg-[#020617]">
 
@@ -31,7 +71,7 @@ export default function AppLayout({ children }) {
             onClick={() => setOpenMenu(false)}
           />
 
-          {/* SIDEBAR MOBILE — IGUAL LOGIN */}
+          {/* SIDEBAR MOBILE */}
           <aside
             className="
               relative
@@ -69,7 +109,7 @@ export default function AppLayout({ children }) {
           ring-black/10
         "
       >
-        {/* SIDEBAR DESKTOP — IGUAL LOGIN */}
+        {/* SIDEBAR DESKTOP */}
         <aside
           className="
             hidden

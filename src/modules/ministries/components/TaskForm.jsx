@@ -1,13 +1,13 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useAuthContext } from "@/modules/auth/context/AuthContext";
 
 export default function TaskForm({
   onSubmit,
+  onDelete, // ✅ ADD
   initialData = null,
   members = [],
 }) {
   const { user } = useAuthContext();
-  const isInitialized = useRef(false);
 
   const canEdit =
     user?.role === "admin" ||
@@ -30,7 +30,7 @@ export default function TaskForm({
   // CARREGAR DADOS (EDIT)
   // ===============================
   useEffect(() => {
-    if (!initialData || isInitialized.current) return;
+    if (!initialData) return;
 
     setForm({
       title: initialData.title || "",
@@ -41,8 +41,6 @@ export default function TaskForm({
       status: initialData.status || "Pendente",
       description: initialData.description || "",
     });
-
-    isInitialized.current = true;
   }, [initialData]);
 
   // ===============================
@@ -50,8 +48,9 @@ export default function TaskForm({
   // ===============================
   const validate = () => {
     const newErrors = {};
-    if (!form.title.trim())
+    if (!form.title.trim()) {
       newErrors.title = "Informe o nome do serviço.";
+    }
     return newErrors;
   };
 
@@ -86,11 +85,24 @@ export default function TaskForm({
     setErrors(validationErrors);
 
     if (Object.keys(validationErrors).length > 0) return;
+
     onSubmit(form);
   };
 
+  const handleDelete = () => {
+    if (!canEdit || !onDelete) return;
+
+    const confirmDelete = window.confirm(
+      "Tem certeza que deseja excluir este serviço?"
+    );
+
+    if (!confirmDelete) return;
+
+    onDelete();
+  };
+
   // ===============================
-  // CLASSES — IGUAIS AO MemberForm
+  // CLASSES
   // ===============================
   const inputBase = `
     input
@@ -215,7 +227,7 @@ export default function TaskForm({
         className={`${textareaBase} ${!canEdit ? readOnlyClass : ""}`}
       />
 
-      {/* AÇÃO — STICKY (IGUAL AO MemberForm) */}
+      {/* AÇÕES */}
       {canEdit && (
         <div
           className="
@@ -225,11 +237,28 @@ export default function TaskForm({
             pt-4
             pb-3
             flex
-            justify-center
+            justify-between
             border-t
             border-base-200
           "
         >
+          <button
+            type="button"
+            onClick={handleDelete}
+            className="
+              text-xs
+              font-medium
+              text-error
+              hover:bg-base-200
+              rounded-lg
+              px-4
+              py-2
+              transition
+            "
+          >
+            Excluir
+          </button>
+
           <button
             type="submit"
             className="

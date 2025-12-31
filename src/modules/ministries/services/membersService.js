@@ -1,82 +1,101 @@
 import {
   collection,
-  addDoc,
-  getDocs,
   doc,
-  updateDoc,
-  deleteDoc,
+  getDocs,
   getDoc,
+  setDoc,
+  deleteDoc,
+  query,
+  where,
   serverTimestamp,
 } from "firebase/firestore";
 
-import { db } from "../../../firebase/firebase";
+import { db } from "@/firebase/firebase";
 
-function getMembersCollection(ministry) {
-  return collection(db, "ministries", ministry, "members");
+// 🔒 SERIALIZA Timestamp Firestore (100% seguro)
+function serializeFirestore(value) {
+  if (value === null || value === undefined) return value;
+
+  // ✅ FIRESTORE TIMESTAMP REAL
+  if (typeof value?.toDate === "function") {
+    return value.toDate().toISOString();
+  }
+
+  if (Array.isArray(value)) {
+    return value.map(serializeFirestore);
+  }
+
+  if (typeof value === "object") {
+    const out = {};
+    for (const [k, v] of Object.entries(value)) {
+      out[k] = serializeFirestore(v);
+    }
+    return out;
+  }
+
+  return value;
 }
 
-function normalizeTimestamps(data) {
+/* ======================================================
+   MEMBROS GLOBAIS
+====================================================== */
+
+export async function getMembers() {
+  const snap = await getDocs(collection(db, "members"));
+
+  return snap.docs.map((d) => {
+    const data = d.data();
+    return {
+      id: d.id,
+      ...serialize(data),
+    };
+  });
+}
+
+export async function findMemberByPhone(phone) {
+  const q = query(
+    collection(db, "members"),
+    where("phone", "==", phone)
+  );
+
+  const snap = await getDocs(q);
+  if (snap.empty) return null;
+
+  const docRef = snap.docs[0];
   return {
-    ...data,
-    createdAt: data.createdAt?.toDate
-      ? data.createdAt.toDate().toISOString()
-      : data.createdAt ?? null,
-    updatedAt: data.updatedAt?.toDate
-      ? data.updatedAt.toDate().toISOString()
-      : data.updatedAt ?? null,
+    id: docRef.id,
+    ...serialize(docRef.data()),
   };
 }
 
-export async function createMember(ministry, data) {
-  const colRef = getMembersCollection(ministry);
+export async function createMember(data) {
+  const ref = doc(collection(db, "members"));
 
-  const payload = {
+  await setDoc(ref, {
     ...data,
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
-  };
-
-  const docRef = await addDoc(colRef, payload);
+  });
 
   return {
-    id: docRef.id,
+    id: ref.id,
     ...data,
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
   };
 }
 
-export async function getMembers(ministry) {
-  const colRef = getMembersCollection(ministry);
-  const snapshot = await getDocs(colRef);
+export async function updateMember(id, data) {
+  const ref = doc(db, "members", id);
 
-  return snapshot.docs.map((d) => ({
-    id: d.id,
-    ...normalizeTimestamps(d.data()),
-  }));
-}
-
-export async function getMemberById(ministry, id) {
-  const ref = doc(db, "ministries", ministry, "members", id);
-  const snap = await getDoc(ref);
-
-  if (!snap.exists()) return null;
-
-  return {
-    id: snap.id,
-    ...normalizeTimestamps(snap.data()),
-  };
-}
-
-export async function updateMember(ministry, id, data) {
-  const ref = doc(db, "ministries", ministry, "members", id);
-
-  const payload = {
-    ...data,
-    updatedAt: serverTimestamp(),
-  };
-
-  await updateDoc(ref, payload);
+  await setDoc(
+    ref,
+    {
+      ...data,
+      updatedAt: serverTimestamp(),
+    },
+    { merge: true }
+  );
 
   return {
     id,
@@ -85,8 +104,50 @@ export async function updateMember(ministry, id, data) {
   };
 }
 
-export async function deleteMember(ministry, id) {
-  const ref = doc(db, "ministries", ministry, "members", id);
-  await deleteDoc(ref);
-  return true;
+export async function deleteMember(id) {
+  await deleteDoc(doc(db, "members", id));
+}
+
+/* ======================================================
+   VÍNCULO COM MINISTÉRIO
+====================================================== */
+
+export async function getMembersByMinistry(ministry) {
+  const snap = await getDocs(
+    collection(db, "ministries", ministry, "members")
+  );
+
+  return snap.docs.map((d) => ({
+    id: d.id,
+    ...serialize(d.data()),
+  }));
+}
+
+export async function linkMemberToMinistry(ministry, memberId) {
+  const globalRef = doc(db, "members", memberId);
+  const snap = await getDoc(globalRef);
+
+  if (!snap.exists()) {
+    throw new Error("Membro global não encontrado");
+  }
+
+  const memberData = serialize(snap.data());
+
+  await setDoc(
+    doc(db, "ministries", ministry, "members", memberId),
+    {
+      memberId,
+      name: memberData.name ?? "",
+      phone: memberData.phone ?? "",
+      email: memberData.email ?? "",
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp(),
+    }
+  );
+}
+
+export async function unlinkMemberFromMinistry(ministry, memberId) {
+  await deleteDoc(
+    doc(db, "ministries", ministry, "members", memberId)
+  );
 }

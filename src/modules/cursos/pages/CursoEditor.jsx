@@ -1,15 +1,23 @@
 import { useState, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, Navigate } from "react-router-dom";
 
 import useCursos from "../hooks/useCursos";
 import CursoForm from "../components/CursoForm";
 import PageHeader from "@/components/ui/PageHeader";
+import useAuth from "@/modules/auth/hooks/useAuth";
 
 export default function CursoEditor() {
   const { id } = useParams();
   const editing = Boolean(id);
 
   const navigate = useNavigate();
+  const { user } = useAuth();
+
+  // 🔒 SOMENTE ADMIN PODE ACESSAR
+  if (user?.role !== "admin") {
+    return <Navigate to="/cursos" replace />;
+  }
+
   const {
     getCursoById,
     createCurso,
@@ -20,7 +28,6 @@ export default function CursoEditor() {
   const [form, setForm] = useState({
     titulo: "",
     descricao: "",
-    link: "",
   });
 
   useEffect(() => {
@@ -32,7 +39,6 @@ export default function CursoEditor() {
     setForm({
       titulo: curso.titulo ?? "",
       descricao: curso.descricao ?? "",
-      link: curso.link ?? "",
     });
   }, [editing, id]);
 
@@ -60,7 +66,7 @@ export default function CursoEditor() {
     if (!editing) return;
 
     const ok = window.confirm(
-      "Tem certeza que deseja excluir esta aula? Essa ação não pode ser desfeita."
+      "Tem certeza que deseja excluir este curso? Todas as aulas vinculadas a ele também serão removidas."
     );
     if (!ok) return;
 
@@ -80,16 +86,16 @@ export default function CursoEditor() {
     >
       {/* HEADER */}
       <PageHeader
-        title={editing ? "Editar aula" : "Nova aula"}
+        title={editing ? "Editar curso" : "Novo curso"}
         subtitle={
           editing
-            ? "Atualize o conteúdo desta aula para a igreja"
-            : "Cadastre uma nova aula para edificação"
+            ? "Atualize as informações deste curso"
+            : "Cadastre um novo curso para organização do ensino"
         }
         align="center"
       />
 
-      {/* FORM — TODA A UI ESTÁ AQUI */}
+      {/* FORM */}
       <CursoForm
         values={form}
         onChange={handleChange}

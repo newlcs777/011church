@@ -29,19 +29,20 @@ export default function CursoForm({
           gap-5
         "
       >
+        {/* HEADER */}
         <div className="text-center">
           <h2 className="text-base font-semibold">
-            Cadastro de Aula
+            Cadastro de Curso
           </h2>
           <p className="text-sm text-base-content/70">
-            Organize o conteúdo e a ordem das aulas.
+            Organize os cursos (módulos) de ensino da igreja.
           </p>
         </div>
 
-        {/* NÚMERO DA AULA */}
+        {/* ORDEM DO CURSO */}
         <div className="flex flex-col gap-1">
           <Input
-            label="Número da aula"
+            label="Ordem do curso"
             name="ordem"
             type="number"
             min={1}
@@ -51,13 +52,13 @@ export default function CursoForm({
             required
           />
           <span className="text-xs text-base-content/60">
-            Define a posição da aula (Aula 01, 02, 03…)
+            Define a ordem de exibição do curso (Curso 01, 02, 03…)
           </span>
         </div>
 
         {/* TÍTULO */}
         <Input
-          label="Título da aula"
+          label="Título do curso"
           name="titulo"
           value={values.titulo ?? ""}
           onChange={onChange}
@@ -67,14 +68,13 @@ export default function CursoForm({
         {/* DESCRIÇÃO */}
         <div className="flex flex-col gap-2">
           <label className="text-sm text-base-content/70">
-            Descrição da aula
+            Descrição do curso
           </label>
           <textarea
             name="descricao"
             value={values.descricao ?? ""}
             onChange={onChange}
             rows={4}
-            required
             className="
               w-full
               bg-base-100
@@ -92,15 +92,6 @@ export default function CursoForm({
           />
         </div>
 
-        {/* LINK */}
-        <Input
-          label="Link da aula (YouTube)"
-          name="link"
-          value={values.link ?? ""}
-          onChange={onChange}
-          required
-        />
-
         <div className="h-px bg-base-200" />
 
         {/* AÇÕES */}
@@ -110,7 +101,7 @@ export default function CursoForm({
           </Button>
 
           <Button type="submit" variant="ghost" disabled={isSubmitting}>
-            {isSubmitting ? "Salvando…" : "Salvar aula"}
+            {isSubmitting ? "Salvando…" : "Salvar curso"}
           </Button>
         </div>
 
@@ -124,7 +115,7 @@ export default function CursoForm({
               className="text-error flex items-center gap-2"
             >
               <FaTrash />
-              Excluir aula
+              Excluir curso
             </Button>
           </>
         )}

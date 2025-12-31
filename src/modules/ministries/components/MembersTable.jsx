@@ -1,22 +1,17 @@
-import { useState } from "react";
 import { useAuthContext } from "@/modules/auth/context/AuthContext";
+import { FaTrash } from "react-icons/fa";
 
 export default function MembersTable({
   members = [],
   onEdit,
-  onDelete,
+  onDelete, // ✅ agora usado
 }) {
   const { user } = useAuthContext();
-  const [confirmId, setConfirmId] = useState(null);
 
   const canEdit =
     user?.role === "admin" ||
     user?.role === "pastor" ||
     user?.role === "lider";
-
-  const canDelete =
-    user?.role === "admin" ||
-    user?.role === "pastor";
 
   if (!members || members.length === 0) {
     return (
@@ -27,143 +22,141 @@ export default function MembersTable({
   }
 
   return (
-    <div className="w-full overflow-x-auto rounded-xl border border-base-300 bg-base-100">
-      <table className="w-full border-collapse">
-        {/* DESKTOP HEADER */}
-        <thead className="hidden sm:table-header-group">
-          <tr className="bg-base-200 text-sm font-medium text-base-content/60">
-            <th className="p-3">Nome</th>
-            <th className="p-3">Função</th>
-            <th className="p-3 text-center">Ações</th>
-          </tr>
-        </thead>
+    <>
+      {/* =========================
+          MOBILE — CARDS
+      ========================= */}
+      <div className="flex flex-col gap-3 sm:hidden">
+        {members.map((member) => {
+          const hasSigned = member.termSigned === true;
 
-        <tbody>
-          {members.map((member) => (
-            <tr
+          return (
+            <div
               key={member.id}
-              className="border-t border-base-300 hover:bg-base-200 transition"
+              className="
+                border
+                border-base-300
+                rounded-xl
+                p-4
+                bg-base-100
+                flex
+                justify-between
+                items-center
+              "
             >
-              {/* NOME + META (MOBILE) */}
-              <td className="p-3">
-                <div className="flex flex-col gap-1">
-                  <span className="text-sm sm:text-base font-medium text-base-content/70">
+              <div>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium">
                     {member.name}
                   </span>
 
-                  <span className="text-sm text-base-content/60">
-                    {member.role}
-                    {!member.termSigned && (
-                      <>
-                        {" "}
-                        • Termo pendente
-                      </>
-                    )}
-                  </span>
+                  {!hasSigned && (
+                    <span className="
+                      text-[10px]
+                      px-2
+                      py-0.5
+                      rounded-full
+                      bg-base-200
+                      text-base-content/60
+                      font-medium
+                    ">
+                      Termo pendente
+                    </span>
+                  )}
                 </div>
-              </td>
 
-              {/* FUNÇÃO (DESKTOP) */}
-              <td className="p-3 hidden sm:table-cell">
-                <span className="text-sm text-base-content/70">
-                  {member.role}
+                <span className="text-xs text-base-content/70">
+                  Função: {member.role || "—"}
                 </span>
-              </td>
+              </div>
 
-              {/* AÇÕES */}
-              <td className="p-3">
-                <div className="flex justify-end gap-2">
-                  {canEdit && (
-                    <button
-                      onClick={() => onEdit(member.id)}
-                      className="
-                        text-xs
-                        font-medium
-                        text-base-content/60
-                        rounded-lg
-                        px-2
-                        py-1
-                        transition
-                        hover:bg-base-200
-                        hover:shadow-sm
-                        active:scale-[0.98]
-                      "
-                    >
-                      Ajustar
-                    </button>
-                  )}
+              {canEdit && onDelete && (
+                <button
+                  type="button"
+                  onClick={() => onDelete(member.id)}
+                  className="
+                    text-base-content/40
+                    hover:text-error
+                    transition
+                  "
+                >
+                  <FaTrash size={14} />
+                </button>
+              )}
+            </div>
+          );
+        })}
+      </div>
 
-                  {canDelete && (
-                    <>
-                      {confirmId === member.id ? (
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs text-base-content/60">
-                            Confirmar?
-                          </span>
-
-                          <button
-                            onClick={() => {
-                              onDelete(member.id);
-                              setConfirmId(null);
-                            }}
-                            className="
-                              text-xs
-                              font-medium
-                              text-error
-                              rounded-lg
-                              px-2
-                              py-1
-                              transition
-                              hover:bg-base-200
-                              hover:shadow-sm
-                            "
-                          >
-                            Sim
-                          </button>
-
-                          <button
-                            onClick={() => setConfirmId(null)}
-                            className="
-                              text-xs
-                              font-medium
-                              text-base-content/60
-                              rounded-lg
-                              px-2
-                              py-1
-                              transition
-                              hover:bg-base-200
-                            "
-                          >
-                            Não
-                          </button>
-                        </div>
-                      ) : (
-                        <button
-                          onClick={() => setConfirmId(member.id)}
-                          className="
-                            text-xs
-                            font-medium
-                            text-error
-                            rounded-lg
-                            px-2
-                            py-1
-                            transition
-                            hover:bg-base-200
-                            hover:shadow-sm
-                            active:scale-[0.98]
-                          "
-                        >
-                          Remover
-                        </button>
-                      )}
-                    </>
-                  )}
-                </div>
-              </td>
+      {/* =========================
+          DESKTOP — TABELA
+      ========================= */}
+      <div className="hidden sm:block w-full overflow-x-auto rounded-xl border border-base-300 bg-base-100">
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="bg-base-200 text-sm font-medium text-base-content/60">
+              <th className="p-3 text-left">Nome</th>
+              <th className="p-3 text-left">Função</th>
+              {canEdit && <th className="p-3 text-right">Ações</th>}
             </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
+          </thead>
+
+          <tbody>
+            {members.map((member) => {
+              const hasSigned = member.termSigned === true;
+
+              return (
+                <tr
+                  key={member.id}
+                  className="border-t border-base-300"
+                >
+                  <td className="p-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium">
+                        {member.name}
+                      </span>
+
+                      {!hasSigned && (
+                        <span className="
+                          text-[10px]
+                          px-2
+                          py-0.5
+                          rounded-full
+                          bg-base-200
+                          text-base-content/60
+                          font-medium
+                        ">
+                          Termo pendente
+                        </span>
+                      )}
+                    </div>
+                  </td>
+
+                  <td className="p-3 text-sm text-base-content/70">
+                    {member.role || "—"}
+                  </td>
+
+                  {canEdit && onDelete && (
+                    <td className="p-3 text-right">
+                      <button
+                        type="button"
+                        onClick={() => onDelete(member.id)}
+                        className="
+                          text-base-content/40
+                          hover:text-error
+                          transition
+                        "
+                      >
+                        <FaTrash size={14} />
+                      </button>
+                    </td>
+                  )}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+    </>
   );
 }

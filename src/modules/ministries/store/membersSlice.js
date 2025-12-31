@@ -1,144 +1,211 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import {
   getMembers,
+  findMemberByPhone,
   createMember,
   updateMember,
   deleteMember,
+  getMembersByMinistry,
+  linkMemberToMinistry,
+  unlinkMemberFromMinistry,
 } from "../services/membersService";
 
 // ======================================================
-// FUNÇÃO DE NORMALIZAÇÃO — SEGURA PARA TODOS MINISTÉRIOS
+// NORMALIZAÇÃO (SEGURA)
 // ======================================================
 function normalize(ministry) {
-  return ministry
+  return String(ministry || "")
     .toLowerCase()
     .trim()
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, ""); // remove acentos
+    .replace(/[\u0300-\u036f]/g, "");
 }
 
-// ======================================================
-// ESTADO INICIAL — ESCALÁVEL
-// ======================================================
-const initialState = {
-  audio: [],
-  kids: [],
-  louvor: [],
-  zelo: [],
-  intercessao: [],
-  midia: [],
-  loading: false,
-  error: null,
-};
+/* =========================
+   GLOBAIS (IGREJA)
+========================= */
 
-// ======================================================
-// BUSCAR MEMBROS
-// ======================================================
 export const fetchMembers = createAsyncThunk(
-  "members/fetchMembers",
-  async (ministry) => {
-    const normalized = normalize(ministry);
-    const data = await getMembers(normalized);
-    return { ministry: normalized, data };
+  "membersGlobal/fetchMembers",
+  async () => {
+    const list = await getMembers();
+    return list || [];
   }
 );
 
-// ======================================================
-// CRIAR MEMBRO
-// ======================================================
+export const searchMemberByPhone = createAsyncThunk(
+  "membersGlobal/searchMemberByPhone",
+  async (phone) => {
+    return await findMemberByPhone(phone);
+  }
+);
+
 export const addMember = createAsyncThunk(
-  "members/addMember",
-  async ({ ministry, data }) => {
-    const normalized = normalize(ministry);
-    const created = await createMember(normalized, data);
-    return { ministry: normalized, created };
+  "membersGlobal/addMember",
+  async (data) => {
+    return await createMember(data);
   }
 );
 
-// ======================================================
-// EDITAR MEMBRO
-// ======================================================
 export const editMember = createAsyncThunk(
-  "members/editMember",
-  async ({ ministry, id, data }) => {
-    const normalized = normalize(ministry);
-    const updated = await updateMember(normalized, id, data);
-    return { ministry: normalized, updated };
+  "membersGlobal/editMember",
+  async ({ id, data }) => {
+    return await updateMember(id, data);
   }
 );
 
-// ======================================================
-// REMOVER MEMBRO
-// ======================================================
 export const removeMember = createAsyncThunk(
-  "members/removeMember",
-  async ({ ministry, id }) => {
-    const normalized = normalize(ministry);
-    await deleteMember(normalized, id);
-    return { ministry: normalized, id };
+  "membersGlobal/removeMember",
+  async (id) => {
+    await deleteMember(id);
+    return id;
   }
 );
 
-// ======================================================
-// SLICE REDUX — CORRIGIDO E ROBUSTO
-// ======================================================
+/* =========================
+   VÍNCULOS POR MINISTÉRIO
+========================= */
+
+export const fetchMembersByMinistry = createAsyncThunk(
+  "membersGlobal/fetchMembersByMinistry",
+  async (ministry) => {
+    const key = normalize(ministry);
+    const members = await getMembersByMinistry(key);
+    return { ministry: key, members: members || [] };
+  }
+);
+
+export const addMemberToMinistry = createAsyncThunk(
+  "membersGlobal/addMemberToMinistry",
+  async ({ ministry, memberId }) => {
+    const key = normalize(ministry);
+    await linkMemberToMinistry(key, memberId);
+    return { ministry: key, memberId };
+  }
+);
+
+export const removeMemberFromMinistry = createAsyncThunk(
+  "membersGlobal/removeMemberFromMinistry",
+  async ({ ministry, memberId }) => {
+    const key = normalize(ministry);
+    await unlinkMemberFromMinistry(key, memberId);
+    return { ministry: key, memberId };
+  }
+);
+
+/* =========================
+   SLICE
+========================= */
+
 const membersSlice = createSlice({
-  name: "members",
-  initialState,
-  reducers: {},
+  name: "membersGlobal",
+  initialState: {
+    items: [],
+    found: null,
+    byMinistry: {},
+    loading: false,
+    error: null,
+  },
+
+  reducers: {
+    clearFound(state) {
+      state.found = null;
+    },
+  },
 
   extraReducers: (builder) => {
-    // =========================
-    // FETCH MEMBERS
-    // =========================
     builder
+      // ===== FETCH GLOBAL =====
       .addCase(fetchMembers.pending, (state) => {
         state.loading = true;
+        state.error = null;
       })
-
       .addCase(fetchMembers.fulfilled, (state, action) => {
-        const { ministry, data } = action.payload;
-        state[ministry] = data;
         state.loading = false;
+        state.items = Array.isArray(action.payload)
+          ? action.payload
+          : [];
       })
-
       .addCase(fetchMembers.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
+        state.error =
+          action.error?.message || "Erro ao carregar membros";
+      })
+
+      // ===== SEARCH =====
+      .addCase(searchMemberByPhone.fulfilled, (state, action) => {
+        state.found = action.payload || null;
+      })
+
+      // ===== ADD GLOBAL =====
+      .addCase(addMember.fulfilled, (state, action) => {
+        if (action.payload) {
+          state.items.unshift(action.payload);
+        }
+      })
+
+      // ===== EDIT GLOBAL =====
+      .addCase(editMember.fulfilled, (state, action) => {
+        const updated = action.payload;
+        if (!updated?.id) return;
+
+        const idx = state.items.findIndex(
+          (m) => m.id === updated.id
+        );
+        if (idx !== -1) {
+          state.items[idx] = {
+            ...state.items[idx],
+            ...updated,
+          };
+        }
+      })
+
+      // ===== REMOVE GLOBAL =====
+      .addCase(removeMember.fulfilled, (state, action) => {
+        const id = action.payload;
+        state.items = state.items.filter((m) => m.id !== id);
+
+        Object.keys(state.byMinistry).forEach((ministry) => {
+          state.byMinistry[ministry] =
+            state.byMinistry[ministry]?.filter(
+              (m) => m.id !== id
+            ) || [];
+        });
+      })
+
+      // ===== FETCH POR MINISTÉRIO (CORREÇÃO AQUI) =====
+      .addCase(fetchMembersByMinistry.pending, (state, action) => {
+        const ministry = normalize(action.meta.arg);
+        state.byMinistry[ministry] = [];
+      })
+      .addCase(fetchMembersByMinistry.fulfilled, (state, action) => {
+        const { ministry, members } = action.payload || {};
+        state.byMinistry[ministry] = Array.isArray(members)
+          ? members
+          : [];
+      })
+      .addCase(fetchMembersByMinistry.rejected, (state) => {
+        // mantém estado consistente, sem quebrar UI
+      })
+
+      // ===== ADD NO MINISTÉRIO =====
+      .addCase(addMemberToMinistry.fulfilled, () => {
+        // ❗ NÃO INSERE OBJETO PARCIAL NO STATE
+        // A UI deve refazer o fetch
+      })
+
+      // ===== REMOVE DO MINISTÉRIO =====
+      .addCase(removeMemberFromMinistry.fulfilled, (state, action) => {
+        const { ministry, memberId } = action.payload || {};
+        if (!ministry || !memberId) return;
+
+        state.byMinistry[ministry] =
+          state.byMinistry[ministry]?.filter(
+            (m) => m.id !== memberId
+          ) || [];
       });
-
-    // =========================
-// ADD MEMBER
-// =========================
-builder.addCase(addMember.fulfilled, (state, action) => {
-  const { ministry, created } = action.payload;
-
-  if (!state[ministry]) {
-    state[ministry] = [];
-  }
-
-  state[ministry].push(created);
-});
-
-
-    // =========================
-    // UPDATE MEMBER
-    // =========================
-    builder.addCase(editMember.fulfilled, (state, action) => {
-      const { ministry, updated } = action.payload;
-      state[ministry] = state[ministry].map((m) =>
-        m.id === updated.id ? { ...m, ...updated } : m
-      );
-    });
-
-    // =========================
-    // DELETE MEMBER
-    // =========================
-    builder.addCase(removeMember.fulfilled, (state, action) => {
-      const { ministry, id } = action.payload;
-      state[ministry] = state[ministry].filter((m) => m.id !== id);
-    });
   },
 });
 
+export const { clearFound } = membersSlice.actions;
 export default membersSlice.reducer;

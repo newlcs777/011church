@@ -4,13 +4,14 @@ import {
   createSchedule,
   updateSchedule,
   deleteSchedule,
+  getMembersForSchedule,
 } from "../services/scheduleService";
 
 // =======================================
-// NORMALIZAÇÃO DE MINISTÉRIO
+// NORMALIZAÇÃO DE MINISTÉRIO (SEGURA)
 // =======================================
 function normalize(ministry) {
-  return ministry
+  return String(ministry || "")
     .toLowerCase()
     .trim()
     .normalize("NFD")
@@ -18,11 +19,12 @@ function normalize(ministry) {
 }
 
 // =======================================
-// ESTADO INICIAL (🔥 CORREÇÃO)
+// ESTADO INICIAL
 // =======================================
 const initialState = {
   items: [],
-  currentMonth: new Date().toISOString().slice(0, 7), // ✅ EX: 2025-12
+  members: [], // membros completos do ministério (já serializados no service)
+  currentMonth: new Date().toISOString().slice(0, 7),
   loading: false,
   error: null,
 };
@@ -35,7 +37,19 @@ export const fetchSchedules = createAsyncThunk(
   async ({ ministry, month }) => {
     const normalized = normalize(ministry);
     const data = await getSchedulesByMonth(normalized, month);
-    return data; // ✅ só os dados
+    return Array.isArray(data) ? data : [];
+  }
+);
+
+// =======================================
+// FETCH MEMBERS DO MINISTÉRIO
+// =======================================
+export const fetchScheduleMembers = createAsyncThunk(
+  "schedule/fetchScheduleMembers",
+  async (ministry) => {
+    const normalized = normalize(ministry);
+    const members = await getMembersForSchedule(normalized);
+    return Array.isArray(members) ? members : [];
   }
 );
 
@@ -85,19 +99,26 @@ const scheduleSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    // FETCH
+    // FETCH SCHEDULES
     builder
       .addCase(fetchSchedules.pending, (state) => {
         state.loading = true;
+        state.error = null;
       })
       .addCase(fetchSchedules.fulfilled, (state, action) => {
-        state.items = action.payload; // ✅ direto
+        state.items = action.payload;
         state.loading = false;
       })
       .addCase(fetchSchedules.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error.message;
+        state.error =
+          action.error?.message || "Erro ao carregar escalas";
       });
+
+    // FETCH MEMBERS DO MINISTÉRIO
+    builder.addCase(fetchScheduleMembers.fulfilled, (state, action) => {
+      state.members = action.payload;
+    });
 
     // CREATE
     builder.addCase(addSchedule.fulfilled, (state, action) => {

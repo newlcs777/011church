@@ -38,7 +38,7 @@ export default function CursosList() {
 
   function handleDelete() {
     const ok = window.confirm(
-      "Tem certeza que deseja excluir esta aula? Essa ação não pode ser desfeita."
+      "Tem certeza que deseja excluir este curso? Todas as aulas vinculadas a ele também serão removidas."
     );
     if (!ok) return;
 
@@ -48,7 +48,7 @@ export default function CursosList() {
 
   /**
    * 🔍 FILTRO + ORDENAÇÃO
-   * Busca por número, título e descrição
+   * Busca por número, título e descrição do curso
    */
   const filteredCursos = useMemo(() => {
     if (!Array.isArray(cursos)) return [];
@@ -76,7 +76,7 @@ export default function CursosList() {
     <div className="flex flex-col gap-4 md:gap-6 pb-6">
       <PageHeader
         title="Cursos e Treinamentos"
-        subtitle="Caminhos de aprendizado para fortalecer sua fé e liderança"
+        subtitle="Módulos de ensino organizados por tema"
         align="center"
       />
 
@@ -84,16 +84,16 @@ export default function CursosList() {
       <CursoSearch
         value={search}
         onChange={setSearch}
-        placeholder="Buscar por aula, tema ou número"
+        placeholder="Buscar por curso, tema ou número"
       />
 
       {loading ? (
         <p className="text-sm text-base-content/60 text-center">
-          Carregando conteúdos…
+          Carregando cursos…
         </p>
       ) : filteredCursos.length === 0 ? (
         <p className="text-sm text-base-content/60 text-center">
-          Nenhuma aula encontrada.
+          Nenhum curso encontrado.
         </p>
       ) : (
         <div className="flex flex-col gap-3">
@@ -108,7 +108,7 @@ export default function CursosList() {
         </div>
       )}
 
-      {/* MODAL DE EDIÇÃO */}
+      {/* MODAL DE EDIÇÃO DO CURSO */}
       {editingCurso && (
         <div className="fixed inset-0 z-50 bg-black/40 flex items-center justify-center px-3">
           <div className="w-full max-w-lg">

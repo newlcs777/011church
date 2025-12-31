@@ -1,10 +1,11 @@
 import { useParams, Link } from "react-router-dom";
-import { FaEdit, FaPlay } from "react-icons/fa";
+import { FaEdit } from "react-icons/fa";
 
 import useCursos from "../hooks/useCursos";
 import PageHeader from "@/components/ui/PageHeader";
-import Button from "@/components/ui/Button";
 import useAuth from "@/modules/auth/hooks/useAuth";
+
+import AulaList from "../aulas/pages/AulaList";
 
 export default function CursoDetails() {
   const { id } = useParams();
@@ -24,7 +25,7 @@ export default function CursoDetails() {
           py-8
         "
       >
-        Aula não encontrada.
+        Curso não encontrado.
       </p>
     );
   }
@@ -46,7 +47,7 @@ export default function CursoDetails() {
         align="center"
       />
 
-      {/* CARD */}
+      {/* CARD DO CURSO */}
       <section
         className="
           group
@@ -65,7 +66,7 @@ export default function CursoDetails() {
           gap-4
         "
       >
-        {/* ✏️ EDITAR */}
+        {/* ✏️ EDITAR CURSO */}
         {canEdit && (
           <Link
             to={`/cursos/editar/${curso.id}`}
@@ -80,13 +81,13 @@ export default function CursoDetails() {
               sm:opacity-0
               sm:group-hover:opacity-100
             "
-            aria-label="Editar aula"
+            aria-label="Editar curso"
           >
             <FaEdit size={14} />
           </Link>
         )}
 
-        {/* DESCRIÇÃO */}
+        {/* DESCRIÇÃO DO CURSO */}
         {curso.descricao && (
           <p
             className="
@@ -98,41 +99,40 @@ export default function CursoDetails() {
             {curso.descricao}
           </p>
         )}
+      </section>
 
-        {/* AÇÃO */}
-        <div
-          className="
-            pt-2
-            flex
-            justify-center
-          "
-        >
-          <Button
-            as="a"
-            href={normalizeUrl(curso.link)}
-            target="_blank"
-            rel="noopener noreferrer"
-            variant="ghost"
-            className="
-              w-full
-              sm:w-auto
-              inline-flex
-              items-center
-              justify-center
-              gap-2
-              active:scale-[0.98]
-            "
-          >
-            <FaPlay className="text-xs" />
-            Assistir aula
-          </Button>
+      {/* ===== AULAS DO CURSO ===== */}
+      <section
+        className="
+          bg-base-100
+          border
+          border-base-200
+          rounded-2xl
+          p-4
+          md:p-6
+          shadow-sm
+          flex
+          flex-col
+          gap-4
+        "
+      >
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-semibold">
+            Aulas do curso
+          </h2>
+
+          {canEdit && (
+            <Link
+              to={`/cursos/${curso.id}/aulas/nova`}
+              className="text-sm text-primary"
+            >
+              Nova aula
+            </Link>
+          )}
         </div>
+
+        <AulaList />
       </section>
     </div>
   );
-}
-
-function normalizeUrl(url = "") {
-  if (!url) return "#";
-  return url.startsWith("http") ? url : `https://${url}`;
 }

@@ -1,44 +1,13 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+} from "react";
+
+import { authUsers } from "../mocks/authUsers";
 
 const AuthContext = createContext();
-
-const defaultUsers = [
-  {
-    id: 1,
-    nome: "Admin Master",
-    email: "admin@teste.com",
-    role: "admin",
-    senha: "admin",
-  },
-  {
-    id: 2,
-    nome: "Pastor João",
-    email: "pastor@teste.com",
-    role: "pastor",
-    senha: "admin",
-  },
-  {
-    id: 3,
-    nome: "Líder Maria",
-    email: "lider@teste.com",
-    role: "lider",
-    senha: "admin",
-  },
-  {
-    id: 4,
-    nome: "Obreiro Pedro",
-    email: "obreiro@teste.com",
-    role: "obreiro",
-    senha: "admin",
-  },
-  {
-    id: 5,
-    nome: "Ana",
-    email: "ana@teste.com",
-    role: "membro",
-    senha: "admin",
-  },
-];
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
@@ -62,13 +31,27 @@ export function AuthProvider({ children }) {
   }, []);
 
   const login = (email, senha) => {
-    const found = defaultUsers.find(
-      (u) => u.email === email && u.senha === senha
+    const found = authUsers.find(
+      (u) =>
+        u.email === email &&
+        u.senha === senha
     );
+
     if (!found) return false;
 
-    setUser(found);
-    localStorage.setItem("011church-user", JSON.stringify(found));
+    const loggedUser = {
+      id: found.id,
+      nome: found.nome,
+      email: found.email,
+      role: found.role,
+    };
+
+    setUser(loggedUser);
+    localStorage.setItem(
+      "011church-user",
+      JSON.stringify(loggedUser)
+    );
+
     return true;
   };
 
@@ -87,10 +70,13 @@ export function AuthProvider({ children }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider
+      value={{ user, login, logout }}
+    >
       {children}
     </AuthContext.Provider>
   );
 }
 
-export const useAuthContext = () => useContext(AuthContext);
+export const useAuthContext = () =>
+  useContext(AuthContext);

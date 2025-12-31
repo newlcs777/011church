@@ -3,7 +3,7 @@ import { HiOutlineArrowLeft } from "react-icons/hi2";
 import useAuth from "../modules/auth/hooks/useAuth";
 
 export default function Header({ onOpenMenu }) {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const navigate = useNavigate();
 
   return (
@@ -31,27 +31,31 @@ export default function Header({ onOpenMenu }) {
           sm:px-4
         "
       >
-        {/* ESQUERDA — VOLTAR */}
-        <button
-          onClick={() => navigate(-1)}
-          aria-label="Voltar"
-          className="
-            flex
-            h-9
-            w-9
-            items-center
-            justify-center
-            rounded-lg
-            text-base-content/70
-            hover:bg-base-200
-            active:scale-[0.96]
-            transition
-          "
-        >
-          <HiOutlineArrowLeft className="text-lg" />
-        </button>
+        {/* ESQUERDA — VOLTAR (NÃO PARA ALUNO) */}
+        {user?.role !== "aluno" ? (
+          <button
+            onClick={() => navigate(-1)}
+            aria-label="Voltar"
+            className="
+              flex
+              h-9
+              w-9
+              items-center
+              justify-center
+              rounded-lg
+              text-base-content/70
+              hover:bg-base-200
+              active:scale-[0.96]
+              transition
+            "
+          >
+            <HiOutlineArrowLeft className="text-lg" />
+          </button>
+        ) : (
+          <div className="h-9 w-9" />
+        )}
 
-        {/* CENTRO — LOGO */}
+        {/* CENTRO — LOGO (SEMPRE) */}
         <div className="flex items-center gap-2">
           <span
             className="
@@ -76,26 +80,44 @@ export default function Header({ onOpenMenu }) {
           </span>
         </div>
 
-        {/* DIREITA — MENU */}
-        <button
-          onClick={onOpenMenu}
-          aria-label="Abrir menu"
-          className="
-            md:hidden
-            flex
-            h-9
-            w-9
-            items-center
-            justify-center
-            rounded-lg
-            text-base-content
-            hover:bg-base-200
-            active:scale-[0.96]
-            transition
-          "
-        >
-          ☰
-        </button>
+        {/* DIREITA — MENU OU SAIR */}
+        {user?.role === "aluno" ? (
+          <button
+            onClick={logout}
+            className="
+              text-xs
+              px-3
+              py-1.5
+              rounded-lg
+              border
+              border-base-300
+              hover:bg-base-200
+              transition
+            "
+          >
+            Sair
+          </button>
+        ) : (
+          <button
+            onClick={onOpenMenu}
+            aria-label="Abrir menu"
+            className="
+              md:hidden
+              flex
+              h-9
+              w-9
+              items-center
+              justify-center
+              rounded-lg
+              text-base-content
+              hover:bg-base-200
+              active:scale-[0.96]
+              transition
+            "
+          >
+            ☰
+          </button>
+        )}
       </div>
     </header>
   );

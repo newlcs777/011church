@@ -12,9 +12,14 @@ export default function LoginForm() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [erro, setErro] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   function handleSubmit(e) {
     e.preventDefault();
+    if (loading) return;
+
+    setErro(null);
+    setLoading(true);
 
     const ok = login(email, senha);
 
@@ -22,6 +27,7 @@ export default function LoginForm() {
       setErro(
         "Não foi possível acessar. Verifique seus dados ou procure a liderança."
       );
+      setLoading(false);
       return;
     }
 
@@ -90,7 +96,10 @@ export default function LoginForm() {
             focus:ring-0
           "
           value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          onChange={(e) => {
+            setEmail(e.target.value);
+            setErro(null);
+          }}
           required
         />
 
@@ -110,12 +119,16 @@ export default function LoginForm() {
             focus:ring-0
           "
           value={senha}
-          onChange={(e) => setSenha(e.target.value)}
+          onChange={(e) => {
+            setSenha(e.target.value);
+            setErro(null);
+          }}
           required
         />
 
         <Button
           type="submit"
+          disabled={loading}
           className="
             w-full
             h-8
@@ -125,9 +138,10 @@ export default function LoginForm() {
             hover:bg-primary
             transition
             mt-1
+            disabled:opacity-60
           "
         >
-          Entrar
+          {loading ? "Entrando..." : "Entrar"}
         </Button>
       </form>
 

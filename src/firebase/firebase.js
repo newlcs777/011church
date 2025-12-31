@@ -8,21 +8,50 @@ import {
   updateDoc,
   deleteDoc,
   doc,
-  serverTimestamp, // ✅ ADD (CRÍTICO)
+  serverTimestamp,
 } from "firebase/firestore";
 import { getAuth } from "firebase/auth";
 import { getStorage } from "firebase/storage";
 
+// 🔐 ENV
+const {
+  VITE_FIREBASE_API_KEY,
+  VITE_FIREBASE_AUTH_DOMAIN,
+  VITE_FIREBASE_PROJECT_ID,
+  VITE_FIREBASE_STORAGE_BUCKET,
+  VITE_FIREBASE_MESSAGING_SENDER_ID,
+  VITE_FIREBASE_APP_ID,
+  VITE_FIREBASE_MEASUREMENT_ID,
+} = import.meta.env;
+
+// ✅ Validação mínima (evita inicializar Firebase com undefined)
+const missing = [
+  ["VITE_FIREBASE_API_KEY", VITE_FIREBASE_API_KEY],
+  ["VITE_FIREBASE_AUTH_DOMAIN", VITE_FIREBASE_AUTH_DOMAIN],
+  ["VITE_FIREBASE_PROJECT_ID", VITE_FIREBASE_PROJECT_ID],
+  ["VITE_FIREBASE_STORAGE_BUCKET", VITE_FIREBASE_STORAGE_BUCKET],
+  ["VITE_FIREBASE_MESSAGING_SENDER_ID", VITE_FIREBASE_MESSAGING_SENDER_ID],
+  ["VITE_FIREBASE_APP_ID", VITE_FIREBASE_APP_ID],
+].filter(([, v]) => !v);
+
+if (missing.length) {
+  throw new Error(
+    `Firebase ENV faltando: ${missing.map(([k]) => k).join(", ")}`
+  );
+}
+
+// 🔐 CONFIG VIA ENV (VITE)
 const firebaseConfig = {
-  apiKey: "AIzaSyDAis41NNsNamWvSlYri6TEohOl7boKe9U",
-  authDomain: "app-011-186ae.firebaseapp.com",
-  projectId: "app-011-186ae",
-  storageBucket: "app-011-186ae.appspot.com",
-  messagingSenderId: "403065339870",
-  appId: "1:403065339870:web:3b5bf88afb5ccd8f20274f",
-  measurementId: "G-B2T934RN86",
+  apiKey: VITE_FIREBASE_API_KEY,
+  authDomain: VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: VITE_FIREBASE_PROJECT_ID,
+  storageBucket: VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: VITE_FIREBASE_MESSAGING_SENDER_ID,
+  appId: VITE_FIREBASE_APP_ID,
+  measurementId: VITE_FIREBASE_MEASUREMENT_ID || undefined,
 };
 
+// 🔥 INIT
 const app = initializeApp(firebaseConfig);
 
 // 🔥 SERVIÇOS
@@ -30,8 +59,8 @@ export const db = getFirestore(app);
 export const auth = getAuth(app);
 export const storage = getStorage(app);
 
-// 🧪 DEBUG CONTROLADO (DEV)
-if (typeof window !== "undefined") {
+// 🧪 DEBUG CONTROLADO (DEV ONLY)
+if (import.meta.env.DEV && typeof window !== "undefined") {
   window.firebase = {
     db,
     collection,
@@ -44,7 +73,7 @@ if (typeof window !== "undefined") {
     serverTimestamp,
   };
 
-  console.log("🔥 Firebase conectado corretamente");
+  console.log("🔥 Firebase conectado corretamente (DEV)");
 }
 
 export { serverTimestamp };

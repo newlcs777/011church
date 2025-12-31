@@ -7,7 +7,10 @@ import {
   createSchedule,
   getSchedulesByMonth,
 } from "../../services/scheduleService";
-import { fetchMembers } from "../../store/membersSlice";
+
+import {
+  fetchMembersByMinistry,
+} from "@/modules/members/store/membersSlice";
 
 import { useAuthContext } from "../../../auth/context/AuthContext";
 
@@ -22,7 +25,10 @@ export default function AudioScheduleCreate() {
     user?.role === "pastor" ||
     user?.role === "lider";
 
-  const members = useSelector((state) => state.members.audio || []);
+  // ✅ CORREÇÃO: membros vêm do vínculo real do áudio
+  const members = useSelector(
+    (state) => state.membersGlobal.byMinistry.audio || []
+  );
 
   const [date, setDate] = useState("");
   const [cult, setCult] = useState("");
@@ -34,8 +40,9 @@ export default function AudioScheduleCreate() {
 
   const month = date ? date.slice(0, 7) : "";
 
+  // ✅ CORREÇÃO: busca membros vinculados ao áudio
   useEffect(() => {
-    dispatch(fetchMembers("audio"));
+    dispatch(fetchMembersByMinistry("audio"));
   }, [dispatch]);
 
   // ===============================

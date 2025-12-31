@@ -2,23 +2,28 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
-import { fetchMembers } from "@/modules/ministries/store/membersSlice";
-import MinistryPageWrapper from "@/modules/ministries/components/MinistryPageWrapper";
+// ✅ THUNK DO SLICE GLOBAL (ONDE OS DADOS SÃO GRAVADOS)
+import { fetchMembersByMinistry } from "@/modules/members/store/membersSlice";
 
+import MinistryPageWrapper from "@/modules/ministries/components/MinistryPageWrapper";
 import { useAuthContext } from "@/modules/auth/context/AuthContext";
 import { canEditMinistry } from "@/modules/auth/permissions";
 
-export default function AudioIndex() {
+export default function AudioPage() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const { user } = useAuthContext();
   const canEdit = canEditMinistry(user);
 
-  const members = useSelector((state) => state.members.audio || []);
+  // ✅ LEITURA DO MESMO SLICE QUE O THUNK ESCREVE
+  const members = useSelector(
+    (state) => state.membersGlobal.byMinistry.audio
+  );
 
+  // ✅ SEMPRE BUSCA NO FIREBASE AO ABRIR (F5 OU NAVEGAÇÃO)
   useEffect(() => {
-    dispatch(fetchMembers("audio"));
+    dispatch(fetchMembersByMinistry("audio"));
   }, [dispatch]);
 
   return (
@@ -43,8 +48,9 @@ export default function AudioIndex() {
             Membros ativos
           </p>
 
+          {/* ✅ NÚMERO REAL VINDO DO FIREBASE */}
           <p className="mt-1 text-3xl font-semibold">
-            {members.length}
+            {Array.isArray(members) ? members.length : 0}
           </p>
         </div>
       </div>

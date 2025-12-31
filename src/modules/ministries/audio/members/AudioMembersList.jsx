@@ -1,8 +1,12 @@
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
-import { fetchMembers, removeMember } from "../../store/membersSlice";
+import {
+  fetchMembers,
+  fetchMembersByMinistry,
+  removeMemberFromMinistry,
+} from "@/modules/members/store/membersSlice";
 
 import MembersTable from "../../components/MembersTable";
 import MinistryPageWrapper from "../../components/MinistryPageWrapper";
@@ -13,7 +17,6 @@ import { useAuthContext } from "../../../auth/context/AuthContext";
 export default function AudioMembersList() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
   const { user } = useAuthContext();
 
   const canEdit =
@@ -21,25 +24,50 @@ export default function AudioMembersList() {
     user?.role === "pastor" ||
     user?.role === "lider";
 
-  const members = useSelector((state) => state.members.audio);
-  const loading = useSelector((state) => state.members.loading);
+  // 🔹 membros globais da igreja
+  const allMembers = useSelector(
+    (state) => state.membersGlobal.items || []
+  );
+
+  // 🔹 vínculos do áudio
+  const audioLinks = useSelector(
+    (state) => state.membersGlobal.byMinistry?.audio || []
+  );
+
+  const loading = useSelector(
+    (state) => state.membersGlobal.loading
+  );
+
+  // ✅ CONTADOR
+  const membersCount = audioLinks.length;
+
+  // ✅ JOIN ESTÁVEL
+  const members = useMemo(() => {
+    if (!allMembers.length || !audioLinks.length) return [];
+
+    return audioLinks
+      .map((link) =>
+        allMembers.find((m) => m.id === link.id)
+      )
+      .filter(Boolean);
+  }, [audioLinks, allMembers]);
 
   useEffect(() => {
-    dispatch(fetchMembers("audio"));
+    dispatch(fetchMembers());              // 🔴 FALTAVA ISSO
+    dispatch(fetchMembersByMinistry("audio"));
   }, [dispatch]);
 
   return (
     <MinistryPageWrapper
       title="Membros do Ministério de Áudio"
-      subtitle="Pessoas que servem e colaboram nos cultos e atividades"
+      subtitle={`Pessoas vinculadas ao ministério de áudio • ${membersCount} membro(s)`}
     >
-      {/* AÇÃO PRINCIPAL — PADRÃO EVENTCARD */}
       {canEdit && (
         <div className="flex justify-end mb-4">
           <button
             type="button"
             onClick={() =>
-              navigate("/ministerios/audio/members/create")
+              navigate("/ministerios/audio/members/link")
             }
             className="
               text-xs
@@ -53,7 +81,7 @@ export default function AudioMembersList() {
               active:scale-[0.98]
             "
           >
-            + Novo membro
+            + Vincular membro
           </button>
         </div>
       )}
@@ -64,7 +92,6 @@ export default function AudioMembersList() {
         </p>
       )}
 
-      {/* CONTEÚDO */}
       {loading ? (
         <p className="text-sm text-base-content/60 p-4">
           Carregando membros…
@@ -74,11 +101,16 @@ export default function AudioMembersList() {
           members={members}
           onEdit={(id) => {
             if (!canEdit) return;
-            navigate(`/ministerios/audio/members/edit/${id}`);
+            navigate(`/members/edit/${id}`);
           }}
           onDelete={(id) => {
             if (!canEdit) return;
-            dispatch(removeMember({ ministry: "audio", id }));
+            dispatch(
+              removeMemberFromMinistry({
+                ministry: "audio",
+                memberId: id,
+              })
+            );
           }}
         />
       )}

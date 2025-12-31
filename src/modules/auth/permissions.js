@@ -3,47 +3,39 @@
 /**
  * Papéis válidos no sistema:
  * - admin
+ * - secretaria
  * - pastor
  * - lider
  * - obreiro
- *
- * Regra geral:
- * admin / pastor / lider -> gerenciam
- * obreiro -> somente leitura
+ * - aluno
+ * - visitante
  */
 
 /* ===============================
    HELPERS BÁSICOS
 ================================ */
 
-/**
- * Pode editar/criar/remover dados do ministério
- */
 export function canEditMinistry(user) {
   return (
     user?.role === "admin" ||
     user?.role === "pastor" ||
-    user?.role === "lider"
+    user?.role === "lider" ||
+    user?.role === "secretaria"
   );
 }
 
-/**
- * Pode apenas visualizar (todos logados)
- */
 export function canViewMinistry(user) {
   return Boolean(user);
 }
 
-/**
- * É admin geral do sistema
- */
 export function isAdmin(user) {
   return user?.role === "admin";
 }
 
-/**
- * É liderança (admin, pastor ou líder)
- */
+export function isSecretary(user) {
+  return user?.role === "secretaria";
+}
+
 export function isLeadership(user) {
   return (
     user?.role === "admin" ||
@@ -52,15 +44,25 @@ export function isLeadership(user) {
   );
 }
 
+export function isSpiritualLeadership(user) {
+  return (
+    user?.role === "pastor" ||
+    user?.role === "lider"
+  );
+}
+
+export function isReadOnly(user) {
+  return (
+    user?.role === "obreiro" ||
+    user?.role === "aluno" ||
+    user?.role === "visitante"
+  );
+}
+
 /* ===============================
    FUTURO (FIREBASE READY)
 ================================ */
 
-/**
- * Permissão por ministério (quando evoluir o modelo)
- * Exemplo futuro:
- * user.ministries = { audio: "lider", louvor: "obreiro" }
- */
 export function canEditSpecificMinistry(user, ministryKey) {
   if (!user || !user.ministries) return false;
 

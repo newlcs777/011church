@@ -3,7 +3,7 @@ import { FaSearch } from "react-icons/fa";
 export default function CursoSearch({
   value,
   onChange,
-  placeholder = "Buscar aula ou curso",
+  placeholder = "Buscar curso ou tema",
 }) {
   return (
     <div

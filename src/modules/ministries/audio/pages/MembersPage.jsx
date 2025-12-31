@@ -2,7 +2,10 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
 
-import { fetchMembers, addMember } from "../../members/store/membersSlice";
+import {
+  fetchMembersByMinistry,
+  addMember,
+} from "../../members/store/membersSlice";
 import MemberForm from "../components/MemberForm";
 
 import { useAuthContext } from "../../../auth/context/AuthContext";
@@ -18,19 +21,22 @@ export default function MembersPage() {
     user?.role === "pastor" ||
     user?.role === "lider";
 
-  const members = useSelector((state) => state.members[ministry] || []);
+  const members = useSelector(
+    (state) => state.members.byMinistry[ministry] || []
+  );
   const loading = useSelector((state) => state.members.loading);
 
   const [openForm, setOpenForm] = useState(false);
 
   useEffect(() => {
-    dispatch(fetchMembers(ministry));
+    dispatch(fetchMembersByMinistry(ministry));
   }, [dispatch, ministry]);
 
   function handleCreate(data) {
     if (!canEdit) return;
 
-    dispatch(addMember({ ministry, data }));
+    dispatch(addMember(data));
+    dispatch(fetchMembersByMinistry(ministry));
     setOpenForm(false);
   }
 

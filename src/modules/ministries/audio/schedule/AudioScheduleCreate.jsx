@@ -4,7 +4,9 @@ import { useDispatch, useSelector } from "react-redux";
 
 import MinistryPageWrapper from "../../components/MinistryPageWrapper";
 import { createSchedule } from "../../services/scheduleService";
-import { fetchMembers } from "../../store/membersSlice";
+import {
+  fetchMembersByMinistry,
+} from "@/modules/members/store/membersSlice";
 import { fetchSchedules } from "../../store/scheduleSlice";
 
 import { useAuthContext } from "../../../auth/context/AuthContext";
@@ -17,14 +19,20 @@ export default function AudioScheduleCreate() {
   const { user } = useAuthContext();
 
   const canEdit =
-  user?.role === "admin" ||
-  user?.role === "pastor" ||
-  user?.role === "lider" ||
-  user?.role === "obreiro";
+    user?.role === "admin" ||
+    user?.role === "pastor" ||
+    user?.role === "lider" ||
+    user?.role === "obreiro";
 
+  // ✅ MEMBROS VINCULADOS AO MINISTÉRIO DE ÁUDIO
+  const members = useSelector(
+    (state) => state.membersGlobal.byMinistry?.audio || []
+  );
 
-
-  const members = useSelector((state) => state.members.audio || []);
+  // ✅ ESCALAS JÁ CARREGADAS DO MÊS
+  const schedules = useSelector(
+    (state) => state.schedule.items || []
+  );
 
   /* DATA VINDO DO CALENDÁRIO */
   const params = new URLSearchParams(location.search);
@@ -37,8 +45,9 @@ export default function AudioScheduleCreate() {
   const [notes, setNotes] = useState("");
   const [saving, setSaving] = useState(false);
 
+  // ✅ BUSCA REAL DOS MEMBROS DO ÁUDIO
   useEffect(() => {
-    dispatch(fetchMembers("audio"));
+    dispatch(fetchMembersByMinistry("audio"));
   }, [dispatch]);
 
   async function handleSubmit(e) {
@@ -47,6 +56,21 @@ export default function AudioScheduleCreate() {
 
     if (!date || !cult || !role || !memberId) {
       alert("Preencha todos os campos obrigatórios.");
+      return;
+    }
+
+    // ✅ BLOQUEIA MEMBRO DUPLICADO NO MESMO DIA + CULTO
+    const conflict = schedules.some(
+      (s) =>
+        s.date === date &&
+        s.cult === cult &&
+        s.memberId === memberId
+    );
+
+    if (conflict) {
+      alert(
+        "Este membro já está escalado neste culto e horário."
+      );
       return;
     }
 
@@ -87,7 +111,6 @@ export default function AudioScheduleCreate() {
 
   return (
     <MinistryPageWrapper>
-      {/* TÍTULO */}
       <div className="mb-6 text-center">
         <h1 className="text-lg sm:text-xl font-semibold">
           Criar escala
@@ -97,7 +120,6 @@ export default function AudioScheduleCreate() {
         </p>
       </div>
 
-      {/* FORMULÁRIO (SEM BORDA / SEM CARD) */}
       <form
         onSubmit={handleSubmit}
         className="max-w-xl mx-auto flex flex-col gap-4"
@@ -179,22 +201,15 @@ export default function AudioScheduleCreate() {
             Observações (opcional)
           </label>
           <textarea
-  rows={3}
-  placeholder="Alguma observação importante para este dia?"
-  className="
-    textarea
-    textarea-bordered
-    w-full
-    resize-none
-  "
-  value={notes}
-  onChange={(e) => setNotes(e.target.value)}
-  disabled={!canEdit}
-/>
-
+            rows={3}
+            placeholder="Alguma observação importante para este dia?"
+            className="textarea textarea-bordered w-full resize-none"
+            value={notes}
+            onChange={(e) => setNotes(e.target.value)}
+            disabled={!canEdit}
+          />
         </div>
 
-        {/* AÇÕES – PADRÃO DO APP */}
         <div className="pt-4 flex flex-col-reverse sm:flex-row justify-end gap-2">
           <button
             type="button"
@@ -222,17 +237,16 @@ export default function AudioScheduleCreate() {
               type="submit"
               disabled={saving}
               className="
-  h-9
-  px-4
-  rounded-lg
-  text-sm
-  font-medium
-  text-neutral/70
-  transition
-  hover:bg-base-200/70
-  active:scale-[0.98]
-"
-
+                h-9
+                px-4
+                rounded-lg
+                text-sm
+                font-medium
+                text-neutral/70
+                transition
+                hover:bg-base-200/70
+                active:scale-[0.98]
+              "
             >
               {saving ? "Salvando..." : "Salvar escala"}
             </button>

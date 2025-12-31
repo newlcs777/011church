@@ -6,7 +6,9 @@ import MinistryPageWrapper from "../../components/MinistryPageWrapper";
 import TaskForm from "../../components/TaskForm";
 
 import { addTask } from "../../store/tasksSlice";
-import { fetchMembers } from "../../store/membersSlice";
+import {
+  fetchMembersByMinistry, // ✅ AJUSTE
+} from "@/modules/members/store/membersSlice";
 
 import { useAuthContext } from "../../../auth/context/AuthContext";
 
@@ -21,16 +23,28 @@ export default function AudioTaskCreate() {
     user?.role === "pastor" ||
     user?.role === "lider";
 
-  const members = useSelector((state) => state.members.audio);
+  // ✅ MEMBROS VINCULADOS AO ÁUDIO (fonte correta)
+  const members = useSelector(
+    (state) => state.membersGlobal.byMinistry.audio || []
+  );
 
   useEffect(() => {
-    dispatch(fetchMembers("audio"));
+    dispatch(fetchMembersByMinistry("audio"));
   }, [dispatch]);
 
   const handleSubmit = async (data) => {
     if (!canEdit) return;
 
-    await dispatch(addTask({ ministry: "audio", data }));
+    await dispatch(
+      addTask({
+        ministry: "audio",
+        data: {
+          ...data,
+          responsibleId: data.responsibleId, // 🔥 garante que só o ID vai
+        },
+      })
+    );
+
     navigate(-1);
   };
 

@@ -3,7 +3,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
 import { fetchTasks, removeTask } from "../../store/tasksSlice";
-import { fetchMembers } from "../../store/membersSlice";
+import {
+  fetchMembersByMinistry, // ✅ FONTE CORRETA
+} from "@/modules/members/store/membersSlice";
 
 import MinistryPageWrapper from "../../components/MinistryPageWrapper";
 import TasksTable from "../../components/TasksTable";
@@ -21,11 +23,16 @@ export default function AudioTasksList() {
     user?.role === "pastor" ||
     user?.role === "lider";
 
-  const tasks = useSelector((state) => state.tasks.audio);
+  const tasks = useSelector((state) => state.tasks.audio || []);
+
+  // ✅ MEMBROS VINCULADOS AO ÁUDIO (usado pela TasksTable)
+  const members = useSelector(
+    (state) => state.membersGlobal.byMinistry.audio || []
+  );
 
   useEffect(() => {
     dispatch(fetchTasks("audio"));
-    dispatch(fetchMembers("audio"));
+    dispatch(fetchMembersByMinistry("audio"));
   }, [dispatch]);
 
   const handleDelete = async (id) => {
@@ -42,7 +49,6 @@ export default function AudioTasksList() {
       title="Serviços do Ministério de Áudio"
       subtitle="Organização dos serviços e responsabilidades no ministério"
     >
-      {/* AÇÃO PRINCIPAL — IGUAL EVENTCARD */}
       {canEdit && (
         <div className="flex justify-end mb-4">
           <button
@@ -64,10 +70,10 @@ export default function AudioTasksList() {
         </div>
       )}
 
-      {/* LISTA — COMPONENTE INTACTO */}
       <div className="flex flex-col gap-4">
         <TasksTable
           tasks={tasks}
+          members={members}
           onEdit={(id) => {
             if (!canEdit) return;
             navigate(`edit/${id}`);

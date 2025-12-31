@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import ProtectedRoute from "../modules/auth/components/ProtectedRoute";
 
 /* ===================== LOGIN ===================== */
@@ -24,6 +24,9 @@ import CursosList from "../modules/cursos/pages/CursosList";
 import CursoDetails from "../modules/cursos/pages/CursoDetails";
 import CursoEditor from "../modules/cursos/pages/CursoEditor";
 
+/* ===================== AULAS ===================== */
+import AulaEditor from "../modules/cursos/aulas/pages/AulaEditor";
+
 /* ===================== MANUTENÇÃO ===================== */
 import MaintenancePage from "@/components/system/MaintenancePage";
 
@@ -40,20 +43,23 @@ import PeopleByDnaPage from "@/modules/people/pages/PeopleByDnaPage";
 /* ===================== ADMIN ===================== */
 import AdminDashboard from "../modules/admin/pages/AdminDashboard";
 
+/* ===================== MEMBERS GLOBAL ===================== */
+import MembersListPage from "../modules/members/pages/MembersListPage";
+import MemberCreatePage from "../modules/members/pages/MemberCreatePage";
+import MemberEditPage from "../modules/members/pages/MemberEditPage";
+
 /* ===================== MINISTÉRIO: ÁUDIO ===================== */
 import AudioPage from "../modules/ministries/audio/pages/AudioPage.jsx";
-
-/* MEMBERS */
 import AudioMembersList from "../modules/ministries/audio/members/AudioMembersList.jsx";
-import AudioMembersCreate from "../modules/ministries/audio/members/AudioMemberCreate.jsx";
 import AudioMembersEdit from "../modules/ministries/audio/members/AudioMemberEdit.jsx";
+import AudioMemberLink from "../modules/ministries/audio/members/AudioMemberLink.jsx";
 
 /* TASKS */
 import AudioTasksList from "../modules/ministries/audio/tasks/List.jsx";
 import AudioTaskCreate from "../modules/ministries/audio/tasks/Create.jsx";
 import AudioTaskEdit from "../modules/ministries/audio/tasks/Edit.jsx";
 
-/* ===================== ESCALA (SCHEDULE) ===================== */
+/* ===================== ESCALA ===================== */
 import AudioSchedulePage from "../modules/ministries/audio/pages/AudioSchedulePage.jsx";
 import AudioScheduleCreate from "../modules/ministries/audio/schedule/AudioScheduleCreate.jsx";
 import AudioScheduleEdit from "../modules/ministries/audio/schedule/AudioScheduleEdit.jsx";
@@ -61,10 +67,10 @@ import AudioScheduleEdit from "../modules/ministries/audio/schedule/AudioSchedul
 export default function AppRoutes() {
   return (
     <Routes>
-      {/* ===================== LOGIN ===================== */}
+      {/* LOGIN */}
       <Route path="/login" element={<Login />} />
 
-      {/* ===================== HOME ===================== */}
+      {/* HOME */}
       <Route
         path="/"
         element={
@@ -74,7 +80,33 @@ export default function AppRoutes() {
         }
       />
 
-      {/* ===================== BÍBLIA ===================== */}
+      {/* MEMBERS */}
+      <Route
+        path="/members"
+        element={
+          <ProtectedRoute>
+            <MembersListPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/members/create"
+        element={
+          <ProtectedRoute>
+            <MemberCreatePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/members/edit/:id"
+        element={
+          <ProtectedRoute>
+            <MemberEditPage />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* BÍBLIA */}
       <Route
         path="/bible"
         element={
@@ -92,7 +124,7 @@ export default function AppRoutes() {
         }
       />
 
-      {/* ===================== EVENTOS ===================== */}
+      {/* EVENTOS */}
       <Route
         path="/eventos"
         element={
@@ -126,7 +158,7 @@ export default function AppRoutes() {
         }
       />
 
-      {/* ===================== COMUNICADOS ===================== */}
+      {/* COMUNICADOS */}
       <Route
         path="/comunicados"
         element={
@@ -194,7 +226,25 @@ export default function AppRoutes() {
         }
       />
 
-      {/* ===================== DNA ===================== */}
+      {/* ===================== AULAS (DENTRO DO CURSO) ===================== */}
+      <Route
+        path="/cursos/:cursoId/aulas/nova"
+        element={
+          <ProtectedRoute>
+            <AulaEditor />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/cursos/:cursoId/aulas/:aulaId/editar"
+        element={
+          <ProtectedRoute>
+            <AulaEditor />
+          </ProtectedRoute>
+        }
+      />
+
+      {/* DNA */}
       <Route
         path="/dna"
         element={
@@ -228,7 +278,7 @@ export default function AppRoutes() {
         }
       />
 
-      {/* ===================== PEOPLE ===================== */}
+      {/* PEOPLE */}
       <Route
         path="/people"
         element={
@@ -254,7 +304,7 @@ export default function AppRoutes() {
         }
       />
 
-      {/* ===================== MINISTÉRIO — ÁUDIO (ÚNICO FEITO) ===================== */}
+      {/* MINISTÉRIO ÁUDIO */}
       <Route
         path="/ministerios/audio"
         element={
@@ -272,10 +322,21 @@ export default function AppRoutes() {
         }
       />
       <Route
+        path="/ministerios/audio/members/link"
+        element={
+          <ProtectedRoute>
+            <AudioMemberLink />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/ministerios/audio/members/create"
         element={
           <ProtectedRoute>
-            <AudioMembersCreate />
+            <Navigate
+              to="/ministerios/audio/members/link"
+              replace
+            />
           </ProtectedRoute>
         }
       />
@@ -287,6 +348,8 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       />
+
+      {/* TASKS */}
       <Route
         path="/ministerios/audio/tasks"
         element={
@@ -311,6 +374,8 @@ export default function AppRoutes() {
           </ProtectedRoute>
         }
       />
+
+      {/* ESCALA */}
       <Route
         path="/ministerios/audio/schedule"
         element={
@@ -336,7 +401,7 @@ export default function AppRoutes() {
         }
       />
 
-      {/* ===================== MINISTÉRIOS — EM MANUTENÇÃO ===================== */}
+      {/* MINISTÉRIOS EM MANUTENÇÃO */}
       {[
         "presbiterio",
         "louvor",
@@ -345,6 +410,7 @@ export default function AppRoutes() {
         "zelo",
         "guardiao",
         "boas-vindas",
+        "boasvindas",
         "kids",
         "diaconia",
         "base",
@@ -363,7 +429,7 @@ export default function AppRoutes() {
         />
       ))}
 
-      {/* ===================== ADMIN ===================== */}
+      {/* ADMIN */}
       <Route
         path="/admin"
         element={
@@ -371,6 +437,12 @@ export default function AppRoutes() {
             <AdminDashboard />
           </ProtectedRoute>
         }
+      />
+
+      {/* 🔁 FALLBACK FINAL */}
+      <Route
+        path="*"
+        element={<Navigate to="/" replace />}
       />
     </Routes>
   );

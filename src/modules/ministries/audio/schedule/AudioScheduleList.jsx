@@ -2,7 +2,11 @@ import { useSelector } from "react-redux";
 import { useAuthContext } from "../../../auth/context/AuthContext";
 
 export default function AudioScheduleList({ schedules, onEdit }) {
-  const members = useSelector((state) => state.members.audio);
+  // ✅ CORREÇÃO: usar membros vinculados ao ministério de áudio
+  const members = useSelector(
+    (state) => state.membersGlobal.byMinistry.audio || []
+  );
+
   const { user } = useAuthContext();
 
   const canEdit =
@@ -26,14 +30,26 @@ export default function AudioScheduleList({ schedules, onEdit }) {
 
   const renderStatus = (status) => {
     if (status === "confirmed") {
-      return <span className="text-green-600 font-medium">✅ Confirmado</span>;
+      return (
+        <span className="text-green-600 font-medium">
+          ✅ Confirmado
+        </span>
+      );
     }
 
     if (status === "pending") {
-      return <span className="text-orange-600 font-medium">⚠️ Pendente</span>;
+      return (
+        <span className="text-orange-600 font-medium">
+          ⚠️ Pendente
+        </span>
+      );
     }
 
-    return <span className="text-red-600 font-medium">❌ Não escalado</span>;
+    return (
+      <span className="text-red-600 font-medium">
+        ❌ Não escalado
+      </span>
+    );
   };
 
   return (
@@ -52,14 +68,19 @@ export default function AudioScheduleList({ schedules, onEdit }) {
 
         <tbody>
           {schedules.map((item) => (
-            <tr key={item.id} className="hover:bg-gray-50 transition">
+            <tr
+              key={item.id}
+              className="hover:bg-gray-50 transition"
+            >
               <td className="p-3 border">{item.date}</td>
               <td className="p-3 border">{item.cult}</td>
               <td className="p-3 border">{item.role}</td>
               <td className="p-3 border font-medium">
                 {getMemberName(item.memberId)}
               </td>
-              <td className="p-3 border">{renderStatus(item.status)}</td>
+              <td className="p-3 border">
+                {renderStatus(item.status)}
+              </td>
 
               <td className="p-3 border text-center">
                 {canEdit ? (

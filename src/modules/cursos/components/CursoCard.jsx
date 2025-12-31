@@ -1,10 +1,13 @@
-import { FaPlay, FaEdit } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import { FaEdit } from "react-icons/fa";
 
 export default function CursoCard({
   curso,
   canEdit,
   onEdit,
 }) {
+  const navigate = useNavigate();
+
   const ordem =
     typeof curso.ordem === "number"
       ? curso.ordem
@@ -12,6 +15,7 @@ export default function CursoCard({
 
   return (
     <div
+      onClick={() => navigate(`/cursos/${curso.id}`)}
       className="
         relative
         bg-base-100
@@ -23,13 +27,19 @@ export default function CursoCard({
         flex
         flex-col
         gap-3
+        cursor-pointer
+        hover:shadow-md
+        transition
       "
     >
-      {/* ✏️ EDITAR */}
+      {/* ✏️ EDITAR CURSO */}
       {canEdit && (
         <button
           type="button"
-          onClick={() => onEdit(curso)}
+          onClick={(e) => {
+            e.stopPropagation();
+            onEdit(curso);
+          }}
           className="
             absolute
             top-3
@@ -37,15 +47,16 @@ export default function CursoCard({
             text-base-content/40
             hover:text-primary
           "
+          aria-label="Editar curso"
         >
           <FaEdit size={14} />
         </button>
       )}
 
-      {/* 🔢 NÚMERO DA AULA (AGORA APARECE) */}
+      {/* 🔢 ORDEM DO CURSO */}
       {Number.isFinite(ordem) && (
         <span className="text-xs text-base-content/50">
-          Aula {String(ordem).padStart(2, "0")}
+          Curso {String(ordem).padStart(2, "0")}
         </span>
       )}
 
@@ -60,32 +71,6 @@ export default function CursoCard({
           {curso.descricao}
         </p>
       )}
-
-      <div className="h-px bg-base-200/70" />
-
-      {/* CTA */}
-      <a
-        href={safeUrl(curso.link)}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="
-          inline-flex
-          items-center
-          gap-2
-          text-sm
-          font-medium
-          text-primary
-        "
-      >
-        <FaPlay className="text-xs" />
-        Assistir aula
-      </a>
     </div>
   );
-}
-
-function safeUrl(url = "") {
-  if (!url) return "#";
-  const u = url.trim();
-  return encodeURI(u.startsWith("http") ? u : `https://${u}`);
 }

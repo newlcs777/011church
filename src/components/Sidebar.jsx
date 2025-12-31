@@ -214,10 +214,21 @@ export default function Sidebar({ onClose }) {
 
             {openMinistries && (
               <div className="ml-10 mt-1 flex flex-col gap-1 border-l border-white/10 pl-3">
+                {/* ✅ GLOBAL */}
+                <NavLink
+                  to="/members"
+                  onClick={onClose}
+                  className="text-sm py-1.5 text-base-100/70 hover:text-base-100"
+                >
+                  Membros (Igreja)
+                </NavLink>
+
+                {/* ✅ MINISTÉRIOS (SEM “Membros do Áudio”) */}
                 {ministryLinks.map((m) => (
                   <NavLink
                     key={m.to}
                     to={m.to}
+                    onClick={onClose}
                     className="text-sm py-1.5 text-base-100/70 hover:text-base-100"
                   >
                     {m.label}
@@ -228,47 +239,46 @@ export default function Sidebar({ onClose }) {
           </>
         )}
 
-     {/* LINKS EXTERNOS */}
-<div className="mt-6 border-t border-white/10 pt-4 space-y-1">
-  <a
-    href="https://open.spotify.com/show/3EA0VR82RfeiktPW4SqgJT"
-    target="_blank"
-    rel="noopener noreferrer"
-    className={`${baseLinkClass} ${inactiveClass}`}
-  >
-    <FaSpotify />
-    <span>Spotify</span>
-  </a>
+        {/* LINKS EXTERNOS */}
+        <div className="mt-6 border-t border-white/10 pt-4 space-y-1">
+          <a
+            href="https://open.spotify.com/show/3EA0VR82RfeiktPW4SqgJT"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`${baseLinkClass} ${inactiveClass}`}
+          >
+            <FaSpotify />
+            <span>Spotify</span>
+          </a>
 
-  <a
-    href="https://www.instagram.com/011church/"
-    target="_blank"
-    rel="noopener noreferrer"
-    className={`${baseLinkClass} ${inactiveClass}`}
-  >
-    <FaInstagram />
-    <span>Instagram</span>
-  </a>
+          <a
+            href="https://www.instagram.com/011church/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`${baseLinkClass} ${inactiveClass}`}
+          >
+            <FaInstagram />
+            <span>Instagram</span>
+          </a>
 
-  <a
-    href="https://www.youtube.com/@011church-sede"
-    target="_blank"
-    rel="noopener noreferrer"
-    className={`${baseLinkClass} ${inactiveClass}`}
-  >
-    <FaYoutube />
-    <span>YouTube</span>
-  </a>
+          <a
+            href="https://www.youtube.com/@011church-sede"
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`${baseLinkClass} ${inactiveClass}`}
+          >
+            <FaYoutube />
+            <span>YouTube</span>
+          </a>
 
-  <a
-    href="#"
-    className={`${baseLinkClass} ${inactiveClass}`}
-  >
-    <FaHeart />
-    <span>Doações</span>
-  </a>
-</div>
-
+          <a
+            href="#"
+            className={`${baseLinkClass} ${inactiveClass}`}
+          >
+            <FaHeart />
+            <span>Doações</span>
+          </a>
+        </div>
       </nav>
 
       {/* LOGOUT */}

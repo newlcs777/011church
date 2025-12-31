@@ -6,16 +6,20 @@ import {
   deleteTask,
 } from "../services/tasksService";
 
-// NORMALIZAÇÃO PADRÃO PARA TODOS MINISTÉRIOS
+// =======================================
+// NORMALIZAÇÃO PADRÃO (SEGURA)
+// =======================================
 function normalize(ministry) {
-  return ministry
+  return String(ministry || "")
     .toLowerCase()
     .trim()
     .normalize("NFD")
     .replace(/[\u0300-\u036f]/g, "");
 }
 
+// =======================================
 // ESTADO INICIAL
+// =======================================
 const initialState = {
   audio: [],
   kids: [],
@@ -27,17 +31,21 @@ const initialState = {
   error: null,
 };
 
+// =======================================
 // BUSCAR TAREFAS
+// =======================================
 export const fetchTasks = createAsyncThunk(
   "tasks/fetchTasks",
   async (ministry) => {
     const key = normalize(ministry);
     const data = await getTasks(key);
-    return { ministry: key, data };
+    return { ministry: key, data: Array.isArray(data) ? data : [] };
   }
 );
 
+// =======================================
 // CRIAR TAREFA
+// =======================================
 export const addTask = createAsyncThunk(
   "tasks/addTask",
   async ({ ministry, data }) => {
@@ -47,7 +55,9 @@ export const addTask = createAsyncThunk(
   }
 );
 
+// =======================================
 // EDITAR TAREFA
+// =======================================
 export const editTask = createAsyncThunk(
   "tasks/editTask",
   async ({ ministry, id, data }) => {
@@ -57,7 +67,9 @@ export const editTask = createAsyncThunk(
   }
 );
 
+// =======================================
 // REMOVER TAREFA
+// =======================================
 export const removeTask = createAsyncThunk(
   "tasks/removeTask",
   async ({ ministry, id }) => {
@@ -67,6 +79,9 @@ export const removeTask = createAsyncThunk(
   }
 );
 
+// =======================================
+// SLICE
+// =======================================
 const tasksSlice = createSlice({
   name: "tasks",
   initialState,
@@ -74,35 +89,54 @@ const tasksSlice = createSlice({
 
   extraReducers: (builder) => {
     builder
+      // ===== FETCH =====
       .addCase(fetchTasks.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-
       .addCase(fetchTasks.fulfilled, (state, action) => {
         const { ministry, data } = action.payload;
         state[ministry] = data;
         state.loading = false;
       })
-
       .addCase(fetchTasks.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.error?.message;
+        state.error =
+          action.error?.message || "Erro ao carregar tarefas";
+      })
+
+      // ===== ADD =====
+      .addCase(addTask.fulfilled, (state, action) => {
+        const { ministry, created } = action.payload;
+
+        if (!Array.isArray(state[ministry])) {
+          state[ministry] = [];
+        }
+
+        state[ministry].push(created);
+      })
+
+      // ===== EDIT =====
+      .addCase(editTask.fulfilled, (state, action) => {
+        const { ministry, updated } = action.payload;
+
+        if (!Array.isArray(state[ministry])) return;
+
+        state[ministry] = state[ministry].map((t) =>
+          t.id === updated.id ? { ...t, ...updated } : t
+        );
+      })
+
+      // ===== REMOVE =====
+      .addCase(removeTask.fulfilled, (state, action) => {
+        const { ministry, id } = action.payload;
+
+        if (!Array.isArray(state[ministry])) return;
+
+        state[ministry] = state[ministry].filter(
+          (t) => t.id !== id
+        );
       });
-
-    builder.addCase(addTask.fulfilled, () => {});
-
-    builder.addCase(editTask.fulfilled, (state, action) => {
-      const { ministry, updated } = action.payload;
-      state[ministry] = state[ministry].map((t) =>
-        t.id === updated.id ? { ...t, ...updated } : t
-      );
-    });
-
-    builder.addCase(removeTask.fulfilled, (state, action) => {
-      const { ministry, id } = action.payload;
-      state[ministry] = state[ministry].filter((t) => t.id !== id);
-    });
   },
 });
 

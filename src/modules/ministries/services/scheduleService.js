@@ -13,26 +13,65 @@ import {
 
 import { db } from "../../../firebase/firebase";
 
-// Caminho: ministries/{ministry}/schedules
+// ======================================================
+// SERIALIZAÇÃO SEGURA (NÃO VAZA Timestamp / FieldValue)
+// ======================================================
+function serializeFirestore(value) {
+  if (value === null || value === undefined) return value;
+
+  // Timestamp real
+  if (typeof value?.toDate === "function") {
+    return value.toDate().toISOString();
+  }
+
+  // FieldValue (serverTimestamp, increment, etc)
+  if (value?.constructor?.name === "FieldValue") {
+    return null;
+  }
+
+  if (Array.isArray(value)) {
+    return value.map(serializeFirestore);
+  }
+
+  if (typeof value === "object") {
+    const out = {};
+    for (const [k, v] of Object.entries(value)) {
+      out[k] = serializeFirestore(v);
+    }
+    return out;
+  }
+
+  return value;
+}
+
+// ======================================================
+// COLLECTION HELPERS
+// ======================================================
 function getSchedulesCollection(ministry) {
   return collection(db, "ministries", ministry, "schedules");
 }
 
-// Buscar escalas por mês (YYYY-MM)
-// Buscar escalas por mês (YYYY-MM)
+function getMembersCollection(ministry) {
+  return collection(db, "ministries", ministry, "members");
+}
+
+// ======================================================
+// BUSCAR ESCALAS POR MÊS (YYYY-MM)
+// ======================================================
 export async function getSchedulesByMonth(ministry, month) {
   const colRef = getSchedulesCollection(ministry);
-
   const q = query(colRef, where("month", "==", month));
   const snapshot = await getDocs(q);
 
   return snapshot.docs.map((d) => ({
     id: d.id,
-    ...d.data(),
+    ...serializeFirestore(d.data()),
   }));
 }
 
-// Buscar por ID
+// ======================================================
+// BUSCAR ESCALA POR ID
+// ======================================================
 export async function getScheduleById(ministry, id) {
   const ref = doc(db, "ministries", ministry, "schedules", id);
   const snap = await getDoc(ref);
@@ -41,11 +80,32 @@ export async function getScheduleById(ministry, id) {
 
   return {
     id: snap.id,
-    ...snap.data(),
+    ...serializeFirestore(snap.data()),
   };
 }
 
-// Criar escala
+// ======================================================
+// BUSCAR MEMBROS DO MINISTÉRIO (COM DADOS COMPLETOS)
+// ======================================================
+export async function getMembersForSchedule(ministry) {
+  const snapshot = await getDocs(
+    getMembersCollection(ministry)
+  );
+
+  return snapshot.docs.map((d) => {
+    const data = serializeFirestore(d.data());
+
+    return {
+      id: d.id,
+      name: data.name ?? "",
+      role: data.role ?? "",
+    };
+  });
+}
+
+// ======================================================
+// CRIAR ESCALA
+// ======================================================
 export async function createSchedule(ministry, data) {
   const colRef = getSchedulesCollection(ministry);
 
@@ -65,7 +125,9 @@ export async function createSchedule(ministry, data) {
   };
 }
 
-// Atualizar escala
+// ======================================================
+// ATUALIZAR ESCALA
+// ======================================================
 export async function updateSchedule(ministry, id, data) {
   const ref = doc(db, "ministries", ministry, "schedules", id);
 
@@ -83,7 +145,9 @@ export async function updateSchedule(ministry, id, data) {
   };
 }
 
-// Remover escala
+// ======================================================
+// REMOVER ESCALA
+// ======================================================
 export async function deleteSchedule(ministry, id) {
   const ref = doc(db, "ministries", ministry, "schedules", id);
   await deleteDoc(ref);
