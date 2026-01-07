@@ -39,28 +39,11 @@ export default function CursoForm({
           </p>
         </div>
 
-        {/* ORDEM DO CURSO */}
-        <div className="flex flex-col gap-1">
-          <Input
-            label="Ordem do curso"
-            name="ordem"
-            type="number"
-            min={1}
-            step={1}
-            value={values.ordem ?? ""}
-            onChange={onChange}
-            required
-          />
-          <span className="text-xs text-base-content/60">
-            Define a ordem de exibição do curso (Curso 01, 02, 03…)
-          </span>
-        </div>
-
         {/* TÍTULO */}
         <Input
           label="Título do curso"
-          name="titulo"
-          value={values.titulo ?? ""}
+          name="title"
+          value={values.title ?? ""}
           onChange={onChange}
           required
         />
@@ -71,8 +54,8 @@ export default function CursoForm({
             Descrição do curso
           </label>
           <textarea
-            name="descricao"
-            value={values.descricao ?? ""}
+            name="description"
+            value={values.description ?? ""}
             onChange={onChange}
             rows={4}
             className="

@@ -1,53 +1,39 @@
-import { useParams, Link } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { FaEdit } from "react-icons/fa";
 
-import useCursos from "../hooks/useCursos";
-import PageHeader from "@/components/ui/PageHeader";
-import useAuth from "@/modules/auth/hooks/useAuth";
+import useCursoDetailsController from "../ui/useCursoDetailsController";
 
+import PageHeader from "@/components/ui/PageHeader";
 import AulaList from "../aulas/pages/AulaList";
 
 export default function CursoDetails() {
-  const { id } = useParams();
-  const { getCursoById } = useCursos();
-  const { user } = useAuth();
+  const { curso, loading, permissions } =
+    useCursoDetailsController();
 
-  const curso = getCursoById(id);
-  const canEdit = user?.role === "admin" || user?.role === "lider";
+  if (loading) {
+    return (
+      <p className="text-sm text-base-content/60 text-center py-8">
+        Carregando curso…
+      </p>
+    );
+  }
 
   if (!curso) {
     return (
-      <p
-        className="
-          text-sm
-          text-base-content/60
-          text-center
-          py-8
-        "
-      >
+      <p className="text-sm text-base-content/60 text-center py-8">
         Curso não encontrado.
       </p>
     );
   }
 
   return (
-    <div
-      className="
-        flex
-        flex-col
-        gap-4
-        md:gap-6
-        pb-6
-      "
-    >
-      {/* HEADER */}
+    <div className="flex flex-col gap-4 md:gap-6 pb-6">
       <PageHeader
-        title={curso.titulo}
+        title={curso.title}
         subtitle="Conteúdo de ensino e edificação"
         align="center"
       />
 
-      {/* CARD DO CURSO */}
       <section
         className="
           group
@@ -66,10 +52,9 @@ export default function CursoDetails() {
           gap-4
         "
       >
-        {/* ✏️ EDITAR CURSO */}
-        {canEdit && (
+        {permissions.canEdit && (
           <Link
-            to={`/cursos/editar/${curso.id}`}
+            to={`/cursos/${curso.id}/editar`}
             className="
               absolute
               top-3
@@ -87,21 +72,13 @@ export default function CursoDetails() {
           </Link>
         )}
 
-        {/* DESCRIÇÃO DO CURSO */}
-        {curso.descricao && (
-          <p
-            className="
-              text-sm
-              text-base-content/70
-              text-center
-            "
-          >
-            {curso.descricao}
+        {curso.description && (
+          <p className="text-sm text-base-content/70 text-center">
+            {curso.description}
           </p>
         )}
       </section>
 
-      {/* ===== AULAS DO CURSO ===== */}
       <section
         className="
           bg-base-100
@@ -121,7 +98,7 @@ export default function CursoDetails() {
             Aulas do curso
           </h2>
 
-          {canEdit && (
+          {permissions.canEdit && (
             <Link
               to={`/cursos/${curso.id}/aulas/nova`}
               className="text-sm text-primary"
@@ -131,7 +108,7 @@ export default function CursoDetails() {
           )}
         </div>
 
-        <AulaList />
+        <AulaList courseId={curso.id} />
       </section>
     </div>
   );

@@ -8,11 +8,6 @@ export default function CursoCard({
 }) {
   const navigate = useNavigate();
 
-  const ordem =
-    typeof curso.ordem === "number"
-      ? curso.ordem
-      : Number(curso.ordem);
-
   return (
     <div
       onClick={() => navigate(`/cursos/${curso.id}`)}
@@ -53,22 +48,22 @@ export default function CursoCard({
         </button>
       )}
 
-      {/* 🔢 ORDEM DO CURSO */}
-      {Number.isFinite(ordem) && (
-        <span className="text-xs text-base-content/50">
-          Curso {String(ordem).padStart(2, "0")}
-        </span>
-      )}
+      {/* STATUS */}
+      <span className="text-xs text-base-content/50">
+        {curso.status === "published" && "Publicado"}
+        {curso.status === "draft" && "Rascunho"}
+        {curso.status === "archived" && "Arquivado"}
+      </span>
 
       {/* TÍTULO */}
       <h3 className="text-sm font-semibold">
-        {curso.titulo}
+        {curso.title}
       </h3>
 
       {/* DESCRIÇÃO */}
-      {curso.descricao && (
+      {curso.description && (
         <p className="text-xs text-base-content/60">
-          {curso.descricao}
+          {curso.description}
         </p>
       )}
     </div>
